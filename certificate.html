@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Сертификат | Барабанная студия Akella</title>
+  <!-- Библиотеки (без пробелов!) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <style>
+    body {
+      background: #f5f3f7;
+      color: #2d2b3a;
+      font-family: 'Georgia', serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+
+    #cert-template {
+      width: 297mm;
+      height: 210mm;
+      background: white;
+      padding: 30mm;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #2d2b3a;
+      position: relative;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    #cert-template::before {
+      content: "";
+      position: absolute;
+      top: 15mm;
+      left: 15mm;
+      right: 15mm;
+      bottom: 15mm;
+      border: 1px solid #aaa;
+      pointer-events: none;
+    }
+
+    .corner {
+      position: absolute;
+      width: 20mm;
+      height: 20mm;
+      opacity: 0.15;
+      font-size: 24px;
+      color: #5a4a8c;
+    }
+    .corner.tl { top: 20mm; left: 20mm; }
+    .corner.tr { top: 20mm; right: 20mm; transform: scaleX(-1); }
+    .corner.bl { bottom: 20mm; left: 20mm; transform: scaleY(-1); }
+    .corner.br { bottom: 20mm; right: 20mm; transform: scale(-1); }
+
+    #qrcode {
+      position: absolute;
+      bottom: 22mm;
+      right: 22mm;
+      width: 30mm;
+      height: 30mm;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+    }
+
+    #cert-template h1 {
+      font-size: 40px;
+      color: #5a4a8c;
+      margin: 0;
+      letter-spacing: 2px;
+      font-family: 'Times New Roman', serif;
+    }
+    #cert-template .subtitle {
+      font-size: 20px;
+      color: #666;
+      margin: 12px 0 28px;
+      font-style: italic;
+    }
+    #cert-template .level {
+      font-size: 30px;
+      color: #6a5fd3;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+    #cert-template .awarded {
+      font-size: 17px;
+      color: #777;
+      margin-top: 10px;
+    }
+    #cert-template .name {
+      font-size: 34px;
+      color: #222;
+      margin: 20px 0 30px;
+      font-weight: bold;
+    }
+    #cert-template .date {
+      font-size: 17px;
+      color: #555;
+      margin: 25px 0 40px;
+    }
+    .line {
+      width: 60%;
+      height: 1px;
+      background: #ccc;
+      margin: 30px auto;
+    }
+    #cert-template .signature {
+      font-size: 22px;
+      color: #5a4a8c;
+      margin-top: 25px;
+      font-family: 'Brush Script MT', cursive;
+    }
+    #cert-template .signature-title {
+      font-size: 14px;
+      color: #777;
+      margin-top: 8px;
+      font-style: italic;
+    }
+    #cert-template .footer {
+      position: absolute;
+      bottom: 25mm;
+      width: 100%;
+      font-size: 12px;
+      color: #888;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div id="cert-template">
+    <div class="corner tl">🥁</div>
+    <div class="corner tr">🥁</div>
+    <div class="corner bl">🥁</div>
+    <div class="corner br">🥁</div>
+    <div id="qrcode"></div>
+    <div class="content">
+      <h1>СЕРТИФИКАТ</h1>
+      <div class="subtitle">об успешном прохождении уровня</div>
+      <div class="level" id="cert-level">Ритм-мастер</div>
+      <div class="awarded">присуждается</div>
+      <div class="name" id="cert-name">Имя Фамилия</div>
+      <div class="date" id="cert-date">Дата: 1 ноября 2025 г.</div>
+      <div class="line"></div>
+      <div class="signature" id="cert-sign">Akella</div>
+      <div class="signature-title">Преподаватель ударных</div>
+      <div class="footer">Барабанная студия Drumz • Троицк</div>
+    </div>
+  </div>
+
+  <script>
+    function generateQR(text, container) {
+      container.innerHTML = '';
+      const qr = qrcode(0, 'M');
+      qr.addData(text);
+      qr.make();
+      container.innerHTML = qr.createImgTag(4, 10);
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const name = urlParams.get('name') || 'Ученик';
+      const level = urlParams.get('level') || 'Новичок';
+
+      // Обновляем данные на странице
+      document.getElementById('cert-name').textContent = name;
+      document.getElementById('cert-level').textContent = level;
+
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+      document.getElementById('cert-date').textContent = `Дата: ${dateStr}`;
+
+      // Генерируем QR-код (можно заменить на свой сайт)
+      const qrUrl = `https://akella-drum.ru/cert/${encodeURIComponent(name)}/${encodeURIComponent(level)}`;
+      generateQR(qrUrl, document.getElementById('qrcode'));
+
+      // Ждём, пока QR отрисуется
+      await new Promise(r => setTimeout(r, 300));
+
+      // Делаем скриншот и PDF
+      const template = document.getElementById('cert-template');
+      const canvas = await html2canvas(template, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true
+      });
+
+      const { jsPDF } = window.jspdf;
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('landscape', 'mm', 'a4');
+      pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
+      pdf.save(`Сертификат_${level.replace(/\s+/g, '_')}_${name.replace(/\s+/g, '_')}.pdf`);
+    });
+  </script>
+</body>
+</html>

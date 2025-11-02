@@ -1,0 +1,21 @@
+RewriteEngine On
+RewriteBase /
+
+# Запрет прямого доступа к .php в публичных разделах (но разрешить /admin/)
+RewriteCond %{THE_REQUEST} \s/+(.+)\.php [NC]
+RewriteCond %{REQUEST_URI} !^/admin/ [NC]
+RewriteRule ^ - [R=404,L]
+
+# ЧПУ для публичных страниц
+RewriteRule ^about/?$ about/index.php [L]
+RewriteRule ^sequencer/?$ sequencer/index.php [L]
+RewriteRule ^exercises/?$ exercises/index.php [L]
+RewriteRule ^songs/?$ songs/index.php [L]
+RewriteRule ^notes/?$ notes/index.php [L]
+RewriteRule ^articles/?$ articles/index.php [L]
+
+# Страница ученика: /student/akella → student/index.php?slug=akella
+RewriteRule ^student/([^/]+)$ student/index.php?slug=$1 [L,QSA]
+
+# Главная
+RewriteRule ^$ index.php [L]

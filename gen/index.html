@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Изучаем длительности нот</title>
+    <style>
+        /* Объединённые стили */
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        canvas { 
+            border: 2px solid #333; 
+            background-color: white;
+            margin: 20px auto;
+            display: block;
+        }
+        
+        button { 
+            padding: 15px 25px; 
+            margin: 10px;
+            font-size: 18px; 
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        #message {
+            font-size: 20px;
+            min-height: 30px;
+            margin: 15px;
+        }
+        
+        .correct { color: green; font-weight: bold; }
+        .incorrect { color: red; font-weight: bold; }
+        
+        h1 {
+            color: #333;
+        }
+        
+        #controls {
+            margin: 20px;
+        }
+        
+        #note-selector {
+            margin: 20px;
+        }
+        
+        .note-group {
+            display: inline-block;
+            margin: 8px;
+            padding: 10px 12px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            background-color: #e0e0e0;
+            cursor: pointer;
+            user-select: none;
+            font-size: 14px;
+        }
+        
+        .note-group:hover {
+            background-color: #d0d0d0;
+        }
+        
+        .note-group.selected {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        #selector-controls {
+            margin: 10px;
+        }
+        
+        #selector-controls button {
+            padding: 10px 15px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        
+        /* Стили из drum-library.css */
+        .drum-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .drum-controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .control-group input, 
+        .control-group button, 
+        .control-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .drum-grid {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .track-row {
+            display: flex;
+            border-bottom: 1px solid #eee;
+        }
+
+        .track-row:last-child {
+            border-bottom: none;
+        }
+
+        .track-name {
+            width: 120px;
+            padding: 15px;
+            font-weight: bold;
+            background: #f8f9fa;
+            text-align: right;
+            border-right: 1px solid #eee;
+        }
+
+        .track-steps {
+            display: flex;
+            flex: 1;
+            padding: 5px;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #ddd;
+            margin: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        /* Цветовые группы по 4 ячейки */
+        .step.group-0 {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+        }
+
+        .step.group-0.active {
+            background-color: #ffc107;
+            border-color: #e0a800;
+        }
+
+        .step.group-1 {
+            background-color: #d1ecf1;
+            border-color: #b8daff;
+        }
+
+        .step.group-1.active {
+            background-color: #17a2b8;
+            border-color: #138496;
+        }
+
+        .step.group-2 {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .step.group-2.active {
+            background-color: #dc3545;
+            border-color: #bd2130;
+        }
+
+        .step.group-3 {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .step.group-3.active {
+            background-color: #28a745;
+            border-color: #1e7e34;
+        }
+
+        .step:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .step.active {
+            background-color: #007bff;
+            border-color: #0056b3;
+            color: white;
+            font-weight: bold;
+        }
+
+        .step.playing {
+            background-color: #ff6b6b !important;
+            border-color: #ff5252 !important;
+            transform: scale(1.1);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .drum-container {
+                padding: 10px;
+            }
+            
+            .track-name {
+                width: 80px;
+                padding: 10px;
+                font-size: 12px;
+            }
+            
+            .step {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 Изучаем длительности нот 🎵</h1>
+    
+    <div id="note-selector">
+        <h3>Выберите группы нот:</h3>
+        <div class="note-group" onclick="toggleNoteType('quarter')">Четвертная</div>
+        <div class="note-group" onclick="toggleNoteType('eighth_pair')">Восьмые</div>
+        <div class="note-group" onclick="toggleNoteType('sixteenth_quartet')">Шестнадцатые</div>
+        <div class="note-group" onclick="toggleNoteType('sixteenth_pair_eighth')">2 шестнадцатых + восьмая</div>
+        <div class="note-group" onclick="toggleNoteType('eighth_sixteenth_pair')">Восьмая + две шестнадцатых</div>
+        <div class="note-group" onclick="toggleNoteType('sixteenth_eighth_sixteenth')">Шестнадцатая + восьмая + шестнадцатая</div>
+    </div>
+    
+    <div id="controls">
+        <button onclick="newQuestion()">Новый пример</button>
+    </div>
+    
+    <canvas id="gameCanvas" width="800" height="300"></canvas>
+
+    <div style="padding: 20px;">
+        <div class="drum-container">
+            <div class="drum-grid" id="drumGrid"></div>
+            <div class="drum-controls">
+                <div class="control-group">
+                    <button onclick="playPattern()" id="playButton">Проиграть</button>
+                    <button onclick="clearPattern()" id="clearButton">Очистить</button>
+                    <input type="range" id="bpm" min="40" max="240" value="60">
+                    <span>BPM: <span id="bpmValue">60</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="message"></div>
+    
+    <script>
+        /* --------------------------------------------------------------
+           Объединённый JavaScript
+           --------------------------------------------------------------*/
+
+        /* ------------------------------------------------------------------------
+           Game Logic
+           ------------------------------------------------------------------------*/
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const messageDiv = document.getElementById('message');
+
+        const noteDurations = {
+            "quarter": {name: "Четвертная", beats: 1},
+            "eighth_pair": {name: "Восьмые", beats: 1},
+            "sixteenth_quartet": {name: "Шестнадцатые", beats: 1},
+            "sixteenth_pair_eighth": {name: "Две шестнадцатых + восьмая", beats: 2},
+            "eighth_sixteenth_pair": {name: "Восьмая + две шестнадцатых", beats: 2},
+            "sixteenth_eighth_sixteenth": {name: "Шестнадцатая + восьмая + шестнадцатая", beats: 2}
+        };
+
+        let currentNotes = [];
+        let selectedNoteTypes = new Set([
+            'quarter', 
+            'eighth_pair', 
+            'sixteenth_quartet', 
+            'sixteenth_pair_eighth',
+            'eighth_sixteenth_pair',
+            'sixteenth_eighth_sixteenth'
+        ]);
+
+        // Функция для выбора/отмены выбора типа нот
+        function toggleNoteType(noteType) {
+            const noteNames = {
+                "quarter": "Четвертная",
+                "eighth_pair": "Восьмые",
+                "sixteenth_quartet": "Шестнадцатые",
+                "sixteenth_pair_eighth": "2 шестнадцатых + восьмая",
+                "eighth_sixteenth_pair": "Восьмая + две шестнадцатых",
+                "sixteenth_eighth_sixteenth": "Шестнадцатая + восьмая + шестнадцатая"
+            };
+            
+            const elements = document.querySelectorAll('.note-group');
+            elements.forEach(element => {
+                if (element.textContent.includes(noteNames[noteType])) {
+                    if (selectedNoteTypes.has(noteType)) {
+                        selectedNoteTypes.delete(noteType);
+                        element.classList.remove('selected');
+                    } else {
+                        selectedNoteTypes.add(noteType);
+                        element.classList.add('selected');
+                    }
+                }
+            });
+        }
+
+        // Выбрать все типы нот
+        function selectAll() {
+            selectedNoteTypes = new Set([
+                'quarter', 
+                'eighth_pair', 
+                'sixteenth_quartet', 
+                'sixteenth_pair_eighth',
+                'eighth_sixteenth_pair',
+                'sixteenth_eighth_sixteenth'
+            ]);
+            const elements = document.querySelectorAll('.note-group');
+            elements.forEach(element => element.classList.add('selected'));
+        }
+
+        // Снять выбор со всех типов нот
+        function deselectAll() {
+            selectedNoteTypes.clear();
+            const elements = document.querySelectorAll('.note-group');
+            elements.forEach(element => element.classList.remove('selected'));
+        }
+
+        // Класс для рисования нот
+        class MusicNotes {
+            constructor(ctx) {
+                this.ctx = ctx;
+                this.ovalWidth = 16;
+                this.ovalHeight = 10;
+                this.stemHeight = 55;
+                this.lineY = 190;
+            }
+            
+            clear() {
+                this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+                this.drawStaff();
+            }
+            
+            drawStaff() {
+                const y = 150;
+                this.ctx.strokeStyle = '#333';
+                this.ctx.lineWidth = 1;
+                for (let i = 0; i < 5; i++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(50, y + i * 20);
+                    this.ctx.lineTo(750, y + i * 20);
+                    this.ctx.stroke();
+                }
+            }
+            
+            // Четвертная нота
+            drawQuarterNote(x, y, color = 'black') {
+                const stemTopY = this.lineY - this.stemHeight;
+                const stemX = x + this.ovalWidth;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(stemX, this.lineY - 5);
+                this.ctx.lineTo(stemX, stemTopY);
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.ellipse(x, this.lineY, this.ovalWidth, this.ovalHeight, 0, 0, 2 * Math.PI);
+                this.ctx.fillStyle = color;
+                this.ctx.fill();
+            }
+            
+            // Пара восьмых нот
+            drawEighthPair(x, y, color = 'black') {
+                const stemTopY = this.lineY - this.stemHeight;
+                const stemX1 = x - 8 + this.ovalWidth;
+                const stemX2 = x + 48 + this.ovalWidth;
+                const beamY = stemTopY + 5;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(stemX1, this.lineY - 5);
+                this.ctx.lineTo(stemX1, beamY);
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.ellipse(x - 8, this.lineY, this.ovalWidth, this.ovalHeight, 0, 0, 2 * Math.PI);
+                this.ctx.fillStyle = color;
+                this.ctx.fill();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(stemX2, this.lineY - 5);
+                this.ctx.lineTo(stemX2, beamY);
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.ellipse(x + 48, this.lineY, this.ovalWidth, this.ovalHeight, 0, 0, 2 * Math.PI);
+                this.ctx.fillStyle = color;
+                this.ctx.fill();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(stemX1, beamY);
+                this.ctx.lineTo(stemX2, beamY);
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+            }
+            
+            // Четверка шестнадцатых нот
+            drawSixteenthQuartet(x, y, color = 'black') {
+                const stemTopY = this.lineY - this.stemHeight;
+                const beamY1 = stemTopY + 5;
+                const beamY2 = stemTopY + 20;
+                const ovalPositions = [-8, 24, 56, 88];
+                const stemPositions = ovalPositions.map(pos => pos + this.ovalWidth);
+                
+                for (let i = 0; i < 4; i++) {
+                    const ovalX = x + ovalPositions[i];
+                    const stemX = x + stemPositions[i];
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(stemX, this.lineY - 5);
+                    this.ctx.lineTo(stemX, stemTopY);
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeStyle = color;
+                    this.ctx.stroke();
+                    
+                    this.ctx.beginPath();
+                    this.ctx.ellipse(ovalX, this.lineY, this.ovalWidth, this.ovalHeight, 0, 0, 2 * Math.PI);
+                    this.ctx.fillStyle = color;
+                    this.ctx.fill();
+                }
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(x + stemPositions[0], beamY1);
+                this.ctx.lineTo(x + stemPositions[3], beamY1);
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(x + stemPositions[0], beamY2);
+                this.ctx.lineTo(x + stemPositions[3], beamY2);
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                for (let i = 0; i < 4; i++) {
+                    const stemX = x + stemPositions[i];
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(stemX, beamY1);
+                    this.ctx.lineTo(stemX, beamY2);
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeStyle = color;
+                    this.ctx.stroke();
+                }
+            }
+            
+            // Две шестнадцатых + одна восьмая
+            drawSixteenthPairEighth(x, y, color = 'black') {
+                const stemTopY = this.lineY - this.stemHeight;
+                const beamY1 = stemTopY + 5;
+                const beamY2 = stemTopY + 20;
+                const eighthBeamY = stemTopY + 5;
+                
+                const ovalPositions = [0, 32, 80];
+                const stemPositions = ovalPositions.map(pos => pos + this.ovalWidth);
+                
+                for (let i = 0; i < 3; i++) {
+                    const ovalX = x + ovalPositions[i];
+                    const stemX = x + stemPositions[i];
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(stemX, this.lineY - 5);
+                    this.ctx.lineTo(stemX, stemTopY);
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeStyle = color;
+                    this.ctx.stroke();
+                    
+                    this.ctx.beginPath();
+                    this.ctx.ellipse(ovalX, this.lineY, this.ovalWidth, this.ovalHeight, 0, 0, 2 * Math.PI);
+                    this.ctx.fillStyle = color;
+                    this.ctx.fill();
+                }
+                
+                const firstStemX = x + stemPositions[0];
+                const secondStemX = x + stemPositions[1];
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(firstStemX, beamY1);
+                this.ctx.lineTo(secondStemX, beamY1);
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(firstStemX, beamY2);
+                this.ctx.lineTo(secondStemX, beamY2);
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                for (let i = 0; i < 2; i++) {
+                    const stemX = x + stemPositions[i];
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(stemX, beamY1);
+                    this.ctx.lineTo(stemX, beamY2);
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeStyle = color;
+                    this.ctx.stroke();
+                }
+                
+                const thirdStemX = x + stemPositions[2];
+                this.ctx.beginPath();
+                this.ctx.moveTo(thirdStemX, eighthBeamY);
+                this.ctx.lineTo(secondStemX, eighthBeamY);
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+            }
+            
+            // Восьмая + две шестнадцатых
+            drawEighthSixteenthPair(x, y, color = 'black') {
+                const stemTopY = this.lineY - this.stemHeight;
+                const beamY1 = stemTopY + 5;
+                const beamY2 = stemTopY + 20;
+                
+                const positions = [32, 64, 96];
+                const ovalPositions = [16, 48, 80];
+                const stemPositions = positions;
+                
+                for (let i = 0; i < 3; i++) {
+                    const ovalX = x + ovalPositions[i];
+                    const stemX = x + stemPositions[i];
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(stemX, this.lineY - 5);
+                    this.ctx.lineTo(stemX, stemTopY);
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeStyle = color;
+                    this.ctx.stroke();
+                    
+                    this.ctx.beginPath();
+                    this.ctx.ellipse(ovalX, this.lineY, this.ovalWidth, this.ovalHeight, 0, 0, 2 * Math.PI);
+                    this.ctx.fillStyle = color;
+                    this.ctx.fill();
+                }
+                
+                const firstStemX = x + stemPositions[0];
+                const secondStemX = x + stemPositions[1];
+                const thirdStemX = x + stemPositions[2];
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(firstStemX, beamY1);
+                this.ctx.lineTo(thirdStemX, beamY1);
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(secondStemX, beamY2);
+                this.ctx.lineTo(thirdStemX, beamY2);
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(firstStemX, beamY1);
+                this.ctx.lineTo(firstStemX, beamY2 - 15);
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(secondStemX, beamY1);
+                this.ctx.lineTo(secondStemX, beamY2);
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(thirdStemX, beamY1);
+                this.ctx.lineTo(thirdStemX, beamY2);
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+            }
+            
+            // Шестнадцатая + восьмая + шестнадцатая
+            drawSixteenthEighthSixteenth(x, y, color = 'black') {
+                const stemTopY = this.lineY - this.stemHeight;
+                const beamY1 = stemTopY + 5;
+                const beamY2 = stemTopY + 20;
+                
+                const positions = [16, 48, 96];
+                const ovalPositions = [0, 32, 80];
+                const stemPositions = positions;
+                
+                for (let i = 0; i < 3; i++) {
+                    const ovalX = x + ovalPositions[i];
+                    const stemX = x + stemPositions[i];
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(stemX, this.lineY - 5);
+                    this.ctx.lineTo(stemX, stemTopY);
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeStyle = color;
+                    this.ctx.stroke();
+                    
+                    this.ctx.beginPath();
+                    this.ctx.ellipse(ovalX, this.lineY, this.ovalWidth, this.ovalHeight, 0, 0, 2 * Math.PI);
+                    this.ctx.fillStyle = color;
+                    this.ctx.fill();
+                }
+                
+                const firstStemX = x + stemPositions[0];
+                const secondStemX = x + stemPositions[1];
+                const thirdStemX = x + stemPositions[2];
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(firstStemX, beamY1);
+                this.ctx.lineTo(thirdStemX, beamY1);
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(firstStemX, beamY2);
+                this.ctx.lineTo(firstStemX + 16, beamY2);
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(thirdStemX - 16, beamY2);
+                this.ctx.lineTo(thirdStemX, beamY2);
+                this.ctx.lineWidth = 5;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(firstStemX, beamY1);
+                this.ctx.lineTo(firstStemX, beamY2);
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(secondStemX, beamY1);
+                this.ctx.lineTo(secondStemX, beamY2 - 15);
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(thirdStemX, beamY1);
+                this.ctx.lineTo(thirdStemX, beamY2);
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeStyle = color;
+                this.ctx.stroke();
+            }
+            
+            drawNote(noteType, x, y) {
+                switch(noteType) {
+                    case 'quarter':
+                        this.drawQuarterNote(x, y);
+                        break;
+                    case 'eighth_pair':
+                        this.drawEighthPair(x, y);
+                        break;
+                    case 'sixteenth_quartet':
+                        this.drawSixteenthQuartet(x, y);
+                        break;
+                    case 'sixteenth_pair_eighth':
+                        this.drawSixteenthPairEighth(x, y);
+                        break;
+                    case 'eighth_sixteenth_pair':
+                        this.drawEighthSixteenthPair(x, y);
+                        break;
+                    case 'sixteenth_eighth_sixteenth':
+                        this.drawSixteenthEighthSixteenth(x, y);
+                        break;
+                }
+            }
+        }
+
+        const notes = new MusicNotes(ctx);
+
+        function newQuestion() {
+            currentNotes = [];
+            messageDiv.textContent = "";
+            messageDiv.className = "";
+            
+            // Проверяем, есть ли выбранные типы нот
+            if (selectedNoteTypes.size === 0) {
+                messageDiv.textContent = "Пожалуйста, выберите хотя бы один тип нот!";
+                messageDiv.className = "incorrect";
+                return;
+            }
+            
+            // Генерируем 4 случайные группы нот из выбранных типов
+            const noteKeys = Array.from(selectedNoteTypes);
+            const positions = [120, 280, 440, 600];
+            
+            for (let i = 0; i < 4; i++) {
+                const noteType = noteKeys[Math.floor(Math.random() * noteKeys.length)];
+                currentNotes.push({
+                    type: noteType,
+                    position: positions[i],
+                    beats: noteDurations[noteType].beats
+                });
+            }
+            
+            drawNotes();
+        }
+
+        function drawNotes() {
+            notes.clear();
+            
+            // Рисуем все 4 группы нот на третьей линии
+            for (let i = 0; i < currentNotes.length; i++) {
+                const note = currentNotes[i];
+                switch(note.type) {
+                    case 'eighth_pair':
+                        notes.drawNote(note.type, note.position - 32, 0);
+                        break;
+                    case 'sixteenth_quartet':
+                        notes.drawNote(note.type, note.position - 48, 0);
+                        break;
+                    case 'sixteenth_pair_eighth':
+                        notes.drawNote(note.type, note.position - 40, 0);
+                        break;
+                    case 'eighth_sixteenth_pair':
+                        notes.drawNote(note.type, note.position - 48, 0);
+                        break;
+                    case 'sixteenth_eighth_sixteenth':
+                        notes.drawNote(note.type, note.position - 48, 0);
+                        break;
+                    default:
+                        notes.drawNote(note.type, note.position, 0);
+                        break;
+                }
+            }
+        }
+
+        // Инициализация выбора
+        selectAll();
+
+        /* ------------------------------------------------------------------------
+           Drum Sequencer
+           ------------------------------------------------------------------------*/
+        class DrumSequencer {
+            constructor() {
+                /* ---------- Настройки ---------- */
+                this.track = 'snare';     // только один трек
+                this.steps = 16;          // количество шагов (16‑16‑th нот)
+                this.bpm   = 60;         // начальное BPM
+
+                /* ---------- Состояние ---------- */
+                this.pattern       = new Array(this.steps).fill(0); // простой массив для одного трека
+                this.isPlaying     = false;            // сейчас играет?
+                this.currentStep   = 0;                // текущий шаг во время воспроизведения
+                this.intervalId    = null;             // ID setInterval
+                this.audioContext  = null;             // Web Audio API context
+                this.samples       = {};               // загруженные AudioBuffer‑ы
+                this.audioReady    = false;            // true, когда все сэмплы загружены
+
+                /* ---------- Инициализация ---------- */
+                this.renderGrid();        // визуальная сетка
+                this.setupEventListeners();
+
+                // сразу начинаем загрузку звуков
+                this.initAudio();
+            }
+
+            /* ------------------------------------------------------------------------
+               AUDIO – инициализация и загрузка сэмплов
+               ------------------------------------------------------------------------ */
+            async initAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext ||
+                                           window.webkitAudioContext)();
+
+                    // Загружаем только snare
+                    const url = 'sounds/snare.wav';
+                    console.log('Загрузка snare...');
+
+                    const resp = await fetch(url);
+                    if (!resp.ok) {
+                        throw new Error(`HTTP ${resp.status}`);
+                    }
+                    const arrayBuf = await resp.arrayBuffer();
+                    this.samples.snare = await this.audioContext.decodeAudioData(arrayBuf);
+                    console.log('✔️ snare загружен');
+                    
+                    this.audioReady = true;
+                    console.log('Сэмпл готов к использованию');
+                } catch (e) {
+                    console.error('Ошибка загрузки аудио:', e);
+                }
+            }
+
+            playSound(name) {
+                if (!this.audioReady) {
+                    console.warn('Звук ещё не загружен');
+                    return;
+                }
+                const buffer = this.samples[name];
+                if (!buffer) {
+                    console.warn(`Сэмпл "${name}" не найден`);
+                    return;
+                }
+
+                try {
+                    const src = this.audioContext.createBufferSource();
+                    src.buffer = buffer;
+                    src.connect(this.audioContext.destination);
+                    src.start(0);
+                } catch (e) {
+                    console.error(`Ошибка воспроизведения ${name}:`, e);
+                }
+            }
+
+            /* ------------------------------------------------------------------------
+               GRID – работа с визуализацией
+               ------------------------------------------------------------------------ */
+            renderGrid() {
+                const grid = document.getElementById('drumGrid');
+                if (!grid) {
+                    console.error('#drumGrid элемент не найден в DOM');
+                    return;
+                }
+                grid.innerHTML = '';
+
+                const row = document.createElement('div');
+                row.className = 'track-row';
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'track-name';
+                nameDiv.textContent = this.track;
+                row.appendChild(nameDiv);
+
+                const stepsDiv = document.createElement('div');
+                stepsDiv.className = 'track-steps';
+
+                this.pattern.forEach((v, i) => {
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = `step ${v ? 'active' : ''}`;
+                    
+                    // Добавляем класс для выделения групп по 4
+                    const groupIndex = Math.floor(i / 4);
+                    stepDiv.classList.add(`group-${groupIndex % 4}`);
+                    
+                    stepDiv.dataset.step = i;
+                    stepDiv.textContent = v ? '●' : '';
+                    stepDiv.addEventListener('click', () => this.toggleStep(i));
+                    stepsDiv.appendChild(stepDiv);
+                });
+
+                row.appendChild(stepsDiv);
+                grid.appendChild(row);
+            }
+
+            // Добавляем недостающий метод
+            toggleStep(step) {
+                this.pattern[step] = this.pattern[step] ? 0 : 1;
+                this.renderGrid();
+            }
+
+            /* ------------------------------------------------------------------------
+               PLAYBACK – воспроизведение
+               ------------------------------------------------------------------------ */
+            playPattern() {
+                if (this.isPlaying) {
+                    this.stopPattern();
+                    return;
+                }
+
+                // Если контекст был «заморожен», разблокируем его
+                if (this.audioContext && this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+
+                if (!this.audioReady) {
+                    alert('Звук ещё не загружен. Пожалуйста, подождите.');
+                    return;
+                }
+
+                this.isPlaying = true;
+                document.getElementById('playButton').textContent = 'Стоп';
+
+                const stepTime = (60 / this.bpm) / 4 * 1000; // 16‑ти нотный шаг
+
+                this.intervalId = setInterval(() => {
+                    this.highlightStep(this.currentStep);
+
+                    // Играем snare если активен
+                    if (this.pattern[this.currentStep]) {
+                        this.playSound(this.track);
+                    }
+
+                    this.currentStep = (this.currentStep + 1) % this.steps;
+                }, stepTime);
+            }
+
+            stopPattern() {
+                this.isPlaying = false;
+                clearInterval(this.intervalId);
+                document.getElementById('playButton').textContent = 'Проиграть';
+                this.clearHighlights();
+                this.currentStep = 0;
+            }
+
+            highlightStep(step) {
+                this.clearHighlights();
+                const cell = document.querySelector(`.step[data-step="${step}"]`);
+                if (cell) cell.classList.add('playing');
+            }
+
+            clearHighlights() {
+                const cells = document.querySelectorAll('.step.playing');
+                cells.forEach(c => c.classList.remove('playing'));
+            }
+
+            clearPattern() {
+                this.pattern = new Array(this.steps).fill(0);
+                this.renderGrid();
+                this.stopPattern();
+            }
+
+            /* ------------------------------------------------------------------------
+               UI – обработчики элементов
+               ------------------------------------------------------------------------ */
+            setBPM(val) {
+                this.bpm = val;
+                if (this.isPlaying) {
+                    this.stopPattern();
+                    this.playPattern();
+                }
+            }
+
+            setupEventListeners() {
+                // BPM‑слайдер
+                const bpmSlider = document.getElementById('bpm');
+                const bpmVal = document.getElementById('bpmValue');
+                if (bpmSlider && bpmVal) {
+                    bpmSlider.addEventListener('input', () => {
+                        this.setBPM(parseInt(bpmSlider.value, 10));
+                        bpmVal.textContent = this.bpm;
+                    });
+                }
+            }
+        }
+
+        /* ------------------------------------------------------------------------
+           Инициализация после загрузки DOM
+           ------------------------------------------------------------------------ */
+        document.addEventListener('DOMContentLoaded', () => {
+            window.drumSequencer = new DrumSequencer();
+
+            // Глобальные функции для HTML
+            window.playPattern = () => drumSequencer.playPattern();
+            window.clearPattern = () => drumSequencer.clearPattern();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+{
+  "title": "Урок 2: Seven Nation Army",
+  "content": "<p>Не обращайте внимание на ключи. Приходится нейтральный ключ заменять на скрипичный ради osmd. В будущем исправим.</p><div class=\"tip\"><strong>Совет:</strong> Начните медленно с темпа 60 BPM</div>",
+  "scores": [
+    {
+      "title": "Куплет",
+      "description": "Играем четвертями kick+tom3",
+      "url": "lessons/lesson2/1.musicxml",
+      "sequencer": { 
+        "tracks": ["tom3", "kick"],
+        "targetCells": {
+          "kick": [1, 5, 9, 13],
+          "tom3": [1, 5, 9, 13]
+        }
+      }
+    },
+	{
+      "title": "Вторая часть куплета",
+      "description": "Продолжаем играть kick+tom3, добавляем snare на 2 и 4",
+      "url": "lessons/lesson2/2.musicxml",
+      "sequencer": {
+		 "tracks": ["snare", "tom3", "kick"],
+		"targetCells": {
+          "snare": [5, 13],
+		  "tom3": [1, 5, 9, 13],
+          "kick": [1, 5, 9, 13]
+        }
+	  }
+    },
+	{
+      "title": "Заходим на припев",
+      "description": "Первая доля - четверть, все остальные - восьмушки",
+      "url": "lessons/lesson2/3.musicxml",
+        "sequencer": {
+		 "tracks": ["crash", "snare", "tom3", "kick"],
+		 "targetCells": {
+          "crash": [1],
+		  "snare": [5, 7, 9, 11, 13, 15],
+		  "tom3": [5, 7, 9, 11, 13, 15],
+          "kick": [1, 5, 9, 13]
+        }
+	  }
+    },
+		{
+      "title": "Припев",
+      "description": "Простой ритм",
+      "url": "lessons/lesson2/4.musicxml",
+      "sequencer": { 
+	  "tracks": ["crash", "snare", "kick"],
+	  "targetCells": {
+          "crash": [1, 5, 9, 13],
+		  "snare": [5, 13],
+          "kick": [1, 9]
+        }
+	  }
+    },
+		{
+      "title": "Сложный такт",
+      "description": "Самое сложное место",
+      "url": "lessons/lesson2/41.musicxml",
+      "sequencer": { 
+	  "tracks": ["crash", "snare", "kick"],
+	  "targetCells": {
+          "crash": [1, 5, 9],
+		  "snare": [5, 15],
+          "kick": [1, 9]
+        }
+	  }
+    },
+   {
+      "title": "Весь фрагмент",
+      "description": "Если освоил все нужные такты, то пробуй собрать всю композицию",
+      "url": "lessons/lesson2/5.musicxml",
+      "sequencer": false
+    }
+  ]
+}

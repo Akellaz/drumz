@@ -1,0 +1,58 @@
+{
+  "title": "Урок 1: Paradise city",
+  "content": "<h2>Четвертные доли</h2><p>Отсчитывайте: «1, 2, 3, 4».</p><div class=\"rhythm-pattern\">♩ ♩ ♩ ♩</div><div class=\"tip\"><strong>Совет:</strong> Начните медленно с темпа 60 BPM</div>",
+  "scores": [
+    {
+      "title": "Вступление",
+      "description": "Типичный ритмический рисунок для вступления. Hihat на вторую и четвертую доли. Выложи в секвенсоре и попробуй повторить. Темп - 100 bpm",
+      "url": "lessons/lesson1/0.musicxml",
+      "sequencer": { 
+        "tracks": ["hihat"],
+        "targetCells": {
+          "hihat": [5, 13]
+        }
+      }
+    },
+    {
+      "title": "Простой ритм",
+      "description": "Основа любой ритмики. Чередование сильных и слабых долей",
+      "url": "lessons/lesson1/1.musicxml",
+      "sequencer": {"tracks": ["snare", "kick"],
+	  "targetCells": {
+          "snare": [5, 13],
+		  "kick": [1, 9]
+        }
+		}
+    },
+    {
+      "title": "Простой ритм с синкопой",
+      "description": "Почти тоже самое, но в третьей доле появляется синкопа",
+      "url": "lessons/lesson1/2.musicxml",
+      "sequencer": {"tracks": ["snare", "kick"],
+	  "targetCells": {
+          "snare": [5, 13],
+		  "kick": [1, 11]
+        }
+	  }
+    },
+	 {
+      "title": "Сложный ритм",
+      "description": "А тут уже не до шуток. Секвенсор в помощь",
+      "url": "lessons/lesson1/3.musicxml",
+      "sequencer": {"tracks": ["crash", "snare", "kick"],
+	  "targetCells": {
+		  "crash": [1],
+          "snare": [5, 13],
+		  "kick": [1, 8, 10, 12]
+        }
+	  }
+    },
+	{
+      "title": "Собираем фрагмент",
+      "description": "Если ты разобрался со всеми тактами, то теперь их нужно собрать в единую композицию и выдержать в темпе",
+      "url": "lessons/lesson1/4.musicxml",
+      "sequencer": false
+    }
+  ]
+
+}

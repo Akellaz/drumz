@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Редактор нотаций для барабанов — Drumz.ru</title>
+  <style>
+    body {
+      background: #1a1a2e;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .controls {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #4e54c8;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      margin: 0 6px 6px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { background: #3a3fb8; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .grid {
+      display: grid;
+      grid-template-columns: 90px repeat(16, 1fr);
+      gap: 2px;
+    }
+    .label {
+      background: #2d2d44;
+      padding: 12px 8px;
+      text-align: right;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 4px 0 0 4px;
+    }
+    .cell {
+      background: #2d2d44;
+      aspect-ratio: 1;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      user-select: none;
+      transition: background 0.1s;
+    }
+    .cell.active {
+      background: #4e54c8;
+      color: white;
+    }
+    .cell:hover {
+      opacity: 0.85;
+    }
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 70px repeat(16, 1fr);
+      }
+      .label {
+        padding: 8px 4px;
+        font-size: 12px;
+      }
+      .cell {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Редактор нотаций для барабанов</h1>
+    <div class="controls">
+      <button id="playBtn">▶️ Play</button>
+      <button id="stopBtn" disabled>⏹️ Stop</button>
+      <button id="clearBtn">🗑️ Очистить всё</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <script>
+    // === Настройки ===
+    const instruments = [
+      { name: 'Kick',    symbol: '●', file: 'kick.wav'    },
+      { name: 'Snare',   symbol: 'x', file: 'snare.wav'   },
+      { name: 'Hi-Hat',  symbol: 'o', file: 'hihat.wav'   },
+      { name: 'Crash',   symbol: '★', file: 'splash.wav'  }
+    ];
+    const steps = 16;
+    let grid = Array(instruments.length).fill().map(() => Array(steps).fill(false));
+    let isPlaying = false;
+    let currentStep = 0;
+    let intervalId = null;
+    const bpm = 120;
+    const stepDuration = (60 / bpm) * 250; // 16th note
+
+    let audioContext = null;
+    const audioBuffers = {};
+
+    // === Загрузка звуков ===
+    async function loadAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      for (const inst of instruments) {
+        try {
+          const response = await fetch(inst.file);
+          if (!response.ok) throw new Error(`Файл ${inst.file} не найден`);
+          const arrayBuffer = await response.arrayBuffer();
+          audioBuffers[inst.name] = await audioContext.decodeAudioData(arrayBuffer);
+        } catch (e) {
+          console.warn(`Не удалось загрузить ${inst.file}:`, e);
+        }
+      }
+    }
+
+    // === Рендер сетки ===
+    function renderGrid() {
+      const gridEl = document.getElementById('grid');
+      gridEl.innerHTML = '';
+
+      instruments.forEach((inst, i) => {
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = inst.name;
+        gridEl.appendChild(label);
+
+        for (let j = 0; j < steps; j++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          if (grid[i][j]) {
+            cell.classList.add('active');
+            cell.textContent = inst.symbol;
+          }
+          cell.dataset.row = i;
+          cell.dataset.col = j;
+          cell.addEventListener('click', () => toggleCell(i, j));
+          gridEl.appendChild(cell);
+        }
+      });
+    }
+
+    function toggleCell(row, col) {
+      grid[row][col] = !grid[row][col];
+      renderGrid();
+    }
+
+    // === Воспроизведение ===
+    function playStep() {
+      // Сброс подсветки предыдущего шага
+      if (currentStep > 0) {
+        document.querySelectorAll(`[data-col="${(currentStep - 1) % steps}"]`).forEach(cell => {
+          if (cell.classList.contains('active')) {
+            const row = parseInt(cell.dataset.row);
+            cell.textContent = instruments[row].symbol;
+          }
+          cell.style.backgroundColor = '';
+        });
+      }
+
+      // Подсветка текущего шага
+      document.querySelectorAll(`[data-col="${currentStep}"]`).forEach(cell => {
+        if (cell.classList.contains('active')) {
+          cell.style.backgroundColor = '#ff6b6b';
+        }
+      });
+
+      // Воспроизведение звуков
+      if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+      instruments.forEach((inst, i) => {
+        if (grid[i][currentStep] && audioBuffers[inst.name]) {
+          const source = audioContext.createBufferSource();
+          source.buffer = audioBuffers[inst.name];
+          source.connect(audioContext.destination);
+          source.start();
+        }
+      });
+
+      currentStep = (currentStep + 1) % steps;
+    }
+
+    async function startPlayback() {
+      if (!audioContext) await loadAudio();
+      isPlaying = true;
+      currentStep = 0;
+      document.getElementById('playBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+      intervalId = setInterval(playStep, stepDuration);
+    }
+
+    function stopPlayback() {
+      isPlaying = false;
+      clearInterval(intervalId);
+      currentStep = 0;
+      document.getElementById('playBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+      renderGrid(); // сброс подсветки
+    }
+
+    function clearAll() {
+      grid = Array(instruments.length).fill().map(() => Array(steps).fill(false));
+      renderGrid();
+    }
+
+    // === Инициализация ===
+    document.getElementById('playBtn').addEventListener('click', startPlayback);
+    document.getElementById('stopBtn').addEventListener('click', stopPlayback);
+    document.getElementById('clearBtn').addEventListener('click', clearAll);
+
+    renderGrid();
+  </script>
+</body>
+</html>

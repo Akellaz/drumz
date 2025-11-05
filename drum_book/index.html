@@ -887,7 +887,14 @@ function createSequencer(scoreIndex, sounds, visibleTracks = ['crash', 'hihat', 
       <button class="sequencer-btn stop" id="stopButton-${scoreIndex}" onclick="stopSequencer(${scoreIndex})" disabled>⏹️ Стоп</button>
       <button class="sequencer-btn" onclick="clearSequencer(${scoreIndex})">🧹 Очистить</button>
     </div>
-    
+
+    <div style="text-align: center; margin-top: 10px;">
+      <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 14px;">
+        <input type="checkbox" id="loopCheckbox-${scoreIndex}">
+        Зациклить
+      </label>
+    </div>
+
     <div class="tempo-control">
       <span class="tempo-label">Темп:</span>
       <input type="range" id="sequencer-tempo-${scoreIndex}" min="40" max="240" value="120" />
@@ -909,10 +916,11 @@ function createSequencer(scoreIndex, sounds, visibleTracks = ['crash', 'hihat', 
     currentStep: 0,
     intervalId: null,
     sounds: sounds,
-    bpm: 120
+    bpm: 120,
+    loop: false // ← по умолчанию НЕ зациклен
   };
   
-  // Добавляем обработчик изменения темпа
+  // Добавляем обработчики после DOM-рендера
   setTimeout(() => {
     const tempoSlider = document.getElementById(`sequencer-tempo-${scoreIndex}`);
     const tempoValue = document.getElementById(`tempo-value-${scoreIndex}`);
@@ -926,6 +934,13 @@ function createSequencer(scoreIndex, sounds, visibleTracks = ['crash', 'hihat', 
           stopSequencer(scoreIndex);
           playSequencer(scoreIndex);
         }
+      });
+    }
+
+    const loopCheckbox = document.getElementById(`loopCheckbox-${scoreIndex}`);
+    if (loopCheckbox) {
+      loopCheckbox.addEventListener('change', function() {
+        sequencers[scoreIndex].loop = this.checked;
       });
     }
   }, 0);
@@ -1101,7 +1116,16 @@ function playSequencer(scoreIndex) {
     });
     
     // Переходим к следующему шагу
-    sequencer.currentStep = (sequencer.currentStep + 1) % 16;
+    sequencer.currentStep += 1;
+    if (sequencer.currentStep >= 16) {
+      if (sequencer.loop) {
+        sequencer.currentStep = 0;
+      } else {
+        // Дошли до конца — останавливаем
+        stopSequencer(scoreIndex);
+        return;
+      }
+    }
   }, stepTime);
 }
 

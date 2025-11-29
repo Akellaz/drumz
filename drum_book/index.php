@@ -1,12 +1,15 @@
+<?php require_once __DIR__ . '/../includes/seo.php'; ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Drum Book | Книга барабанщика</title>
-  <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.7.0/build/opensheetmusicdisplay.min.js"></script>
-  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drum Book | Книга барабанщика - Drumz</title>
+  <!-- Общий стиль сайта -->
+  <link rel="stylesheet" href="/assets/style.css">
+  <!-- Специфичные стили для Drum Book (встроены) -->
   <style>
+    /* Вставляем стили из index.html.txt */
     :root {
       --bg: #ffffff;
       --text: #2d3748;
@@ -22,47 +25,21 @@
       --radius: 12px;
       --spacing: 16px;
     }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #f8fafc;
-      color: var(--text);
-      margin: 0;
-      padding: var(--spacing);
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: var(--bg);
-      padding: 24px;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-
     .header {
       text-align: center;
       margin-bottom: 24px;
     }
-
     .header h1 {
       font-size: 2.2em;
       font-weight: 700;
       color: var(--text);
       margin: 0;
     }
-
     .header p {
       font-size: 1.1em;
       color: var(--text-light);
       margin-top: 8px;
     }
-
     .osmd-container {
       width: 100%;
       height: 300px;
@@ -72,14 +49,12 @@
       margin: 24px 0;
       overflow: hidden;
     }
-
     .lesson-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 14px;
       margin: 24px 0;
     }
-
     .lesson-btn {
       padding: 16px;
       background: white;
@@ -96,29 +71,24 @@
       align-items: center;
       min-height: 80px;
     }
-
     .lesson-btn:hover:not(.locked) {
       border-color: var(--primary);
       background-color: var(--primary-light);
       transform: translateY(-2px);
     }
-
     .lesson-btn.active {
       border-color: var(--primary);
       background-color: var(--primary-light);
       box-shadow: inset 0 0 0 2px var(--primary);
     }
-
     .lesson-btn.completed {
       border-color: var(--success);
       background-color: #f0fdf4;
     }
-
     .lesson-btn.locked {
       opacity: 0.6;
       cursor: not-allowed;
     }
-
     .lesson-number {
       display: inline-block;
       width: 24px;
@@ -132,20 +102,17 @@
       justify-content: center;
       margin-bottom: 6px;
     }
-
     .content-section {
       display: grid;
       grid-template-columns: 2fr 1fr;
       gap: 24px;
       margin: 24px 0;
     }
-
     @media (max-width: 900px) {
       .content-section {
         grid-template-columns: 1fr;
       }
     }
-
     .lesson-content,
     .tools-panel {
       background: white;
@@ -153,35 +120,29 @@
       border-radius: var(--radius);
       border: 1px solid var(--border);
     }
-
     .lesson-content h2,
     .tools-panel h3 {
       margin-top: 0;
       color: var(--primary);
     }
-
     .tip, .warning, .info-box {
       padding: 16px;
       border-radius: var(--radius);
       margin: 16px 0;
       border-left: 4px solid;
     }
-
     .tip {
       background: #ebf8ff;
       border-left-color: var(--primary);
     }
-
     .warning {
       background: #fff8e6;
       border-left-color: var(--warning);
     }
-
     .info-box {
       background: #f0f9ff;
       border-left-color: #3182ce;
     }
-
     .metronome-controls {
       display: flex;
       flex-wrap: wrap;
@@ -189,7 +150,6 @@
       gap: 16px;
       margin: 16px 0;
     }
-
     .interactive-btn,
     .metronome-btn,
     .mode-btn,
@@ -203,7 +163,6 @@
       transition: all 0.2s;
       text-align: center;
     }
-
     .interactive-btn:hover,
     .metronome-btn:hover,
     .mode-btn:hover,
@@ -211,23 +170,20 @@
       border-color: var(--primary);
       background: var(--primary-light);
     }
-
     .interactive-btn.correct { background: #f0fdf4; border-color: var(--success); }
     .interactive-btn.wrong { background: #fff5f5; border-color: var(--danger); }
-
-    .play-btn { 
-      border-color: var(--success); 
+    .play-btn {
+      border-color: var(--success);
       color: var(--success);
       padding: 12px 24px;
       font-size: 1.1em;
     }
-    .stop-btn { 
-      border-color: var(--danger); 
+    .stop-btn {
+      border-color: var(--danger);
       color: var(--danger);
       padding: 12px 24px;
       font-size: 1.1em;
     }
-
     input[type="range"] {
       width: 160px;
       height: 6px;
@@ -235,7 +191,6 @@
       background: #e2e8f0;
       outline: none;
     }
-
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       width: 18px;
@@ -244,7 +199,6 @@
       background: var(--primary);
       cursor: pointer;
     }
-
     .rhythm-pattern {
       font-size: 2em;
       text-align: center;
@@ -254,7 +208,6 @@
       margin: 16px 0;
       font-family: monospace;
     }
-
     .exercise-section,
     .quiz-section {
       background: white;
@@ -263,42 +216,35 @@
       margin: 24px 0;
       border: 1px solid var(--border);
     }
-
     .quiz-options {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin: 16px 0;
     }
-
     .quiz-btn.selected {
       background: var(--primary-light);
       border-color: var(--primary);
     }
-
     .quiz-btn.correct {
       background: #f0fdf4;
       border-color: var(--success);
       color: var(--success);
     }
-
     .quiz-btn.wrong {
       background: #fff5f5;
       border-color: var(--danger);
       color: var(--danger);
     }
-
     .feedback {
       min-height: 24px;
       margin: 12px 0;
       font-weight: 600;
     }
-
     .tempo-label {
       font-weight: bold;
       color: var(--text);
     }
-    
     /* Стили для нескольких партитур */
     .scores-container {
       display: flex;
@@ -306,21 +252,18 @@
       gap: 20px;
       margin: 20px 0;
     }
-    
     .score-item {
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 15px;
       background: white;
     }
-    
     .score-title {
       font-weight: bold;
       margin-bottom: 10px;
       color: var(--primary);
       font-size: 1.1em;
     }
-    
     .score-description {
       margin-bottom: 10px;
       padding: 10px;
@@ -329,7 +272,6 @@
       font-size: 0.95em;
       color: var(--text-light);
     }
-    
     .score-container {
       height: auto !important;
       min-height: 200px;
@@ -340,7 +282,6 @@
       text-align: center;
       padding: 10px;
     }
-    
     .score-container svg {
       display: inline-block;
       margin: 0 auto;
@@ -348,14 +289,12 @@
       height: auto !important;
       min-height: 200px;
     }
-    
     .score-error {
       padding: 20px;
       text-align: center;
       color: var(--danger);
       font-style: italic;
     }
-    
     /* Стили для секвенсора */
     .sequencer {
       margin-top: 20px;
@@ -364,7 +303,6 @@
       border-radius: 8px;
       border: 1px solid #d1dce5;
     }
-    
     /* Градиентная подсветка контейнера секвенсора */
     .sequencer.highlighted {
       border: 0px solid transparent;
@@ -373,7 +311,6 @@
       animation: glow 2s ease-in-out infinite alternate;
       border-radius: 8px;
     }
-    
     @keyframes glow {
       from {
         box-shadow: 0 0 10px rgba(72, 187, 120, 0.3);
@@ -382,14 +319,12 @@
         box-shadow: 0 0 20px rgba(72, 187, 120, 0.6), 0 0 30px rgba(72, 187, 120, 0.3);
       }
     }
-    
     .sequencer-title {
       font-weight: bold;
       margin-bottom: 15px;
       color: var(--primary);
       text-align: center;
     }
-    
     .drum-grid {
       background: white;
       border-radius: 8px;
@@ -397,16 +332,13 @@
       overflow: hidden;
       margin-bottom: 15px;
     }
-
     .track-row {
       display: flex;
       border-bottom: 1px solid #eee;
     }
-
     .track-row:last-child {
       border-bottom: none;
     }
-
     .track-name {
       width: 100px;
       padding: 12px;
@@ -416,13 +348,11 @@
       border-right: 1px solid #eee;
       font-size: 14px;
     }
-
     .track-steps {
       display: flex;
       flex: 1;
       padding: 5px;
     }
-
     .step {
       width: 30px;
       height: 30px;
@@ -437,73 +367,60 @@
       transition: all 0.2s ease;
       font-size: 12px;
     }
-
     /* Цветовые группы по 4 ячейки */
     .step.group-0 {
       background-color: #fff3cd;
       border-color: #ffeaa7;
     }
-
     .step.group-0.active {
       background-color: #ffc107;
       border-color: #e0a800;
     }
-
     .step.group-1 {
       background-color: #d1ecf1;
       border-color: #b8daff;
     }
-
     .step.group-1.active {
       background-color: #17a2b8;
       border-color: #138496;
     }
-
     .step.group-2 {
       background-color: #f8d7da;
       border-color: #f5c6cb;
     }
-
     .step.group-2.active {
       background-color: #dc3545;
       border-color: #bd2130;
     }
-
     .step.group-3 {
       background-color: #d4edda;
       border-color: #c3e6cb;
     }
-
     .step.group-3.active {
       background-color: #28a745;
       border-color: #1e7e34;
     }
-
     .step:hover {
       background-color: #e9ecef;
       border-color: #adb5bd;
     }
-
     .step.active {
       background-color: #007bff;
       border-color: #0056b3;
       color: white;
       font-weight: bold;
     }
-
     .step.playing {
       background-color: #ff6b6b !important;
       border-color: #ff5252 !important;
       transform: scale(1.1);
     }
-
     .sequencer-controls {
       display: flex;
       justify-content: center;
       gap: 10px;
       margin-top: 10px;
     }
-    
     .sequencer-btn {
       padding: 8px 16px;
       border: 1px solid var(--border);
@@ -514,32 +431,26 @@
       transition: all 0.2s;
       font-size: 14px;
     }
-    
     .sequencer-btn:hover {
       border-color: var(--primary);
       background: var(--primary-light);
     }
-    
     .sequencer-btn.play {
       border-color: var(--success);
       color: var(--success);
     }
-    
     .sequencer-btn.stop {
       border-color: var(--danger);
       color: var(--danger);
     }
-    
     .sequencer-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
-    
     .tempo-label {
       font-weight: bold;
       font-size: 14px;
     }
-    
     /* Адаптивность */
     @media (max-width: 768px) {
       .track-name {
@@ -547,41 +458,60 @@
         padding: 8px;
         font-size: 12px;
       }
-      
       .step {
         width: 25px;
         height: 25px;
         font-size: 10px;
       }
     }
+	/* Убираем прокрутку и делаем ноты адаптивными */
+.score-container {
+  overflow: hidden !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.score-container svg {
+  max-width: 100%;
+  height: auto !important;
+  width: auto !important;
+  min-height: 200px;
+  /* Делаем SVG центрированным и масштабируемым */
+  transform: scale(1);
+  transform-origin: top center;
+}
   </style>
+  <?php require_once __DIR__ . '/../includes/seo.php'; ?>
 </head>
 <body>
-  <div class="container">
+  <?php require_once __DIR__ . '/../includes/header.php'; ?>
+
+  <main class="container">
     <div class="header">
       <h1>🎵 Drum Book</h1>
       <p>Книга барабанщика</p>
     </div>
-
     <div class="lesson-grid">
+	
+	    <button class="lesson-btn" onclick="loadLesson(2)"><span class="lesson-number"></span> Seven Nation Army</button>
       <button class="lesson-btn" onclick="loadLesson(1)"><span class="lesson-number"></span> Paradise city</button>
-      <button class="lesson-btn" onclick="loadLesson(2)"><span class="lesson-number"></span> Seven Nation Army</button>
+        <button class="lesson-btn" onclick="loadLesson(4)"><span class="lesson-number"></span> The Unfogiven</button>
       <button class="lesson-btn" onclick="loadLesson(3)"><span class="lesson-number"></span> Perhaps</button>
-      <button class="lesson-btn" onclick="loadLesson(4)"><span class="lesson-number">4</span> Синкопы</button>
+
       <button class="lesson-btn" onclick="loadLesson(5)"><span class="lesson-number">5</span> Триоли</button>
-      <button class="lesson-btn" onclick="loadLesson(6)"><span class="lesson-number">6</span> Сложные ритмы</button>
+
       <button class="lesson-btn" onclick="loadLesson(7)"><span class="lesson-number">7</span> Полиритмия</button>
       <button class="lesson-btn" onclick="loadLesson(8)"><span class="lesson-number">8</span> Джаз</button>
       <button class="lesson-btn" onclick="loadLesson(9)"><span class="lesson-number">9</span> Латина</button>
       <button class="lesson-btn" onclick="loadLesson(10)"><span class="lesson-number">10</span> Рок</button>
-      <button class="lesson-btn" onclick="loadLesson(11)"><span class="lesson-number">11</span> Мировые</button>
+      <button class="lesson-btn" onclick="loadLesson(11)"><span class="lesson-number">11</span> Синкопы</button>
       <button class="lesson-btn" onclick="loadLesson(12)"><span class="lesson-number">12</span> Профи</button>
+	        <button class="lesson-btn" onclick="loadLesson(6)"><span class="lesson-number">6</span> Дуэт с учителем</button>
       <button class="lesson-btn locked" onclick="showLockedMessage(13)"><span class="lesson-number">13</span> AI-анализ</button>
       <button class="lesson-btn locked" onclick="showLockedMessage(14)"><span class="lesson-number">14</span> Импровизация</button>
       <button class="lesson-btn locked" onclick="showLockedMessage(15)"><span class="lesson-number">15</span> Композиция</button>
       <button class="lesson-btn locked" onclick="showLockedMessage(16)"><span class="lesson-number">16</span> Мастерство</button>
     </div>
-
     <div class="content-section">
       <div class="lesson-content" id="lessonContent">
         <h2>Добро пожаловать!</h2>
@@ -594,9 +524,7 @@
         <div class="info-box"><strong>Секвенсор</strong> — для понимания</div>
       </div>
     </div>
-
     <div id="scoresContainer" class="scores-container"></div>
-
     <div class="exercise-section" id="exerciseSection" style="display:none;">
       <h3>🎯 Упражнение</h3>
       <div class="rhythm-pattern" id="exercisePattern"></div>
@@ -604,7 +532,6 @@
       <div class="feedback" id="exerciseFeedback"></div>
       <button class="interactive-btn" onclick="nextExercise()">Следующее</button>
     </div>
-
     <div class="quiz-section" id="quizSection" style="display:none;">
       <h3>🧠 Тест</h3>
       <div class="quiz-question" id="quizQuestion"></div>
@@ -612,8 +539,12 @@
       <button class="interactive-btn" onclick="checkQuizAnswer()" id="quizSubmit" disabled>Проверить</button>
       <div class="feedback" id="quizFeedback"></div>
     </div>
-  </div>
+  </main>
 
+  <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+  <!-- Вставляем JavaScript из index.html.txt -->
+  <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.7.0/build/opensheetmusicdisplay.min.js"></script>
   <script>
   // === Модифицированный JavaScript без прогресса и статистики ===
 let osmdInstances = [];
@@ -622,14 +553,12 @@ let currentQuiz = null;
 let selectedQuizAnswer = null;
 let audioContext = null;
 let sequencers = []; // Массив для хранения данных секвенсоров
-
 // Инициализация AudioContext
 function initAudio() {
   if (!audioContext) {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
   }
 }
-
 // Загрузка аудиофайлов
 async function loadAudioFiles() {
   const sounds = {};
@@ -641,7 +570,6 @@ async function loadAudioFiles() {
     crash: 'sounds/crash.wav',
     hihat: 'sounds/hihat.wav'
   };
-  
   for (const [name, url] of Object.entries(soundFiles)) {
     try {
       const response = await fetch(url);
@@ -651,62 +579,47 @@ async function loadAudioFiles() {
       console.error(`Ошибка загрузки звука ${name}:`, error);
     }
   }
-  
   return sounds;
 }
-
 // Воспроизведение звука
 function playSound(buffer, time = 0) {
   if (!buffer || !audioContext) return;
-  
   const source = audioContext.createBufferSource();
   source.buffer = buffer;
   source.connect(audioContext.destination);
   source.start(time);
 }
-
 // === Основная функция загрузки урока ===
 async function loadLesson(lessonNumber) {
   if (lessonNumber > 12) return showLockedMessage(lessonNumber);
-  
   try {
     // Показываем индикатор загрузки
     showLoadingState();
-    
     // Загружаем данные урока из JSON файла
-    const response = await fetch(`lessons/lesson${lessonNumber}/data.json`);
+    const response = await fetch(`lessons/lesson${lessonNumber}/data.json?_=${Date.now()}`);
     if (!response.ok) {
       throw new Error(`Урок ${lessonNumber} не найден (статус: ${response.status})`);
     }
-    
     const lesson = await response.json();
     currentLesson = lessonNumber;
-    
     // Обновляем UI активного урока
     updateLessonButtons();
-    
     // Отображаем содержимое урока
     displayLessonContent(lesson);
-    
     // Отображаем партитуры
     if (lesson.scores && lesson.scores.length > 0) {
       await displayMultipleScores(lesson.scores);
     }
-    
     // Отображаем упражнение
     displayExercise(lesson.exercise);
-    
     // Отображаем тест
     displayQuiz(lesson.quiz);
-    
   } catch (error) {
     console.error('Ошибка загрузки урока:', error);
     handleErrorState(lessonNumber, error);
   }
 }
-
 // === Вспомогательные функции ===
-
 function showLoadingState() {
   document.getElementById('lessonContent').innerHTML = `
     <div style="text-align: center; padding: 40px;">
@@ -717,24 +630,20 @@ function showLoadingState() {
   document.getElementById('exerciseSection').style.display = 'none';
   document.getElementById('quizSection').style.display = 'none';
 }
-
 function updateLessonButtons() {
   document.querySelectorAll('.lesson-btn').forEach(btn => {
     btn.classList.remove('active');
   });
-  
   if (event && event.target) {
     event.target.classList.add('active');
   }
 }
-
 function displayLessonContent(lesson) {
   document.getElementById('lessonContent').innerHTML = `
     <h2>${lesson.title}</h2>
     ${lesson.content || '<p>Содержание урока загружено.</p>'}
   `;
 }
-
 // Функция для конвертации номеров ячеек из 1-16 в 0-15
 function convertTargetCells(targetCells) {
   const converted = {};
@@ -743,29 +652,23 @@ function convertTargetCells(targetCells) {
   }
   return converted;
 }
-
 async function displayMultipleScores(scores) {
   const container = document.getElementById('scoresContainer');
   container.innerHTML = '';
-  
   // Очищаем предыдущие экземпляры OSMD и секвенсоры
   osmdInstances = [];
   sequencers = [];
-  
   // Инициализируем аудио
   initAudio();
   const sounds = await loadAudioFiles();
-  
   // Создаем контейнеры для всех партитур
   scores.forEach((score, index) => {
     const scoreItem = document.createElement('div');
     scoreItem.className = 'score-item';
-    
     const title = document.createElement('div');
     title.className = 'score-title';
     title.textContent = score.title || `Партитура ${index + 1}`;
     scoreItem.appendChild(title);
-    
     // Добавляем описание, если оно есть
     if (score.description) {
       const description = document.createElement('div');
@@ -773,24 +676,20 @@ async function displayMultipleScores(scores) {
       description.textContent = score.description;
       scoreItem.appendChild(description);
     }
-    
     const scoreContainer = document.createElement('div');
     scoreContainer.className = 'score-container';
     scoreContainer.id = `scoreContainer${index}`;
     scoreItem.appendChild(scoreContainer);
-    
     // Добавляем индикатор загрузки
     const loadingIndicator = document.createElement('div');
     loadingIndicator.className = 'score-loading';
     loadingIndicator.innerHTML = '<div style="text-align: center; padding: 20px;">Загрузка нот...</div>';
     scoreContainer.appendChild(loadingIndicator);
-    
     // Добавляем секвенсор, если он включен в JSON
     if (score.sequencer !== false) {
       // Определяем видимые дорожки
       let visibleTracks = ['hihat', 'snare', 'kick']; // по умолчанию все
       let targetCells = {}; // Целевые ячейки для проверки
-      
       if (typeof score.sequencer === 'object') {
         if (Array.isArray(score.sequencer.tracks)) {
           visibleTracks = score.sequencer.tracks;
@@ -800,52 +699,57 @@ async function displayMultipleScores(scores) {
           targetCells = convertTargetCells(score.sequencer.targetCells);
         }
       }
-
       const sequencer = createSequencer(index, sounds, visibleTracks, targetCells);
       scoreItem.appendChild(sequencer);
     }
-    
     container.appendChild(scoreItem);
   });
-  
   // Загружаем все партитуры параллельно
   const loadPromises = scores.map(async (score, index) => {
     try {
       const scoreContainer = document.getElementById(`scoreContainer${index}`);
       scoreContainer.innerHTML = ''; // Убираем индикатор загрузки
-      
-      const osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(scoreContainer.id, {    
-        autoResize: true,    
-        backend: "svg",    
-        disableCursor: false,    
-        drawingParameters: "default",    
-        newSystemFromXML: true,    
-        renderSingleHorizontalStaffline: false,     
-        drawPartNames: false,    
-        drawTitle: false,    
-        drawComposer: false,    
-        drawFingerings: true,    
-        autoBeam: false,    
+      const osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(scoreContainer.id, {
+        autoResize: true,
+        backend: "svg",
+        disableCursor: false,
+        drawingParameters: "default",
+        newSystemFromXML: true,
+        renderSingleHorizontalStaffline: false,
+        drawPartNames: false,
+        drawTitle: false,
+        drawComposer: false,
+        drawFingerings: true,
+        autoBeam: false,
         pageFormat: "Endless"
-         
-      });    
-      
-      await osmd.load(score.url);  
-      
-      // Настройки ПОСЛЕ load(), но ПЕРЕД render()  
-      osmd.EngravingRules.RenderXMeasuresPerLineAkaSystem = 4;    
-      osmd.EngravingRules.PageTopMargin = 5;    
-      osmd.EngravingRules.PageBottomMargin = 1;    
-      osmd.EngravingRules.PageLeftMargin = 5;    
-      osmd.EngravingRules.PageRightMargin = 5;    
-      osmd.EngravingRules.BetweenStaffDistance = 7;    
-      osmd.EngravingRules.StaffHeight = 3.2;    
-      
-      await osmd.render();    
-      
-      osmd.zoom = 0.95;    
+      });
+      await osmd.load(score.url);
+// После osmd.load(score.url), перед osmd.render()
+osmd.EngravingRules.RenderXMeasuresPerLineAkaSystem = 4;
+osmd.EngravingRules.PageTopMargin = 5;
+osmd.EngravingRules.PageBottomMargin = 1;
+osmd.EngravingRules.PageLeftMargin = 5;
+osmd.EngravingRules.PageRightMargin = 5;
+osmd.EngravingRules.BetweenStaffDistance = 7;
+osmd.EngravingRules.StaffHeight = 3.2;
+osmd.EngravingRules.PercussionOneLineCutoff = -1;
+osmd.EngravingRules.PercussionForceVoicesOneLineCutoff = -1;
+osmd.EngravingRules.PercussionUseXMLDisplayStep = false; // Попробуй добавить это
+// Попытка вручную установить количество линеек
+// ВНИМАНИЕ: Это может не сработать или привести к непредсказуемому поведению
+if (osmd.Sheet && osmd.Sheet.Instruments && osmd.Sheet.Instruments.length > 0) {
+    for (const instrument of osmd.Sheet.Instruments) {
+        if (instrument.MidiInstrumentId === opensheetmusicdisplay.MidiInstrument.Percussion) { // или проверь по другому признаку
+            for (const staff of instrument.Staves) {
+                // console.log("Before render - StafflineCount:", staff.StafflineCount); // Отладка
+                staff.StafflineCount = 5; // Попробовать установить
+            }
+        }
+    }
+}
+await osmd.render();
+      osmd.zoom = 0.95;
       osmdInstances.push(osmd);
-      
     } catch (err) {
       console.error(`Ошибка загрузки партитуры ${score.title || index + 1}:`, err);
       const scoreContainer = document.getElementById(`scoreContainer${index}`);
@@ -859,10 +763,8 @@ async function displayMultipleScores(scores) {
       }
     }
   });
-  
   // Ждем завершения всех загрузок
   await Promise.all(loadPromises);
-  
   // Создаем ячейки для секвенсоров после загрузки DOM
   setTimeout(() => {
     scores.forEach((score, index) => {
@@ -872,42 +774,35 @@ async function displayMultipleScores(scores) {
     });
   }, 0);
 }
-
 // Создание секвенсора
 function createSequencer(scoreIndex, sounds, visibleTracks = ['crash', 'hihat', 'snare', 'tom1', 'tom3', 'kick'], targetCells = {}) {
   const sequencerDiv = document.createElement('div');
   sequencerDiv.className = 'sequencer';
   sequencerDiv.id = `sequencer-${scoreIndex}`;
-  
   sequencerDiv.innerHTML = `
     <div class="drum-grid" id="drumGrid-${scoreIndex}"></div>
-    
     <div class="sequencer-controls">
       <button class="sequencer-btn play" id="playButton-${scoreIndex}" onclick="playSequencer(${scoreIndex})">▶️ Играть</button>
       <button class="sequencer-btn stop" id="stopButton-${scoreIndex}" onclick="stopSequencer(${scoreIndex})" disabled>⏹️ Стоп</button>
       <button class="sequencer-btn" onclick="clearSequencer(${scoreIndex})">🧹 Очистить</button>
     </div>
-
     <div style="text-align: center; margin-top: 10px;">
       <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 14px;">
-        <input type="checkbox" id="loopCheckbox-${scoreIndex}">
+        <input type="checkbox" id="loopCheckbox-${scoreIndex}" checked="false"> <!-- Исправлено: по умолчанию НЕ зациклено -->
         Зациклить
       </label>
     </div>
-
     <div class="tempo-control">
       <span class="tempo-label">Темп:</span>
       <input type="range" id="sequencer-tempo-${scoreIndex}" min="40" max="240" value="120" />
       <span id="tempo-value-${scoreIndex}">120 BPM</span>
     </div>
   `;
-  
   // Инициализируем данные секвенсора только для видимых дорожек
   const initialTracks = {};
   visibleTracks.forEach(track => {
     initialTracks[track] = Array(16).fill(0);
   });
-
   sequencers[scoreIndex] = {
     tracks: initialTracks,
     visibleTracks: visibleTracks,
@@ -919,12 +814,10 @@ function createSequencer(scoreIndex, sounds, visibleTracks = ['crash', 'hihat', 
     bpm: 120,
     loop: false // ← по умолчанию НЕ зациклен
   };
-  
   // Добавляем обработчики после DOM-рендера
   setTimeout(() => {
     const tempoSlider = document.getElementById(`sequencer-tempo-${scoreIndex}`);
     const tempoValue = document.getElementById(`tempo-value-${scoreIndex}`);
-    
     if (tempoSlider && tempoValue) {
       tempoSlider.addEventListener('input', function() {
         sequencers[scoreIndex].bpm = parseInt(this.value);
@@ -936,7 +829,6 @@ function createSequencer(scoreIndex, sounds, visibleTracks = ['crash', 'hihat', 
         }
       });
     }
-
     const loopCheckbox = document.getElementById(`loopCheckbox-${scoreIndex}`);
     if (loopCheckbox) {
       loopCheckbox.addEventListener('change', function() {
@@ -944,17 +836,13 @@ function createSequencer(scoreIndex, sounds, visibleTracks = ['crash', 'hihat', 
       });
     }
   }, 0);
-  
   return sequencerDiv;
 }
-
 // Создание ячеек секвенсора
 function createSequencerCells(scoreIndex) {
   const grid = document.getElementById(`drumGrid-${scoreIndex}`);
   if (!grid) return;
-  
   grid.innerHTML = '';
-  
   const sequencer = sequencers[scoreIndex];
   const tracks = sequencer.visibleTracks;
   const trackNames = {
@@ -965,55 +853,42 @@ function createSequencerCells(scoreIndex) {
     'tom3': 'Tom3',
     'kick': 'Kick'
   };
-  
   tracks.forEach(trackName => {
     const row = document.createElement('div');
     row.className = 'track-row';
-    
     const nameDiv = document.createElement('div');
     nameDiv.className = 'track-name';
     nameDiv.textContent = trackNames[trackName];
     row.appendChild(nameDiv);
-    
     const stepsDiv = document.createElement('div');
     stepsDiv.className = 'track-steps';
-    
     for (let i = 0; i < 16; i++) {
       const stepDiv = document.createElement('div');
       stepDiv.className = `step ${sequencer.tracks[trackName][i] ? 'active' : ''}`;
-      
       // Добавляем класс для выделения групп по 4
       const groupIndex = Math.floor(i / 4);
       stepDiv.classList.add(`group-${groupIndex % 4}`);
-      
       stepDiv.dataset.track = trackName;
       stepDiv.dataset.step = i;
       stepDiv.dataset.score = scoreIndex;
       stepDiv.textContent = sequencer.tracks[trackName][i] ? '●' : '';
-      
       stepDiv.addEventListener('click', function() {
         toggleSequencerStep(this);
       });
-      
       stepsDiv.appendChild(stepDiv);
     }
-    
     row.appendChild(stepsDiv);
     grid.appendChild(row);
   });
 }
-
 // Переключение состояния ячейки
 function toggleSequencerStep(cell) {
   const track = cell.dataset.track;
   const step = parseInt(cell.dataset.step);
   const scoreIndex = parseInt(cell.dataset.score);
-  
   const sequencer = sequencers[scoreIndex];
-  
   // Переключаем состояние в данных (0 или 1)
   sequencer.tracks[track][step] = sequencer.tracks[track][step] ? 0 : 1;
-  
   // Обновляем визуальное состояние
   if (sequencer.tracks[track][step]) {
     cell.classList.add('active');
@@ -1022,29 +897,23 @@ function toggleSequencerStep(cell) {
     cell.classList.remove('active');
     cell.textContent = '';
   }
-  
   // Проверяем, нужно ли подсвечивать контейнер
   checkSequencerHighlight(scoreIndex);
 }
-
 // Новая функция для проверки подсветки контейнера
 function checkSequencerHighlight(scoreIndex) {
   const sequencer = sequencers[scoreIndex];
   const targetCells = sequencer.targetCells;
   const sequencerDiv = document.getElementById(`sequencer-${scoreIndex}`);
-  
   // Если нет целевых ячеек, убираем подсветку
   if (!targetCells || Object.keys(targetCells).length === 0) {
     sequencerDiv.classList.remove('highlighted');
     return;
   }
-  
   let allMatch = true;
-  
   // Проверяем каждую дорожку
   for (const trackName in targetCells) {
     const targetSteps = targetCells[trackName];
-    
     // Проверяем каждую целевую ячейку
     for (const step of targetSteps) {
       // Если целевая ячейка не активна, убираем подсветку
@@ -1053,10 +922,8 @@ function checkSequencerHighlight(scoreIndex) {
         break;
       }
     }
-    
     if (!allMatch) break;
   }
-  
   // Также проверяем, что нет лишних активных ячеек
   if (allMatch) {
     for (const trackName in sequencer.tracks) {
@@ -1073,7 +940,6 @@ function checkSequencerHighlight(scoreIndex) {
       if (!allMatch) break;
     }
   }
-  
   // Применяем подсветку
   if (allMatch && Object.keys(targetCells).length > 0) {
     sequencerDiv.classList.add('highlighted');
@@ -1081,40 +947,32 @@ function checkSequencerHighlight(scoreIndex) {
     sequencerDiv.classList.remove('highlighted');
   }
 }
-
 // Воспроизведение секвенсора
 function playSequencer(scoreIndex) {
   const sequencer = sequencers[scoreIndex];
   if (sequencer.isPlaying || !audioContext) return;
-  
   // Возобновляем AudioContext если он приостановлен
   if (audioContext.state === 'suspended') {
     audioContext.resume();
   }
-  
   sequencer.isPlaying = true;
   sequencer.currentStep = 0;
-  
   // Обновляем кнопки
   const playBtn = document.getElementById(`playButton-${scoreIndex}`);
   const stopBtn = document.getElementById(`stopButton-${scoreIndex}`);
   //if (playBtn) playBtn.textContent = '⏹️ Стоп';
   if (stopBtn) stopBtn.disabled = false;
-  
   // Рассчитываем интервал в миллисекундах (16-ти нотный шаг)
   const stepTime = (60 / sequencer.bpm) / 4 * 1000;
-  
   sequencer.intervalId = setInterval(() => {
     // Выделяем текущий шаг
     highlightSequencerStep(scoreIndex, sequencer.currentStep);
-    
     // Воспроизводим звуки для текущего шага
     Object.keys(sequencer.tracks).forEach(trackName => {
       if (sequencer.tracks[trackName][sequencer.currentStep] && sequencer.sounds[trackName]) {
         playSound(sequencer.sounds[trackName]);
       }
     });
-    
     // Переходим к следующему шагу
     sequencer.currentStep += 1;
     if (sequencer.currentStep >= 16) {
@@ -1128,62 +986,49 @@ function playSequencer(scoreIndex) {
     }
   }, stepTime);
 }
-
 // Остановка секвенсора
 function stopSequencer(scoreIndex) {
   const sequencer = sequencers[scoreIndex];
   if (!sequencer.isPlaying) return;
-  
   clearInterval(sequencer.intervalId);
   sequencer.isPlaying = false;
   sequencer.currentStep = 0;
-  
   // Обновляем кнопки
   const playBtn = document.getElementById(`playButton-${scoreIndex}`);
   const stopBtn = document.getElementById(`stopButton-${scoreIndex}`);
   if (playBtn) playBtn.textContent = '▶️ Играть';
   if (stopBtn) stopBtn.disabled = true;
-  
   // Сбрасываем визуальное выделение
   clearSequencerHighlights(scoreIndex);
 }
-
 // Выделение текущего шага
 function highlightSequencerStep(scoreIndex, step) {
   clearSequencerHighlights(scoreIndex);
-  
   const cells = document.querySelectorAll(`#sequencer-${scoreIndex} .step[data-step="${step}"]`);
   cells.forEach(cell => cell.classList.add('playing'));
 }
-
 // Сброс выделения шагов
 function clearSequencerHighlights(scoreIndex) {
   const cells = document.querySelectorAll(`#sequencer-${scoreIndex} .step.playing`);
   cells.forEach(cell => cell.classList.remove('playing'));
 }
-
 // Очистка секвенсора
 function clearSequencer(scoreIndex) {
   const sequencer = sequencers[scoreIndex];
-  
   // Останавливаем воспроизведение если оно активно
   if (sequencer.isPlaying) {
     stopSequencer(scoreIndex);
   }
-  
   // Сбрасываем данные
   Object.keys(sequencer.tracks).forEach(trackName => {
     sequencer.tracks[trackName] = Array(16).fill(0);
   });
-  
   // Обновляем визуальное состояние
   createSequencerCells(scoreIndex);
-  
   // Убираем подсветку после очистки
   const sequencerDiv = document.getElementById(`sequencer-${scoreIndex}`);
   sequencerDiv.classList.remove('highlighted');
 }
-
 function displayExercise(exercise) {
   if (exercise) {
     document.getElementById('exerciseSection').style.display = 'block';
@@ -1202,7 +1047,6 @@ function displayExercise(exercise) {
     document.getElementById('exerciseSection').style.display = 'none';
   }
 }
-
 function displayQuiz(quiz) {
   if (quiz) {
     document.getElementById('quizSection').style.display = 'block';
@@ -1211,7 +1055,6 @@ function displayQuiz(quiz) {
     document.getElementById('quizSection').style.display = 'none';
   }
 }
-
 function handleErrorState(lessonNumber, error) {
   document.getElementById('lessonContent').innerHTML = `
     <h2>Ошибка загрузки урока ${lessonNumber}</h2>
@@ -1229,9 +1072,7 @@ function handleErrorState(lessonNumber, error) {
   document.getElementById('exerciseSection').style.display = 'none';
   document.getElementById('quizSection').style.display = 'none';
 }
-
 // === Остальные функции остаются без изменений ===
-
 function loadQuiz(q) {
   currentQuiz = q;
   selectedQuizAnswer = null;
@@ -1253,7 +1094,6 @@ function loadQuiz(q) {
   document.getElementById('quizSubmit').disabled = true;
   document.getElementById('quizFeedback').textContent = '';
 }
-
 function checkQuizAnswer() {
   if (selectedQuizAnswer === null) return;
   const btns = document.querySelectorAll('.quiz-btn');
@@ -1270,7 +1110,6 @@ function checkQuizAnswer() {
   }
   document.getElementById('quizSubmit').disabled = true;
 }
-
 function checkExercise(i, v) {
   const btns = document.querySelectorAll('.interactive-btn');
   const fb = document.getElementById('exerciseFeedback');
@@ -1285,7 +1124,6 @@ function checkExercise(i, v) {
     fb.style.color = 'var(--danger)';
   }
 }
-
 function nextExercise() {
   document.getElementById('exerciseFeedback').textContent = 'Следующее упражнение...';
   setTimeout(() => {
@@ -1293,7 +1131,6 @@ function nextExercise() {
     document.querySelectorAll('.interactive-btn').forEach(b => b.classList.remove('correct', 'wrong'));
   }, 1000);
 }
-
 function showLockedMessage(n) {
   alert(`🔒 Урок ${n} пока недоступен.`);
 }

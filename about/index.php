@@ -1,299 +1,185 @@
+<?php require_once __DIR__ . '/../includes/seo.php'; ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Уроки игры на барабанах в Троицке | Барабаны в Троицке | Drumz.ru</title>
-    <meta name="description" content="Профессиональные уроки игры на барабанах в Троицке. Индивидуальные занятия для детей и взрослых. Опытный преподаватель Сергей Щепотин. Запишитесь на пробный урок!">
-    <meta name="keywords" content="уроки барабанов в Троицке, играть на барабанах, школа барабанов, обучение барабанам, Сергей Щепотин, барабаны в Троицке">
-    <meta name="author" content="Сергей Щепотин">
-    <meta name="robots" content="index, follow">
-    
-    <!-- Open Graph для социальных сетей -->
-    <meta property="og:title" content="Уроки игры на барабанах в Троицке">
-    <meta property="og:description" content="Профессиональные уроки игры на барабанах в Троицке от опытного преподавателя">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://drumz.ru">
-    <meta property="og:site_name" content="Drumz.ru">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://drumz.ru">
-    
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        
-        header {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 1em 0;
-        }
-        
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-            display: flex;
-            justify-content: space-evenly;
-            background-color: #555;
-            margin: 0;
-            flex-wrap: wrap;
-        }
-        
-        nav li {
-            margin: 0;
-        }
-        
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 1em;
-            transition: all 0.3s ease-in-out;
-            display: block;
-        }
-        
-        nav a:hover {
-            background-color: #777;
-        }
-        
-        section {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 2em;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 1em 0;
-            margin-top: 20px;
-        }
-        
-        .contact-info {
-            background-color: #e9f7fe;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        
-        .advantages-list {
-            padding-left: 20px;
-        }
-        
-        .advantages-list li {
-            margin: 10px 0;
-        }
-        
-        .course-item {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-left: 3px solid #333;
-            background-color: #f9f9f9;
-        }
-        
-        .back-to-main {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            display: inline-block;
-            margin: 10px 0;
-            transition: background-color 0.3s;
-        }
-        
-        .back-to-main:hover {
-            background-color: #218838;
-            color: white;
-        }
-        
-        @media (max-width: 768px) {
-            nav ul {
-                flex-direction: column;
-            }
-            
-            nav a {
-                text-align: center;
-                padding: 0.8em;
-            }
-        }
-    </style>
-	
-<!-- Микроразметка для локального бизнеса -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "MusicSchool",
-  "name": "Уроки барабанов в Троицке",
-  "url": "https://drumz.ru",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Микрорайон В, 59 ст1",
-    "addressLocality": "Троицк",
-    "addressRegion": "Московская область",
-    "addressCountry": "RU"
-  },
-  "telephone": "+79309930503",
-  "email": "info@drumz.ru",
-  "openingHours": "Mo-Su 08:00-23:00",
-  "priceRange": "500-1500 руб/урок",
-  "description": "Профессиональные уроки игры на барабанах в Троицке для детей и взрослых"
-}
-</script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <?php require_once __DIR__ . '/../includes/seo.php'; ?>
+  <link rel="stylesheet" href="/assets/style.css">
+  <style>
+    .studio-card {
+      margin-bottom: 32px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      position: relative;
+    }
+    .map-container {
+      margin-top: 16px;
+      height: 250px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .map-attribution {
+      position: absolute;
+      bottom: 4px;
+      left: 8px;
+      font-size: 10px;
+      color: #999;
+    }
+    .highlight-box {
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(255,107,107,0.15);
+      border: 1px solid #ff6b6b;
+      border-radius: 8px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+    .btn--whatsapp {
+      background: #25D366;
+    }
+    .card h3 {
+      margin-top: 0.5em;
+    }
+    .studio-card:nth-child(1) .map-container { border-color: #007bff; }
+    .studio-card:nth-child(2) .map-container { border-color: #28a745; }
+    .studio-card:nth-child(3) .map-container { border-color: #6f42c1; }
+  </style>
 </head>
 <body>
-    
-    <!-- Шапка -->
-    <header>
-        <h1>Уроки игры на барабанах в Троицке - Барабанная школа Drumz</h1>
+  <?php require_once __DIR__ . '/../includes/header.php'; ?>
 
-    </header>
-    
-    <!-- Навигация -->
-    <nav>
-        <ul>
-            <li><a href="#about">О преподавателе</a></li>
-            <li><a href="#courses">Курсы барабанов</a></li>
-            <li><a href="#contact">Контакты и запись</a></li>
-            <li><a href="/" class="back-to-main" style="background-color: #28a745; margin: 5px; padding: 0.5em 1em;">← Главная</a></li>
-        </ul>
-    </nav>
-    
-    <!-- Основной контент -->
-    <main>
-        <section id="about" itemscope itemtype="https://schema.org/Person">
-            <h2>О преподавателе барабанов в Троицке</h2>
-            
-            
-            <p itemprop="name">Меня зовут <span itemprop="givenName">Сергей Щепотин</span>, и я помогу вам освоить игру на барабанах в Троицке.</p>
-            
-            <p>Предлагаю <strong>профессиональные уроки игры на барабанах в Троицке</strong> для всех уровней подготовки - от новичков до продвинутых музыкантов.</p>
-            
-            <p>
-            Опытный барабанщик и педагог с многолетним опытом игры и преподавания. Музыка стала моей страстью с детства, и теперь я хочу поделиться этим мастерством с каждым, кто хочет научиться играть на барабанах. Преподаватель обладает музыкальным образованием и большим опытом работы с учениками разного возраста и уровня подготовки в Троицке. Практика в разных стилях музыки позволяет подбирать индивидуальные программы занятий для каждого студента.
-            </p>
-            
-            <h3>Образование и опыт преподавателя:</h3>
-            <ul>
-                <li>Образование ДШИ им. Глинки</li>
-                <li>Оркестр "Big Band" В.И. Герасимова</li>
-                <li>Оркестр "Freedom Jazz Orchestra" Николя Филибера (Nicolas Philibert)</li>
-                <li>Опыт преподавания более 10 лет в Троицке</li>
-                <li>Участие в концертных программах</li>
-            </ul>
-            
-            <h3>Почему учатся именно у меня?</h3>
-            <ul class="advantages-list">
-                <li><strong>Индивидуальный подход</strong> - каждая программа под ваш уровень подготовки</li>
-                <li><strong>Удобное расположение</strong> - студия в центре Троицка, легко добраться</li>
-                <li><strong>Современное оборудование</strong> - качественные барабаны и инструменты</li>
-                <li><strong>Концертная практика</strong> - помогу подготовиться к выступлениям и конкурсам</li>
-                <li><strong>Гибкий график</strong> - занятия в удобное для вас время</li>
-                <li><strong>Работа с детьми и взрослыми</strong> - любой возраст welcome!</li>
-            </ul>
-            
-            
-        </section>
-        
-        <section id="courses">
-            <h2>Курсы игры на барабанах в Троицке</h2>
-            
-            
-            <div class="course-item">
-                <h3>1. Начальный уровень - Уроки барабанов для новичков</h3>
-                <p>Идеально для тех, кто хочет <strong>научиться играть на барабанах с нуля в Троицке</strong>:</p>
-                <ul>
-                    <li>Освоение базовых ритмов и техники игры</li>
-                    <li>Изучение основных типов ударов и приемов</li>
-                    <li>Основы музыкальной теории и нотной грамоты</li>
-                    <li>Развитие чувства ритма и координации движений</li>
-                </ul>
-            </div>
-            
-            <div class="course-item">
-                <h3>2. Средний уровень - Продвинутое обучение барабанам</h3>
-                <p>Для учеников, которые уже <strong>умеют играть на барабанах и хотят развиваться дальше в Троицке</strong>:</p>
-                <ul>
-                    <li>Углубленное изучение техник исполнения сложных ритмов</li>
-                    <li>Работа над развитием скорости и точности игры</li>
-                    <li>Обучение импровизации и созданию собственных партий</li>
-                    <li>Практическое применение полученных навыков в ансамбле</li>
-                </ul>
-            </div>
-            
-            <div class="course-item">
-                <h3>3. Продвинутый уровень - Мастер-классы по барабанам</h3>
-                <p>Для опытных барабанщиков, которые хотят достичь профессионального уровня в Троицке:</p>
-                <ul>
-                    <li>Совершенствование исполнительского мастерства</li>
-                    <li>Понимание и исполнение сложных стилей и жанров</li>
-                    <li>Создание собственной музыкальной композиции</li>
-                    <li>Участие в записи альбомов и концертных мероприятиях</li>
-                </ul>
-            </div>
-            
-            
-        </section>
-     
-        <section id="contact">
-            <h2>Контакты - Запись на уроки барабанов в Троицке</h2>
-            
-            
-            <div class="contact-info">
-                <h3>📍 Адрес школы барабанов в Троицке:</h3>
-                <p itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
-                    <span itemprop="streetAddress">Микрорайон В, 59 ст1</span>, 
-                    <span itemprop="addressLocality">Троицк</span>, 
-                    <span itemprop="addressRegion">Московская область</span>
-                </p>
-                
-                <h3>📞 Телефон для записи:</h3>
-                <p itemprop="telephone"><a href="tel:+79309930503">+7 (930) 993-05-03</a></p>
-                
-                <h3>📧 Email:</h3>
-                <p itemprop="email"><a href="mailto:info@drumz.ru">info@drumz.ru</a></p>
-                
-                <h3>🕐 Режим работы в Троицке:</h3>
-                <p itemprop="openingHoursSpecification" itemscope itemtype="https://schema.org/OpeningHoursSpecification">
-                    <span itemprop="dayOfWeek" content="Monday">Пн</span>-
-                    <span itemprop="dayOfWeek" content="Sunday">Вс</span>: 
-                    <span itemprop="opens">08:00</span>-
-                    <span itemprop="closes">23:00</span>
-                </p>
-            </div>
-            
-            <h3>Быстрая связь:</h3>
-            <address>
-                Телеграм: <a href="https://t.me/SchepotinSergey" target="_blank">@SchepotinSergey</a><br>
-                WhatsApp: <a href="https://wa.me/79309930503" target="_blank">+7 (930) 993-05-03</a>
-            </address>
-            
-            <div style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
-                <h3>🔥 Специальное предложение!</h3>
-                <p><strong>Пробный урок со скидкой 50%</strong> - идеальная возможность попробовать уроки барабанов в Троицке!</p>
-                <p>Звоните прямо сейчас: <a href="tel:+79309930503">+7 (930) 993-05-03</a></p>
-            </div>
-            
-            <p><a href="/" class="back-to-main">← Вернуться на главную страницу drumz.ru</a></p>
-        </section>
-    </main>
-    
-    <!-- Подвал -->
-    <footer>
-        <p>© 2025 Барабанные уроки в Троицке - Drumz.ru</p>
-        <p>Профессиональные уроки игры на барабанах в Троицке | <a href="tel:+79309930503" style="color: white;">+7 (930) 993-05-03</a></p>
-        
-    </footer>
+  <main class="container" itemscope itemtype="https://schema.org/Person">
+    <!-- === О ПРЕПОДАВАТЕЛЕ === -->
+    <div class="card" id="about">
+      <h2>О преподавателе</h2>
+      <p itemprop="name">Меня зовут <span itemprop="givenName">Сергей Щепотин</span> — я преподаю игру на барабанах в Троицке.</p>
 
+      <p><strong>Профессиональные уроки для детей от 7 лет и взрослых</strong> — от первого удара до концертной сцены.</p>
+
+      <h3>Образование и опыт:</h3>
+      <ul>
+        <li>ДШИ им. Глинки</li>
+        <li>Big Band под управлением В.И. Герасимова</li>
+        <li>Freedom Jazz Orchestra Николя Филибера</li>
+        <li>Более 10 лет преподавания в Троицке</li>
+        <li>Участие в концертных программах</li>
+      </ul>
+    </div>
+
+   
+
+    <!-- === СТУДИИ С КАРТАМИ === -->
+    <div class="card" id="studios">
+      <h2>Наши студии</h2>
+
+      <!-- Студия 1: Микрорайон В, Троицк -->
+      <div class="studio-card">
+        <h3>📍 Студия в Троицке</h3>
+        <p><strong>Адрес:</strong> Микрорайон В, 59 ст1</p>
+		        <p><em>Занятия по предварительной записи</em></p>
+        <div class="map-container">
+          <iframe
+            src="https://yandex.ru/map-widget/v1/?ll=37.296571%2C55.491124&mode=whatshere&whatshere%5Bpoint%5D=37.294792%2C55.491071&whatshere%5Bzoom%5D=17.33&z=17.33"
+            frameborder="0"
+            allowfullscreen
+          ></iframe>
+          <div class="map-attribution">© Яндекс.Карты</div>
+        </div>
+      </div>
+
+      <!-- Студия 2: Рогозинино -->
+      <div class="studio-card">
+        <h3>📍 Студия в Рогозинино</h3>
+        <p><strong>Адрес:</strong> Луговая ул., вл20Ас1, д. Рогозинино, этаж 2</p>
+        <p><em>Занятия по предварительной записи</em></p>
+        <div class="map-container">
+          <iframe
+            src="https://yandex.ru/map-widget/v1/?ll=37.185923%2C55.539976&mode=whatshere&whatshere%5Bpoint%5D=37.187854%2C55.539842&whatshere%5Bzoom%5D=16&z=16"
+            frameborder="0"
+            allowfullscreen
+          ></iframe>
+          <div class="map-attribution">© Яндекс.Карты</div>
+        </div>
+      </div>
+
+      <!-- Студия 3: Жуковка -->
+      <div class="studio-card">
+        <h3>📍 Студия в Жуковке</h3>
+        <p><strong>Адрес:</strong> Деревня Жуковка, вл1с1, район Троицк, Москва</p>
+        <p><em>Занятия по предварительной записи</em></p>
+        <div class="map-container">
+          <iframe
+            src="https://yandex.ru/map-widget/v1/?ll=37.286624%2C55.510871&mode=whatshere&whatshere%5Bpoint%5D=37.286074%2C55.511114&whatshere%5Bzoom%5D=17.59&z=17.59"
+            frameborder="0"
+            allowfullscreen
+          ></iframe>
+          <div class="map-attribution">© Яндекс.Карты</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- === ФОРМА ЗАПИСИ === -->
+    <?php include '../form/widget.php'; ?>
+
+    <!-- === КОНТАКТЫ И ПРЕДЛОЖЕНИЕ === -->
+    <div class="card" id="contact">
+      <h2>Связаться и записаться</h2>
+      <p><strong>📞 Телефон:</strong> <a href="tel:+79309930503" itemprop="telephone">+7 (930) 993-05-03</a></p>
+      <p><strong>🕐 Режим работы:</strong> ежедневно с 08:00 до 23:00</p>
+      <p>
+        <a href="https://t.me/SchepotinSergey" class="btn" target="_blank">Telegram</a>
+        <a href="https://wa.me/79309930503" class="btn btn--whatsapp" target="_blank">WhatsApp</a>
+      </p>
+
+      <div class="highlight-box">
+        <h3>🔥 Пробный урок — 1500 ₽</h3>
+        <p>Полноценное занятие 60 минут со скидкой 50% — убедитесь, что барабаны для вас!</p>
+      </div>
+    </div>
+
+    <!-- === FAQ === -->
+    <section class="faq-section" style="margin-top: 40px; padding: 20px; background: #f9f9f9; border-radius: 12px;">
+      <h2>Вопросы и ответы</h2>
+      <div itemscope itemtype="https://schema.org/FAQPage">
+        <div itemscope itemtype="https://schema.org/Question" style="margin-bottom: 24px;">
+          <h3 itemprop="name">Сколько стоит пробный урок?</h3>
+          <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+            <div itemprop="text">Пробный урок — 1500 ₽ вместо 3000 ₽. Длится 60 минут и проходит в одной из трёх студий.</div>
+          </div>
+        </div>
+        <div itemscope itemtype="https://schema.org/Question" style="margin-bottom: 24px;">
+          <h3 itemprop="name">Для кого уроки?</h3>
+          <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+            <div itemprop="text">Для детей от 7 лет и взрослых любого уровня — от новичка до профессионала.</div>
+          </div>
+        </div>
+        <div itemscope itemtype="https://schema.org/Question" style="margin-bottom: 24px;">
+          <h3 itemprop="name">Как записаться?</h3>
+          <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+            <div itemprop="text">Напишите в Telegram: <a href="https://t.me/SchepotinSergey">@SchepotinSergey</a> — выберем студию и удобное время.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <?php require_once __DIR__ . '/../includes/footer.php'; ?>
 </body>
 </html>

@@ -1,11 +1,13 @@
 <header class="site-header">
-  <div class="container">
-    <h1><a href="/">🥁 Drumz — уроки барабанов в Троицке</a></h1>
-    <nav class="main-nav">
-      <a href="/sequencer/" <?= basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/') === 'sequencer' ? 'class="active"' : '' ?>>Секвенсор</a>
-      <a href="/about/" <?= basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/') === 'about' ? 'class="active"' : '' ?>>Школа</a>
-	    <a href="/gen/" <?= basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/') === 'gen' ? 'class="active"' : '' ?>>Gen</a>
-	    <a href="/drum_book/" <?= basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/') === 'drum_book' ? 'class="active"' : '' ?>>Drum book</a>
-    </nav>
-  </div>
+  <h1><a href="/">Drumz</a></h1>
+  <nav class="main-nav">
+    
+    <a href="/gen_etudes/" class="<?php echo $_SERVER['REQUEST_URI'] === '/gen_etudes/' ? 'active' : ''; ?>">Этюды</a>
+    <a href="/gen_rhythms/" class="<?php echo $_SERVER['REQUEST_URI'] === '/gen_rhythms/' ? 'active' : ''; ?>">Ритмы</a>
+	<a href="/pattern/" class="<?php echo $_SERVER['REQUEST_URI'] === '/pattern/' ? 'active' : ''; ?>">Паттерны</a>
+		<a href="/time-feel/" class="<?php echo $_SERVER['REQUEST_URI'] === '/time-feel/' ? 'active' : ''; ?>">Время</a>
+		<a href="/gen/" class="<?php echo $_SERVER['REQUEST_URI'] === '/gen/' ? 'active' : ''; ?>">Секвенсор</a>
+    <a href="/drum_book/" class="<?php echo $_SERVER['REQUEST_URI'] === '/drum_book/' ? 'active' : ''; ?>">Drum Book</a>
+
+  </nav>
 </header>

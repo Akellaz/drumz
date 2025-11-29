@@ -1,33 +1,35 @@
 {
-  "title": "Урок 1: Paradise city",
-  "content": "<h2>Четвертные доли</h2><p>Отсчитывайте: «1, 2, 3, 4».</p><div class=\"rhythm-pattern\">♩ ♩ ♩ ♩</div><div class=\"tip\"><strong>Совет:</strong> Начните медленно с темпа 60 BPM</div>",
+  "title": "Дуэт с учителем",
+  "content": ".",
   "scores": [
     {
-      "title": "Вступление",
-      "description": "Типичный ритмический рисунок для вступления. Hihat на вторую и четвертую доли. Выложи в секвенсоре и попробуй повторить. Темп - 100 bpm",
-      "url": "lessons/lesson1/0.musicxml",
+      "title": "0",
+      "description": ".",
+      "url": "lessons/lesson6/0.musicxml",
       "sequencer": { 
-        "tracks": ["hihat"],
+        "tracks": ["hihat", "snare", "kick"],
         "targetCells": {
-          "hihat": [5, 13]
+          "hihat": [1, 3, 5, 7, 9, 11, 13, 15],
+		  "snare": [5, 13],
+		  "kick": [1, 9, 11]
         }
       }
     },
     {
-      "title": "Простой ритм",
-      "description": "Основа любой ритмики. Чередование сильных и слабых долей",
-      "url": "lessons/lesson1/1.musicxml",
+      "title": "1",
+      "description": ".",
+      "url": "lessons/lesson6/1.musicxml",
       "sequencer": {"tracks": ["snare", "kick"],
 	  "targetCells": {
           "snare": [5, 13],
-		  "kick": [1, 9]
+		  "kick": [1, 9, 11]
         }
 		}
     },
     {
-      "title": "Простой ритм с синкопой",
-      "description": "Почти тоже самое, но в третьей доле появляется синкопа",
-      "url": "lessons/lesson1/2.musicxml",
+      "title": "2",
+      "description": ".",
+      "url": "lessons/lesson6/2.musicxml",
       "sequencer": {"tracks": ["snare", "kick"],
 	  "targetCells": {
           "snare": [5, 13],
@@ -36,32 +38,46 @@
 	  }
     },
 	 {
-      "title": "Сложный ритм",
-      "description": "А тут уже не до шуток. Секвенсор в помощь",
-      "url": "lessons/lesson1/3.musicxml",
-      "sequencer": {"tracks": ["crash", "snare", "kick"],
+      "title": "3",
+      "description": ".",
+      "url": "lessons/lesson6/3.musicxml",
+     "sequencer": {"tracks": ["snare", "kick"],
 	  "targetCells": {
-		  "crash": [1],
           "snare": [5, 13],
-		  "kick": [1, 8, 10, 12]
+		  "kick": [1, 9]
         }
 	  }
     },
+		 {
+      "title": "4",
+      "description": ".",
+      "url": "lessons/lesson6/4.musicxml",
+     "sequencer": {"tracks": ["snare", "kick"],
+	  "targetCells": {
+          "snare": [5, 13],
+		  "kick": [1, 9]
+        }
+	  }
+    },
+			 {
+      "title": "5",
+      "description": ".",
+      "url": "lessons/lesson6/5.musicxml",
+     "sequencer": { 
+        "tracks": ["hihat", "snare", "kick"],
+        "targetCells": {
+          "hihat": [1, 3, 5, 7, 9, 11, 13, 15],
+		  "snare": [5, 13],
+		  "kick": [1, 9, 11]
+        }
+      }
+    },
 	{
-      "title": "Собираем фрагмент",
-      "description": "Если ты разобрался со всеми тактами, то теперь их нужно собрать в единую композицию и выдержать в темпе",
-      "url": "lessons/lesson1/4.musicxml",
+      "title": "Партитура",
+      "description": ".",
+      "url": "lessons/lesson6/all.musicxml",
       "sequencer": false
     }
-  ],
-  "exercise": {
-    "pattern": "♩♩♩♩",
-    "buttons": ["четвертная", "четвертная", "четвертная", "четвертная"],
-    "correct": [1, 1, 1, 1]
-  },
-  "quiz": {
-    "question": "Что такое пульс?",
-    "options": ["Громкость", "Единица времени", "Высота", "Пауза"],
-    "correct": 1
-  }
+  ]
+
 }

@@ -1,0 +1,230 @@
+<?php require_once __DIR__ . '/../includes/seo.php'; ?>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drum Book | Ноты и длительности - Drumz</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #2d3748;
+      --border: #e2e8f0;
+      --primary: #4299e1;
+      --card-bg: #fafafa;
+      --shadow: 0 2px 6px rgba(0,0,0,0.05);
+      --radius: 12px;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      font-size: 2em;
+      margin: 0;
+    }
+
+    .scores-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .score-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      background: white;
+    }
+
+    .score-title {
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: var(--primary);
+      font-size: 1.3em;
+    }
+
+    .score-container {
+      height: auto;
+      min-height: 200px;
+      background: #f9f9f9;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      overflow: hidden;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .score-container svg {
+      max-width: 100%;
+      height: auto !important;
+      width: auto !important;
+      min-height: 200px;
+      transform-origin: top center;
+    }
+
+    /* Таблица длительностей */
+    .durations-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 1em;
+    }
+
+    .durations-table th,
+    .durations-table td {
+      padding: 12px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .durations-table th {
+      background-color: var(--card-bg);
+      font-weight: 600;
+    }
+
+    .durations-table img {
+      height: 40px;
+      vertical-align: middle;
+    }
+  </style>
+  <?php require_once __DIR__ . '/../includes/seo.php'; ?>
+</head>
+<body>
+  <?php require_once __DIR__ . '/../includes/header.php'; ?>
+
+  <main class="container">
+    <div class="header">
+      <h1>🥁 Ноты для перкуссии</h1>
+    </div>
+
+    <!-- Здесь можно подключить конкретные перкуссионные партитуры -->
+    <div class="scores-container" id="scoresContainer">
+      <!-- Партитуры будут загружены скриптом -->
+    </div>
+
+    <h2>⏱️ Длительности нот (для ударных)</h2>
+    <table class="durations-table">
+      <thead>
+        <tr>
+          <th>Название</th>
+          <th>Обозначение</th>
+          <th>Доля такта (4/4)</th>
+          <th>Счёт</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Целая нота</td>
+          <td>𝅝</td>
+          <td>4 доли</td>
+          <td>1 – 2 – 3 – 4</td>
+        </tr>
+        <tr>
+          <td>Половинная нота</td>
+          <td>𝅗𝅥</td>
+          <td>2 доли</td>
+          <td>1 – 2</td>
+        </tr>
+        <tr>
+          <td>Четвертная нота</td>
+          <td>♩</td>
+          <td>1 доля</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>Восьмая нота</td>
+          <td>♪</td>
+          <td>½ доли</td>
+          <td>и</td>
+        </tr>
+        <tr>
+          <td>Шестнадцатая нота</td>
+          <td>𝅘𝅥𝅯</td>
+          <td>¼ доли</td>
+          <td>е – и</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </main>
+
+  <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+  <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.7.0/build/opensheetmusicdisplay.min.js"></script>
+  <script>
+    // Пример: загрузка одной перкуссионной партитуры (замените URL на ваш)
+    async function loadPercussionScore() {
+      const container = document.getElementById('scoresContainer');
+      const scoreItem = document.createElement('div');
+      scoreItem.className = 'score-item';
+      scoreItem.innerHTML = `
+        <div class="score-title">Пример перкуссионной записи</div>
+        <div class="score-container" id="percussionScore"></div>
+      `;
+      container.appendChild(scoreItem);
+
+      try {
+        const osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay("percussionScore", {
+          autoResize: true,
+          backend: "svg",
+          disableCursor: true,
+          drawingParameters: "default",
+          newSystemFromXML: true,
+          renderSingleHorizontalStaffline: false,
+          drawPartNames: false,
+          drawTitle: false,
+          drawComposer: false,
+          autoBeam: false,
+          pageFormat: "Endless"
+        });
+
+        // Установка параметров для перкуссии
+        osmd.EngravingRules.RenderXMeasuresPerLineAkaSystem = 4;
+        osmd.EngravingRules.StaffHeight = 3.2;
+        osmd.EngravingRules.BetweenStaffDistance = 7;
+        osmd.EngravingRules.PercussionOneLineCutoff = -1;
+        osmd.EngravingRules.PercussionForceVoicesOneLineCutoff = -1;
+        osmd.EngravingRules.PercussionUseXMLDisplayStep = true;
+
+        // Замените на путь к вашему перкуссионному MusicXML-файлу
+        await osmd.load("/lessons/percussion_example.xml");
+        await osmd.render();
+        osmd.zoom = 0.95;
+      } catch (err) {
+        console.error("Ошибка загрузки партитуры:", err);
+        document.getElementById('percussionScore').innerHTML = `
+          <div style="padding:20px; color:#e53e3e; text-align:center;">
+            Не удалось загрузить партитуру.
+          </div>
+        `;
+      }
+    }
+
+    // Загружаем при старте
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadPercussionScore);
+    } else {
+      loadPercussionScore();
+    }
+  </script>
+</body>
+</html>

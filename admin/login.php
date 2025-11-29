@@ -1,4 +1,5 @@
 <?php
+session_start(); // ← ЭТО ОБЯЗАТЕЛЬНО
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($_POST['password'] === 'jocker') { // ← замени на свой!
         $_SESSION['admin_logged_in'] = true;

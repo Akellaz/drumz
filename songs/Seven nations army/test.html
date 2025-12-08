@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Редактор перкуссии</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/abcjs-audio.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      background: #f9f9f9;
+      height: 100vh;
+      overflow: hidden;
+      font-size: 14px;
+    }
+
+    .container {
+      display: flex;
+      height: 100%;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: #fff;
+      border-right: 1px solid #ddd;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+    }
+
+    .project-header {
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .project-header input {
+      width: 100%;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      margin: 3px 0;
+      font-size: 13px;
+    }
+
+    .project-header input[type="number"] {
+      width: 80px;
+    }
+
+    .fragments-section {
+      margin-bottom: 10px;
+    }
+
+    .fragment-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .fragment-section-header .actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .fragment-section-header button {
+      padding: 2px 6px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .fragment-section-header button.danger {
+      background: #dc3545;
+    }
+
+    #fragment-list {
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 3px;
+      margin-bottom: 8px;
+      background: #fafafa;
+    }
+
+    .fragment-item {
+      padding: 6px 8px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .fragment-item:hover {
+      background: #f0f0f0;
+    }
+
+    .fragment-item.active {
+      background: #007bff;
+      color: white;
+    }
+
+    .fragment-item.active:hover {
+      background: #0069d9;
+    }
+
+    .fragment-title {
+      flex: 1;
+      padding: 1px 3px;
+      border-radius: 2px;
+      cursor: text;
+    }
+
+    .fragment-title:focus {
+      outline: 1px solid #007bff;
+      background: white;
+      color: black;
+    }
+
+    .editor-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .sidebar textarea {
+      flex: 1;
+      font-family: monospace;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      resize: none;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .project-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .project-actions button {
+      padding: 6px 8px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .project-actions button:hover {
+      background: #5a6268;
+    }
+
+    .resizer {
+      width: 4px;
+      background: #ccc;
+      cursor: col-resize;
+      user-select: none;
+    }
+
+    .main {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 0;
+    }
+
+    #paper {
+      background: white;
+      padding: 12px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      width: 100%;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    #paper svg {
+      width: 100%;
+      height: auto;
+    }
+
+    #audio-controls {
+      margin: 8px 0;
+    }
+
+    .main-controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .main-controls label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .main-controls label input {
+      cursor: pointer;
+    }
+
+    .pdf-button-container {
+      margin-top: 15px;
+    }
+
+    .pdf-button-container button {
+      padding: 8px 15px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .pdf-button-container button:hover {
+      background: #218838;
+    }
+
+    /* Стили для выделения при перетаскивании */
+    .abcjs-dragging {
+      stroke: blue !important;
+      fill: blue !important;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 250px;
+      }
+      .project-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/dist/abcjs-basic.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <div class="project-header">
+        <input type="text" id="project-title" placeholder="Название песни" value="Новая песня">
+        <div style="display: flex; align-items: center; gap: 5px; margin-top: 4px;">
+          <span style="font-size: 12px;">Темп:</span>
+          <input type="number" id="project-tempo" placeholder="BPM" value="120" min="40" max="300">
+        </div>
+      </div>
+
+      <div class="fragments-section">
+        <div class="fragment-section-header">
+          <span>ФРАГМЕНТЫ</span>
+          <div class="actions">
+            <button id="add-fragment" title="Добавить фрагмент">+</button>
+            <button id="delete-fragment" class="danger" title="Удалить фрагмент">–</button>
+          </div>
+        </div>
+        <div id="fragment-list"></div>
+      </div>
+
+      <div class="editor-section">
+        <div class="editor-header">
+          <span>НОТЫ</span>
+          <button id="renderBtn" title="Обновить ноты">↻</button>
+        </div>
+        <textarea id="abc" spellcheck="false">g4 g4 cccc cccc | [F2g2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2 |</textarea>
+        
+        <!-- Кнопки сохранения и загрузки — добавлены обратно -->
+        <div class="project-actions">
+          <button id="save-project" title="Сохранить проект">Сохранить</button>
+          <button id="load-project" title="Загрузить проект">Загрузить</button>
+        </div>
+      </div>
+      
+      <input type="file" id="file-input" accept=".json" style="display: none;">
+    </div>
+
+    <div class="resizer" id="resizer"></div>
+
+    <div class="main">
+      <div id="paper"></div>
+      <div id="audio-controls"></div>
+      <div class="main-controls">
+        <label>
+          <input type="checkbox" id="show-cursor" checked> Курсор
+        </label>
+      </div>
+      <div class="pdf-button-container">
+        <button id="downloadPdfBtn">Скачать PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === Drag Resizer Logic ===
+    const resizer = document.getElementById("resizer");
+    const sidebar = document.querySelector(".sidebar");
+
+    resizer.addEventListener("mousedown", (e) => {
+      document.addEventListener("mousemove", resize);
+      document.addEventListener("mouseup", stopResize);
+      e.preventDefault();
+    });
+
+    function resize(e) {
+      const containerRect = document.querySelector(".container").getBoundingClientRect();
+      const newWidth = e.clientX - containerRect.left;
+      if (newWidth > 100 && newWidth < containerRect.width - 200) {
+        sidebar.style.width = newWidth + "px";
+      }
+    }
+
+    function stopResize() {
+      document.removeEventListener("mousemove", resize);
+      document.removeEventListener("mouseup", stopResize);
+    }
+
+    // === ABCJS Logic ===
+    let synthControl = null;
+    let visualObj = null;
+    let abcString = document.getElementById("abc").value;
+    const abcTextarea = document.getElementById("abc");
+    const paperDiv = document.getElementById("paper");
+    const audioDiv = document.getElementById("audio-controls");
+    const showCursor = document.getElementById("show-cursor");
+    const renderBtn = document.getElementById("renderBtn");
+    const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+    const fragmentList = document.getElementById("fragment-list");
+    const addFragmentBtn = document.getElementById("add-fragment");
+    const deleteFragmentBtn = document.getElementById("delete-fragment");
+    const saveProjectBtn = document.getElementById("save-project");
+    const loadProjectBtn = document.getElementById("load-project");
+    const fileInput = document.getElementById("file-input");
+    const projectTitle = document.getElementById("project-title");
+    const projectTempo = document.getElementById("project-tempo");
+
+    const percNotes = ['F', 'c', 'g', 'e', 'd', 'A', 'a'];
+
+    let fragments = [
+      {
+        id: 0,
+        title: "Вступление",
+        abc: abcString
+      }
+    ];
+    let currentFragmentId = 0;
+
+    let project = {
+      title: "Новая песня",
+      tempo: 120,
+      fragments: fragments
+    };
+
+    function extractNotesFromABC(fullABC) {
+      const lines = fullABC.split('\n');
+      const noteLines = lines.filter(line => {
+        return line.trim() !== '' && 
+               !/^[A-Z]:/.test(line.trim()) && 
+               !/^%%/.test(line.trim()) &&
+               !/^X:/.test(line.trim()) &&
+               !/^T:/.test(line.trim()) &&
+               !/^L:/.test(line.trim()) &&
+               !/^M:/.test(line.trim()) &&
+               !/^K:/.test(line.trim()) &&
+               !/^Q:/.test(line.trim()) &&
+               !/^V:/.test(line.trim()) &&
+               !/^U:/.test(line.trim());
+      });
+      return noteLines.join('\n');
+    }
+
+    function createFullABCFromNotes(notes, fragmentTitle) {
+      const tempo = parseInt(projectTempo.value) || 120;
+      return `X:1
+T:${project.title} - ${fragmentTitle}
+L:1/16
+M:4/4
+K:C clef=perc
+Q:1/4=${tempo}
+V:Drums stem=down
+U:n=!style=x!
+%%percmap F  acoustic-bass-drum
+%%percmap c  acoustic-snare
+%%percmap g  closed-hi-hat x
+%%percmap e  high-tom
+%%percmap d  hi-mid-tom
+%%percmap A  low-tom
+%%percmap a  crash-cymbal-1  x
+${notes.trim()}`;
+    }
+
+    function modifyPercNote(note, step) {
+      const index = percNotes.indexOf(note);
+      if (index === -1) return note;
+      const newIndex = Math.max(0, Math.min(percNotes.length - 1, index - step));
+      return percNotes[newIndex];
+    }
+
+    function tokenize(str) {
+      const arr = str.split(/(!.+?!|".+?")/);
+      const output = [];
+      for (let i = 0; i < arr.length; i++) {
+        const token = arr[i];
+        if (token.length > 0) {
+          if (token[0] !== '"' && token[0] !== '!') {
+            const arr2 = token.split(/([A-Ga-g][,']*)/);
+            output.push(...arr2.filter(t => t.length > 0));
+          } else {
+            output.push(token);
+          }
+        }
+      }
+      return output;
+    }
+
+    function clickListener(abcelem, tuneNumber, classes, analysis, drag, mouseEvent) {
+      if (drag && drag.step && abcelem.el_type === 'note' && abcelem.startChar >= 0 && abcelem.endChar >= 0) {
+        const originalText = abcString.substring(abcelem.startChar, abcelem.endChar);
+        const tokens = tokenize(originalText);
+        let modified = false;
+        
+        for (let i = 0; i < tokens.length; i++) {
+          if (percNotes.includes(tokens[i])) {
+            tokens[i] = modifyPercNote(tokens[i], drag.step);
+            modified = true;
+          }
+        }
+        
+        if (modified) {
+          const newText = tokens.join("");
+          abcString = abcString.substring(0, abcelem.startChar) + newText + abcString.substring(abcelem.endChar);
+          const notesOnly = extractNotesFromABC(abcString);
+          abcTextarea.value = notesOnly;
+          const currentFragment = fragments.find(f => f.id === currentFragmentId);
+          if (currentFragment) {
+            currentFragment.abc = notesOnly;
+          }
+          refreshTune();
+        }
+      }
+    }
+
+    function CursorControl() {
+      const self = this;
+      self.onEvent = function(ev) {
+        let cursor = document.querySelector("#paper svg .abcjs-cursor");
+        if (!cursor) {
+          const svg = document.querySelector("#paper svg");
+          if (svg) {
+            cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            cursor.setAttribute("class", "abcjs-cursor");
+            svg.appendChild(cursor);
+          }
+        }
+        if (cursor && showCursor.checked && ev && ev.left != null) {
+          cursor.setAttribute("x1", ev.left - 2);
+          cursor.setAttribute("x2", ev.left - 2);
+          cursor.setAttribute("y1", ev.top || 0);
+          cursor.setAttribute("y2", (ev.top || 0) + (ev.height || 30));
+        } else if (cursor) {
+          cursor.setAttribute("x1", -10);
+          cursor.setAttribute("x2", -10);
+        }
+      };
+
+      self.onFinished = function() {
+        const cursor = document.querySelector("#paper svg .abcjs-cursor");
+        if (cursor) {
+          cursor.setAttribute("x1", -10);
+          cursor.setAttribute("x2", -10);
+        }
+      };
+    }
+
+    function refreshTune() {
+      paperDiv.innerHTML = "";
+      audioDiv.innerHTML = "";
+      
+      const currentFragment = fragments.find(f => f.id === currentFragmentId);
+      if (!currentFragment) return;
+      
+      const notesOnly = abcTextarea.value;
+      currentFragment.abc = notesOnly;
+      const fullABC = createFullABCFromNotes(notesOnly, currentFragment.title);
+      abcString = fullABC;
+
+      if (!abcString.trim()) return;
+
+      try {
+        const options = {
+          add_classes: true,
+          responsive: "resize",
+          dragging: true,
+          clickListener: clickListener
+        };
+
+        const vo = ABCJS.renderAbc(paperDiv, abcString, options);
+        if (!vo || vo.length === 0) throw new Error("Render failed");
+        visualObj = vo[0];
+
+        if (ABCJS.synth.supportsAudio()) {
+          const cursorControl = new CursorControl();
+          synthControl = new ABCJS.synth.SynthController();
+          synthControl.load(audioDiv, cursorControl, {
+            displayLoop: false,
+            displayRestart: false,
+            displayPlay: true,
+            displayProgress: false,
+            displayWarp: false
+          });
+          synthControl.disable(true);
+
+          const bpmMatch = abcString.match(/Q:\s*1\/4\s*=\s*(\d+)/i);
+          const bpm = bpmMatch ? parseInt(bpmMatch[1]) : parseInt(projectTempo.value) || 120;
+          const msPerMeasure = (4 / bpm) * 60 * 1000;
+
+          const midiBuffer = new ABCJS.synth.CreateSynth();
+          midiBuffer.init({
+            visualObj: visualObj,
+            millisecondsPerMeasure: msPerMeasure
+          }).then(() => {
+            synthControl.setTune(visualObj, false).then(() => {
+              synthControl.disable(false);
+            });
+          }).catch(err => {
+            console.error("Synth init error:", err);
+            audioDiv.innerHTML = "<p style='color:red;'>Ошибка аудио.</p>";
+          });
+        }
+      } catch (e) {
+        console.error("Render error:", e);
+        paperDiv.innerHTML = `<p style="color:red;font-size:12px;">Ошибка: ${e.message}</p>`;
+      }
+    }
+
+    function renderFragmentList() {
+      fragmentList.innerHTML = "";
+      fragments.forEach(fragment => {
+        const div = document.createElement("div");
+        div.className = "fragment-item";
+        if (fragment.id === currentFragmentId) {
+          div.classList.add("active");
+        }
+        
+        const titleSpan = document.createElement("span");
+        titleSpan.className = "fragment-title";
+        titleSpan.textContent = fragment.title;
+        titleSpan.contentEditable = true;
+        titleSpan.addEventListener("blur", () => {
+          fragment.title = titleSpan.textContent;
+        });
+        titleSpan.addEventListener("keypress", (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            titleSpan.blur();
+          }
+        });
+        
+        div.appendChild(titleSpan);
+        
+        div.onclick = (e) => {
+          if (e.target !== titleSpan) {
+            selectFragment(fragment.id);
+          }
+        };
+        
+        fragmentList.appendChild(div);
+      });
+    }
+
+    function selectFragment(id) {
+      currentFragmentId = id;
+      const fragment = fragments.find(f => f.id === id);
+      if (fragment) {
+        abcString = fragment.abc;
+        abcTextarea.value = abcString;
+        renderFragmentList();
+        refreshTune();
+      }
+    }
+
+    function addFragment() {
+      const newId = fragments.length > 0 ? Math.max(...fragments.map(f => f.id)) + 1 : 0;
+      const newFragment = {
+        id: newId,
+        title: `Фрагмент ${fragments.length + 1}`,
+        abc: "z16 | z16 | z16 | z16 |"
+      };
+      fragments.push(newFragment);
+      selectFragment(newId);
+    }
+
+    function deleteFragment() {
+      if (fragments.length <= 1) {
+        alert("Нельзя удалить последний фрагмент");
+        return;
+      }
+      
+      if (confirm("Удалить фрагмент?")) {
+        fragments = fragments.filter(f => f.id !== currentFragmentId);
+        if (fragments.length > 0) {
+          selectFragment(fragments[0].id);
+        }
+      }
+    }
+
+    function downloadSingleFragmentAsPdf(fragment) {
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      document.body.appendChild(tempDiv);
+      
+      try {
+        const fullABC = createFullABCFromNotes(fragment.abc, fragment.title);
+        const vo = ABCJS.renderAbc(tempDiv, fullABC, {
+          add_classes: true,
+          responsive: "resize"
+        });
+        
+        if (vo && vo.length > 0) {
+          const svg = tempDiv.querySelector('svg');
+          if (svg) {
+            const s = new XMLSerializer();
+            const url = URL.createObjectURL(new Blob([s.serializeToString(svg)], {type: 'image/svg+xml'}));
+            const img = new Image();
+            
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              const bbox = svg.getBBox();
+              canvas.width = Math.max(bbox.width * 2, 800);
+              canvas.height = bbox.height * 2;
+              ctx.fillStyle = 'white';
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+              const { jsPDF } = window.jspdf;
+              const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+              
+              pdf.setFontSize(16);
+              pdf.text(fragment.title, 105, 15, null, null, 'center');
+              pdf.setFontSize(12);
+              
+              const bpm = `Темп: ${projectTempo.value} BPM`;
+              pdf.text(bpm, 105, 25, null, null, 'center');
+              
+              const imgData = canvas.toDataURL('image/png');
+              const w = 180;
+              const h = (canvas.height * w) / canvas.width;
+              pdf.addImage(imgData, 'PNG', 15, 35, w, h);
+              pdf.save(`${fragment.title.replace(/\s+/g, '_')}.pdf`);
+              URL.revokeObjectURL(url);
+            };
+            
+            img.onerror = () => {
+              alert('Ошибка создания PDF.');
+              URL.revokeObjectURL(url);
+            };
+            
+            img.src = url;
+          }
+        }
+      } catch (e) {
+        console.error("Error rendering fragment:", e);
+        alert('Ошибка создания PDF.');
+      } finally {
+        document.body.removeChild(tempDiv);
+      }
+    }
+
+    function saveProject() {
+      const currentFragment = fragments.find(f => f.id === currentFragmentId);
+      if (currentFragment) {
+        currentFragment.abc = abcTextarea.value;
+      }
+      
+      project.title = projectTitle.value;
+      project.tempo = parseInt(projectTempo.value) || 120;
+      project.fragments = fragments;
+      
+      const projectData = {
+        title: project.title,
+        tempo: project.tempo,
+        fragments: project.fragments
+      };
+      
+      const dataStr = JSON.stringify(projectData, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      
+      const exportFileDefaultName = `${project.title.replace(/\s+/g, '_')}_проект.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', url);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+      
+      URL.revokeObjectURL(url);
+    }
+
+    function loadProject() {
+      fileInput.click();
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const projectData = JSON.parse(e.target.result);
+          
+          project.title = projectData.title || "Новая песня";
+          project.tempo = projectData.tempo || 120;
+          project.fragments = projectData.fragments || [];
+          
+          projectTitle.value = project.title;
+          projectTempo.value = project.tempo;
+          
+          fragments = project.fragments;
+          
+          if (fragments.length > 0) {
+            currentFragmentId = fragments[0].id;
+            selectFragment(currentFragmentId);
+          }
+          
+          alert("Проект загружен!");
+        } catch (error) {
+          console.error("Ошибка загрузки:", error);
+          alert("Ошибка загрузки проекта.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderFragmentList();
+      refreshTune();
+      
+      renderBtn.addEventListener("click", refreshTune);
+      addFragmentBtn.addEventListener("click", addFragment);
+      deleteFragmentBtn.addEventListener("click", deleteFragment);
+      downloadPdfBtn.addEventListener("click", () => {
+        const currentFragment = fragments.find(f => f.id === currentFragmentId);
+        if (currentFragment) {
+          downloadSingleFragmentAsPdf(currentFragment);
+        }
+      });
+      
+      saveProjectBtn.addEventListener("click", saveProject);
+      loadProjectBtn.addEventListener("click", loadProject);
+      fileInput.addEventListener("change", handleFileSelect);
+      
+      let debounceTimer;
+      abcTextarea.addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          const currentFragment = fragments.find(f => f.id === currentFragmentId);
+          if (currentFragment) {
+            currentFragment.abc = abcTextarea.value;
+          }
+          refreshTune();
+        }, 1000);
+      });
+      
+      const refreshOptions = () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(refreshTune, 100);
+      };
+      
+      showCursor.addEventListener("change", refreshOptions);
+      
+      projectTitle.addEventListener("input", () => {
+        project.title = projectTitle.value;
+      });
+      
+      projectTempo.addEventListener("input", () => {
+        const tempo = parseInt(projectTempo.value);
+        if (!isNaN(tempo) && tempo >= 40 && tempo <= 300) {
+          project.tempo = tempo;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

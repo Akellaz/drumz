@@ -58,7 +58,7 @@
 
   <script src="https://yookassa.ru/checkout-widget/v1"></script>
   <script>
-    const shopId = 'your-shop-id';
+    const shopId = '1215197';
 
     document.getElementById('yoo-payment').innerHTML =
       '<button class="btn" style="width:100%; padding:14px;">Поддержать проект</button>';

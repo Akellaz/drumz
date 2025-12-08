@@ -1,7 +1,4 @@
 <?php
-// hall-of-fame/index.php
-require_once '../includes/seo.php';
-
 // Функция: определить количество полностью завершённых ТИТУЛОВ
 function getCompletedTitlesCount($pdo, $student_id) {
     // Определяем структуру титулов: каждый титул (кроме "Новичка") состоит из 4 уровней
@@ -170,10 +167,10 @@ function getCurrentTitle($completed_titles, $pdo, $student_id) {
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<?php require_once __DIR__ . '/../includes/seo.php'; ?>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Зал славы | Drumz — Уроки барабанов в Троицке</title>
-  <meta name="description" content="Посмотрите на наших учеников, их прогресс и достижения. Зал славы школы барабанов Drumz в Троицке.">
+
   <link rel="stylesheet" href="/assets/style.css">
   <style>
     /* Дополнительные стили для карточек, если не определены в основном CSS */
@@ -203,7 +200,7 @@ function getCurrentTitle($completed_titles, $pdo, $student_id) {
   </style>
 </head>
 <body>
-  <?php require_once '../includes/header.php'; ?>
+    <?php require_once __DIR__ . '/../includes/header.php'; ?>
 
   <main class="container">
     <section class="hero">

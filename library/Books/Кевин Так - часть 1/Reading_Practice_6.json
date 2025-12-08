@@ -1,0 +1,21 @@
+{
+  "title": "Reading Practice #6",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 80,
+  "version": "1.0",
+  "created": "2025-12-04",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "v.1",
+      "abc": "c12 c4 | c12 z4 | c2c2 c2c2 c2c2 c4 | c12 c4 | \nc5 c2 c8 | c5 c2 c8 |c12 c4 | c12 z4 |\nc2c2 c2c2 c2c2 c2c2 | c5 c2 c2c2 c2c2 | c2c2 c2c2 c2c2 c2c2 | c12 c4 |\nc2c2 c2c2 c5 c2 | c5 c2 c4 c4 | c2c2 c2c2 c2c2 c2c2 | c5 c2 c4 z4 | "
+    },
+    {
+      "id": 1,
+      "title": "v.2",
+      "abc": "c5 c2 c4 c4 | c5c2 c2c2 c2c2 | c5 c2 c4 c4 | c5c2 cccc c2c2 | \nc5c2 c4 c4 | c5 c2 c2c2 cccc | c5c2 c4 c4 | c12 c4 | \nc5 c2 c2c2 c2c2 | cccc c2c2 c4 z4 | c5c2 c2c2 c4 | cccc c2c2 c2c2 c4 | \nc12 cccc | c5 c2 c4 c4 | cccc cccc cccc cccc | c5c2 c4 z4 | \n"
+    }
+  ]
+}

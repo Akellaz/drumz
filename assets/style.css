@@ -99,16 +99,31 @@ a:hover {
 /* --- Шапка и подвал --- */
 .site-header {
   background: var(--header-bg);
-  padding: 20px 0;
+  padding: 15px 0;
   border-bottom: 1px solid var(--border);
   margin-bottom: 20px;
   text-align: center;
 }
-.site-header h1 a {
-  color: var(--primary);
-  text-decoration: none;
-  font-size: 2rem;
+.site-title {
+  margin: 0;
 }
+.site-title a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--primary), #3182ce);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: all 0.3s ease;
+}
+.site-title a:hover {
+  transform: scale(1.02);
+  text-decoration: none;
+}
+
 .main-nav {
   display: flex;
   flex-wrap: wrap;
@@ -249,6 +264,58 @@ a:hover {
 }
 
 
+
+
+.dev-panel {
+  background: #fdfdfd;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 0.875rem;
+  max-width: 650px;
+  margin-top: 24px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.dev-panel h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: #222;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dev-links {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+}
+
+.dev-links li {
+  margin-bottom: 12px;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.dev-links a {
+  color: #0066cc;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.dev-links a:hover {
+  text-decoration: underline;
+}
+
+
+
+
+
+
 /* --- Адаптивность --- */
 @media (max-width: 768px) {
   .container {
@@ -260,5 +327,8 @@ a:hover {
   h2 { font-size: 1.4rem; }
   .form-group input, .form-group select {
     font-size: 16px;
+  }
+  .site-title a {
+    font-size: 2rem;
   }
 }

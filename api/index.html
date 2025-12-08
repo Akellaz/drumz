@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Тест звука с чекбоксами</title>
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/abcjs-audio.min.css">
+	<style>
+		body {
+			font-family: sans-serif;
+			padding: 20px;
+			background: #f9f9f9;
+		}
+		#paper {
+			background: white;
+			padding: 15px;
+			margin: 20px 0;
+			border-radius: 6px;
+			box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+		}
+		.highlight {
+			fill: #0a9ecc;
+		}
+		.abcjs-cursor {
+			stroke: red;
+			stroke-width: 2;
+		}
+		.cursor-nav {
+			margin: 10px 0;
+		}
+		.cursor-nav label {
+			margin-right: 15px;
+			user-select: none;
+		}
+	</style>
+	<script src="../assets/abcjs-main/dist/abcjs-basic.js"></script>
+</head>
+<body onload="load()">
+
+<h2>Тест звука с чекбоксами</h2>
+
+<div class="cursor-nav">
+	<label><input type="checkbox" id="hide-finished-measures"> Hide Finished Measures</label>
+	<label><input type="checkbox" id="show-cursor" checked> Show Cursor</label>
+	<label><input type="checkbox" id="color-note" checked> Color Note</label>
+</div>
+
+<div id="paper"></div>
+<div id="audio"></div>
+
+<script>
+var abc = `X:1
+T:Маленькое Скерцо (Д. Кобалевский)
+L:1/16
+M:2/4
+K:C
+Q:1/4=100
+V:Drums stem=down clef=perc
+%%percmap c acoustic-snare x
+c3c  c2c2 | cccc  c2c2 | cccc cccc | c8
+`;
+
+var abcOptions = {
+	add_classes: true,
+	responsive: "resize"
+};
+
+// Сохраняем состояние последней подсветки
+var lastHighlighted = [];
+
+// Чекбоксы (глобально доступны в cursorControl)
+var hideFinishedMeasures;
+var showCursor;
+var colorNote;
+
+function CursorControl() {
+	var self = this;
+	self.onStart = function() {};
+	self.onBeat = function() {};
+
+	self.onEvent = function(ev) {
+		// ---- 1. Скрытие завершённых тактов ----
+		if (ev && ev.measureStart && hideFinishedMeasures.checked) {
+			// Скрываем предыдущий такт
+			if (self.lastMeasureNumber !== undefined && self.lastMeasureNumber < ev.measureNumber) {
+				var prevMeasureEls = document.querySelectorAll(".abcjs-l" + self.lastLine + ".abcjs-m" + self.lastMeasureNumber);
+				prevMeasureEls.forEach(el => el.classList.add("abcjs-hidden-measure"));
+			}
+			self.lastLine = ev.line;
+			self.lastMeasureNumber = ev.measureNumber;
+		}
+
+		// ---- 2. Подсветка нот (Color Note) ----
+		// Снимаем старую подсветку
+		lastHighlighted.forEach(el => el.classList.remove("highlight"));
+		lastHighlighted = [];
+
+		if (ev && ev.elements && colorNote.checked) {
+			ev.elements.forEach(note => {
+				note.forEach(el => {
+					el.classList.add("highlight");
+					lastHighlighted.push(el);
+				});
+			});
+		}
+
+		// ---- 3. Курсор (Show Cursor) ----
+		var cursor = document.querySelector("#paper svg .abcjs-cursor");
+		if (!cursor) {
+			var svg = document.querySelector("#paper svg");
+			if (svg) {
+				cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
+				cursor.setAttribute("class", "abcjs-cursor");
+				svg.appendChild(cursor);
+			}
+		}
+
+		if (cursor && showCursor.checked && ev && ev.left != null) {
+			cursor.setAttribute("x1", ev.left - 2);
+			cursor.setAttribute("x2", ev.left - 2);
+			cursor.setAttribute("y1", ev.top || 0);
+			cursor.setAttribute("y2", (ev.top || 0) + (ev.height || 20));
+		} else if (cursor) {
+			cursor.setAttribute("x1", -10);
+			cursor.setAttribute("x2", -10);
+		}
+	};
+
+	self.onFinished = function() {
+		// Снимаем подсветку
+		lastHighlighted.forEach(el => el.classList.remove("highlight"));
+		lastHighlighted = [];
+
+		// Скрываем курсор
+		var cursor = document.querySelector("#paper svg .abcjs-cursor");
+		if (cursor) {
+			cursor.setAttribute("x1", -10);
+			cursor.setAttribute("x2", -10);
+		}
+
+		// Показываем все такты (опционально)
+		document.querySelectorAll(".abcjs-hidden-measure").forEach(el => el.classList.remove("abcjs-hidden-measure"));
+		self.lastMeasureNumber = undefined;
+	};
+}
+
+// Стиль для скрытия тактов
+var style = document.createElement('style');
+style.textContent = '.abcjs-hidden-measure { opacity: 0.2; }';
+document.head.appendChild(style);
+
+var synthControl;
+var cursorControl = new CursorControl();
+
+function load() {
+	// Инициализация чекбоксов
+	hideFinishedMeasures = document.getElementById("hide-finished-measures");
+	showCursor = document.getElementById("show-cursor");
+	colorNote = document.getElementById("color-note");
+
+	if (ABCJS.synth.supportsAudio()) {
+		synthControl = new ABCJS.synth.SynthController();
+		synthControl.load("#audio", cursorControl, {
+			displayLoop: true,
+			displayRestart: true,
+			displayPlay: true,
+			displayProgress: true,
+			displayWarp: false
+		});
+	} else {
+		document.getElementById("audio").innerHTML = "<p>Аудио не поддерживается.</p>";
+	}
+	setTune(false);
+}
+
+function setTune(userAction) {
+	synthControl.disable(true);
+	var visualObj = ABCJS.renderAbc("paper", abc, abcOptions)[0];
+
+	var midiBuffer = new ABCJS.synth.CreateSynth();
+	midiBuffer.init({
+		visualObj: visualObj
+	}).then(function () {
+		if (synthControl) {
+			synthControl.setTune(visualObj, userAction).then(function () {
+				synthControl.disable(false);
+			}).catch(function (error) {
+				console.warn("Audio problem:", error);
+			});
+		}
+	}).catch(function (error) {
+		console.warn("Init failed:", error);
+	});
+}
+</script>
+
+</body>
+</html>

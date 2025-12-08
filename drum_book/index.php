@@ -481,7 +481,6 @@
   transform-origin: top center;
 }
   </style>
-  <?php require_once __DIR__ . '/../includes/seo.php'; ?>
 </head>
 <body>
   <?php require_once __DIR__ . '/../includes/header.php'; ?>

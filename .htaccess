@@ -1,17 +1,26 @@
 RewriteEngine On
 RewriteBase /
 
-# Разрешить прямой доступ к обработчику формы
+# Прямой доступ к song-editor (статический HTML)
+RewriteRule ^song-editor/ - [L]
+
+# Обработчик формы
 RewriteRule ^form/form_handler\.php$ form/form_handler.php [L]
 
-# Запрет прямого доступа к .php в публичных разделах
-# Исключения: /admin/, /form/form_handler.php, и все файлы внутри /orden/ (но через ЧПУ!)
+# Короткие ссылки на упражнения
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^library/([a-zA-Z0-9_-]+)$ library/index.php?exercise=$1 [L,QSA]
+
+# Запрет прямого доступа к .php (кроме явно разрешённых)
 RewriteCond %{THE_REQUEST} \s/+(.+)\.php [NC]
 RewriteCond %{REQUEST_URI} !^/admin/ [NC]
 RewriteCond %{REQUEST_URI} !^/form/form_handler\.php [NC]
+RewriteCond %{REQUEST_URI} !^/library/index\.php [NC]
+RewriteCond %{REQUEST_URI} !^/library/tree\.php [NC]
 RewriteRule ^ - [R=404,L]
 
-# ЧПУ: Орден Перкуссии
+# ЧПУ: Орден
 RewriteRule ^orden/?$ orden/index.php [L]
 RewriteRule ^orden/manifest/?$ orden/manifest.php [L]
 RewriteRule ^orden/professions/?$ orden/professions.php [L]
@@ -20,13 +29,14 @@ RewriteRule ^orden/levels/?$ orden/levels.php [L]
 RewriteRule ^orden/ratings/?$ orden/ratings.php [L]
 RewriteRule ^orden/shadows/?$ orden/shadows.php [L]
 
-
-# ЧПУ: остальные публичные страницы
+# Остальные страницы
 RewriteRule ^about/?$ about/index.php [L]
 RewriteRule ^sequencer/?$ sequencer/index.php [L]
-
-# Страница ученика: /student/akella → student/index.php?slug=akella
 RewriteRule ^student/([^/]+)$ student/index.php?slug=$1 [L,QSA]
-
-# Главная
 RewriteRule ^$ index.php [L]
+
+# Разрешить статические файлы
+<FilesMatch "\.(json|css|js|png|jpg|jpeg|svg|woff2|ico|html)$">
+  Order Allow,Deny
+  Allow from all
+</FilesMatch>

@@ -175,23 +175,24 @@
         </div>
       </div>
 
-      <!-- Категория: Математика Ритма -->
+       <!-- Категория: Этнические Стили -->
       <div class="skill-category">
-        <div class="category-header">Математика Ритма</div>
+        <div class="category-header">Этнические Стили</div>
         <div class="skill-tree">
-          <div class="skill-node" style="background: #9f7aea" data-key="math-basic">
-            Математик ритма
+          <div class="skill-node" style="background: #805ad5" data-key="ethno-basic">
+            Этно-следопыт
           </div>
           <div class="skill-connector"></div>
-          <div class="skill-node" style="background: #9f7aea" data-key="architect">
-            Архитектор Времени
+          <div class="skill-node" style="background: #805ad5" data-key="world-beat">
+            Хранитель Культур
           </div>
           <div class="skill-connector"></div>
-          <div class="skill-node" style="background: #9f7aea" data-key="time-lord">
-            Повелитель Времени
+          <div class="skill-node" style="background: #805ad5" data-key="culture-keeper">
+            Хранитель Традиций
           </div>
         </div>
       </div>
+	 
 
       <!-- Категория: Метал и Рок -->
       <div class="skill-category">
@@ -229,23 +230,24 @@
         </div>
       </div>
 
-      <!-- Категория: Этнические Стили -->
+ <!-- Категория: Математика Ритма -->
       <div class="skill-category">
-        <div class="category-header">Этнические Стили</div>
+        <div class="category-header">Математика Ритма</div>
         <div class="skill-tree">
-          <div class="skill-node" style="background: #805ad5" data-key="ethno-basic">
-            Этно-следопыт
+          <div class="skill-node" style="background: #9f7aea" data-key="math-basic">
+            Математик ритма
           </div>
           <div class="skill-connector"></div>
-          <div class="skill-node" style="background: #805ad5" data-key="world-beat">
-            Хранитель Культур
+          <div class="skill-node" style="background: #9f7aea" data-key="architect">
+            Архитектор Времени
           </div>
           <div class="skill-connector"></div>
-          <div class="skill-node" style="background: #805ad5" data-key="culture-keeper">
-            Хранитель Традиций
+          <div class="skill-node" style="background: #9f7aea" data-key="time-lord">
+            Повелитель Времени
           </div>
         </div>
       </div>
+    
 
       <!-- Категория: Студийная Работа -->
       <div class="skill-category">

@@ -1,19 +1,10 @@
-<?php require_once __DIR__ . '/../includes/seo.php'; ?>
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" itemscope itemtype="https://schema.org/WebApplication">
 <head>
+	<?php require_once __DIR__ . '/../includes/seo.php'; ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title><?= htmlspecialchars($title) ?></title>
-    <meta name="description" content="<?= htmlspecialchars($description) ?>">
-    <meta name="keywords" content="длительности нот, обучение ритму, музыкальное сольфеджио, уроки барабанов, Троицк, Drumz, ритм-тренажёр, ноты для детей">
-    <meta name="author" content="Сергей Щепотин">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://drumz.ru<?= htmlspecialchars($_SERVER['REQUEST_URI'], ENT_QUOTES) ?>">
-    <!-- Подключаем общий стиль сайта -->
-    <link rel="stylesheet" href="/assets/style.css">
-    <!-- Встроенные стили для специфичных элементов тренажёра -->
+    <link rel="stylesheet" href="/assets/style.css?v=<?= filemtime(__DIR__ . '/../assets/style.css') ?>">
     <style>
         /* Уникальные стили для музыкального тренажера */
         #game-content {
@@ -243,6 +234,45 @@
             transform: scale(1.1);
             color: white;
         }
+        
+        /* Секция контента */
+        .content-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .content-section h2 {
+            color: var(--text);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .content-section p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .content-section ul, 
+        .content-section ol {
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+        
+        .content-section li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .keywords {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+        
         /* Адаптивность */
         @media (max-width: 768px) {
             .track-name {
@@ -292,50 +322,104 @@
             }
         }
     </style>
-    <?php require_once __DIR__ . '/../includes/seo.php'; ?>
 </head>
 <body>
     <?php require_once __DIR__ . '/../includes/header.php'; ?>
-    <main class="container">
-        <div class="card"> <!-- Обернули в общую карточку -->
-            <h1>🎵 Изучаем длительности нот 🎵</h1>
-            <div id="note-selector">
-                <h3>Выберите группы нот:</h3>
-                <div class="note-group" onclick="toggleNoteType('quarter')">Четвертная</div>
-                <div class="note-group" onclick="toggleNoteType('eighth_pair')">Восьмые</div>
-                <div class="note-group" onclick="toggleNoteType('sixteenth_quartet')">Шестнадцатые</div>
-                <div class="note-group" onclick="toggleNoteType('sixteenth_pair_eighth')">2 шестнадцатых + восьмая</div>
-                <div class="note-group" onclick="toggleNoteType('eighth_sixteenth_pair')">Восьмая + две шестнадцатых</div>
-                <div class="note-group" onclick="toggleNoteType('sixteenth_eighth_sixteenth')">Шестнадцатая + восьмая + шестнадцатая</div>
-                <!-- УБРАНО: <div class="note-group" onclick="toggleNoteType('eighth_dotted_sixteenth')">Восьмая с точкой + 16</div> -->
-                <div id="selector-controls">
-                    <button class="btn" onclick="selectAll()">Выбрать все</button>
-                    <button class="btn" onclick="deselectAll()">Снять выбор</button>
+    
+    <main class="container" itemprop="mainEntity">
+        <h1 itemprop="name"><?= htmlspecialchars($title) ?></h1>
+        
+        <!-- ИНСТРУМЕНТ -->
+        <div class="tool-container">
+            <div class="card"> <!-- Обернули в общую карточку -->
+                <div id="note-selector">
+                    <h3>Выберите группы нот:</h3>
+                    <div class="note-group" onclick="toggleNoteType('quarter')">Четвертная</div>
+                    <div class="note-group" onclick="toggleNoteType('eighth_pair')">Восьмые</div>
+                    <div class="note-group" onclick="toggleNoteType('sixteenth_quartet')">Шестнадцатые</div>
+                    <div class="note-group" onclick="toggleNoteType('sixteenth_pair_eighth')">2 шестнадцатых + восьмая</div>
+                    <div class="note-group" onclick="toggleNoteType('eighth_sixteenth_pair')">Восьмая + две шестнадцатых</div>
+                    <div class="note-group" onclick="toggleNoteType('sixteenth_eighth_sixteenth')">Шестнадцатая + восьмая + шестнадцатая</div>
+                    <div id="selector-controls">
+                        <button class="btn" onclick="selectAll()">Выбрать все</button>
+                        <button class="btn" onclick="deselectAll()">Снять выбор</button>
+                    </div>
                 </div>
-            </div>
-            <div id="game-content">
-                <div style="text-align: center; margin: 20px 0;">
-                    <button class="btn-primary" id="newQuestionBtn">Новый пример</button>
+                <div id="game-content">
+                    <div style="text-align: center; margin: 20px 0;">
+                        <button class="btn-primary" id="newQuestionBtn">Новый пример</button>
+                    </div>
+                    <canvas id="gameCanvas" width="800" height="300"></canvas>
+                    <div id="message"></div>
                 </div>
-                <canvas id="gameCanvas" width="800" height="300"></canvas>
-                <div id="message"></div>
-            </div>
-            <!-- Секвенсор теперь внутри карточки, под нотами -->
-            <div class="drum-container">
-                <h2 style="margin: 0 0 15px 0; font-size: 1.4em; color: var(--primary);">🥁 Попробуй сыграть этот ритм</h2>
-                <div class="drum-grid" id="drumGrid"></div>
-                <div class="drum-controls">
-                    <div class="control-group">
-                        <button onclick="playPattern()" id="playButton" class="btn">▶️ Проиграть</button>
-                        <button onclick="clearPattern()" id="clearButton" class="btn">🧹 Очистить</button>
-                        <input type="range" id="bpm" min="40" max="240" value="60">
-                        <span>BPM: <span id="bpmValue">60</span></span>
+                <!-- Секвенсор теперь внутри карточки, под нотами -->
+                <div class="drum-container">
+                    <h2 style="margin: 0 0 15px 0; font-size: 1.4em; color: var(--primary);">🥁 Попробуй сыграть этот ритм</h2>
+                    <div class="drum-grid" id="drumGrid"></div>
+                    <div class="drum-controls">
+                        <div class="control-group">
+                            <button onclick="playPattern()" id="playButton" class="btn">▶️ Проиграть</button>
+                            <button onclick="clearPattern()" id="clearButton" class="btn">🧹 Очистить</button>
+                            <input type="range" id="bpm" min="40" max="240" value="60">
+                            <span>BPM: <span id="bpmValue">60</span></span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <!-- ТЕКСТЫ ПОСЛЕ ИНСТРУМЕНТА -->
+        <div class="content-section">
+            <div class="seo-description" itemprop="description">
+                <p><?= htmlspecialchars($description) ?></p>
+            </div>
+            
+            <section class="tool-explanation">
+                <h2>О тренажёре длительностей нот</h2>
+                <p>Интерактивный тренажёр длительностей нот - это мощный инструмент для изучения музыкальных ритмов и развития ритмического слуха. Он помогает визуально воспринимать различные нотные значения и правильно их исполнять.</p>
+                <p>Тренажёр идеально подходит как для самостоятельного изучения, так и для использования преподавателями в образовательном процессе. Он развивает чувство ритма, координацию и музыкальное мышление.</p>
+            </section>
+            
+            <section class="instructions">
+                <h2>Как использовать тренажёр</h2>
+                <ol>
+                    <li><strong>Выберите нотные группы:</strong> отметьте нужные типы нот в панели выбора</li>
+                    <li><strong>Сгенерируйте пример:</strong> нажмите кнопку "Новый пример" для создания задания</li>
+                    <li><strong>Изучите ноты:</strong> внимательно рассмотрите визуальное представление длительностей</li>
+                    <li><strong>Практикуйтесь:</strong> используйте секвенсор для воспроизведения ритма</li>
+                </ol>
+            </section>
+            
+            <section class="features">
+                <h2>Особенности тренажёра</h2>
+                <ul>
+                    <li><strong>Визуальное обучение:</strong> наглядное представление различных нотных значений</li>
+                    <li><strong>Интерактивная практика:</strong> секвенсор для отработки ритмов</li>
+                    <li><strong>Гибкая настройка:</strong> выбор из 6 различных типов нотных групп</li>
+                    <li><strong>Регулировка темпа:</strong> возможность изменения скорости от 40 до 240 BPM</li>
+                    <li><strong>Обратная связь:</strong> система проверки правильности выполнения</li>
+                </ul>
+            </section>
+            
+            <section class="methodology">
+                <h2>Методика работы</h2>
+                <ol>
+                    <li><strong>Начальный уровень:</strong> начните с простых групп (четверти, восьмые)</li>
+                    <li><strong>Средний уровень:</strong> добавляйте сложные комбинации (шестнадцатые)</li>
+                    <li><strong>Продвинутый уровень:</strong> работайте со всеми доступными группами</li>
+                    <li><strong>Регулярная практика:</strong> ежедневные занятия по 15-20 минут</li>
+                </ol>
+            </section>
+            
+            <section class="keywords">
+                <h2>Ключевые слова и темы</h2>
+                <p>длительности нот, обучение ритму, музыкальное сольфеджио, уроки барабанов, Троицк, Drumz, ритм-тренажёр, ноты для детей, музыкальный тренажер, ритмические упражнения, развитие ритма, нотная грамота, музыкальное образование, ритмическая практика, барабанные упражнения</p>
+            </section>
+        </div>
     </main>
+    
     <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+    
     <script>
         /* --------------------------------------------------------------
            Объединённый JavaScript (обновлён)
@@ -353,10 +437,8 @@
             "sixteenth_pair_eighth": {name: "Две шестнадцатых + восьмая", beats: 2},
             "eighth_sixteenth_pair": {name: "Восьмая + две шестнадцатых", beats: 2},
             "sixteenth_eighth_sixteenth": {name: "Шестнадцатая + восьмая + шестнадцатая", beats: 2}
-            // "eighth_dotted_sixteenth": {name: "Восьмая с точкой + шестнадцатая", beats: 2} // УБРАНО
         };
         let currentNotes = [];
-        // УБРАНО: 'eighth_dotted_sixteenth' из начального набора
         let selectedNoteTypes = new Set([
             'quarter', 
             'eighth_pair', 
@@ -374,7 +456,6 @@
                 "sixteenth_pair_eighth": "2 шестнадцатых + восьмая",
                 "eighth_sixteenth_pair": "Восьмая + две шестнадцатых",
                 "sixteenth_eighth_sixteenth": "Шестнадцатая + восьмая + шестнадцатая"
-                // "eighth_dotted_sixteenth": "Восьмая с точкой + шестнадцатая" // УБРАНО
             };
             const elements = document.querySelectorAll('.note-group');
             elements.forEach(element => {
@@ -398,7 +479,6 @@
                 'sixteenth_pair_eighth',
                 'eighth_sixteenth_pair',
                 'sixteenth_eighth_sixteenth'
-                // 'eighth_dotted_sixteenth' // УБРАНО
             ]);
             const elements = document.querySelectorAll('.note-group');
             elements.forEach(element => element.classList.add('selected'));
@@ -695,7 +775,6 @@
                 this.ctx.strokeStyle = color;
                 this.ctx.stroke();
             }
-            // УБРАНО: drawEighthDottedSixteenth
             drawNote(noteType, x, y) {
                 switch(noteType) {
                     case 'quarter':
@@ -716,9 +795,6 @@
                     case 'sixteenth_eighth_sixteenth':
                         this.drawSixteenthEighthSixteenth(x, y);
                         break;
-                    // case 'eighth_dotted_sixteenth': // УБРАНО
-                    //     this.drawEighthDottedSixteenth(x, y);
-                    //     break;
                 }
             }
         }
@@ -772,9 +848,6 @@
                     case 'sixteenth_eighth_sixteenth':
                         notes.drawNote(note.type, note.position - 48, 0);
                         break;
-                    // case 'eighth_dotted_sixteenth': // УБРАНО
-                    //     notes.drawNote(note.type, note.position - 48, 0); // ⬅️ теперь как у 4 шестнадцатых
-                    //     break;
                     default:
                         notes.drawNote(note.type, note.position, 0);
                         break;

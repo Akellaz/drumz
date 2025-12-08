@@ -1,0 +1,16 @@
+{
+  "title": "Dynamically Speaking",
+  "category": "solo",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 120,
+  "version": "1.0",
+  "created": "2025-12-04",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "c2c2 c2c2 c2c2 c2c2 |  c2c2 c4 cccc c4 | c2c2 c2c2 c2c2 c2c2 | c2c2 c2c2 cccc c4 | \n!p! c2c2 c4 c2c2 c4 | cccc c4 cccc c4 | c2c2 c2c2 c2c2 c2c2 | cccc cccc c2c2 c4 | \n!p! cccc c4 !mp! cccc c4 | !mf! cccc c4 !f! cccc c4 | !p! c2!<(!  c2 c2c2 c2c2 c2c2 | cccc cc!<)!cc !f! c2c2 c4 | \n!pp! c4 c4 c2c2 c4 | c2c2 c2c2 cccc c4 | c4 z4 c2c2 c2c2 | c2c2 c2c2 z2 c2 c4 | \n!pp! cccc c4 !p! cccc c4 | !mf! cccc c4 !f! cccc c4 | !ff! c2c2 c2c2 c2c2 c2c2 | !<(!cccc cc!<)!cc  !ff! c2c2 c4 | \n!f! cccc c4 !mf! cccc c4 | !mp! cccc c4 !p! cccc c4|  !pp! cccc c4 cccc c4 | c2c2 c4 c2c2 c4 | \n!f! c4 c4 z2 c2 c4 | c2c2 c2c2 z2 c2 c4 | !pp! c2c2 c2c2 z2 c2 c4 | cccc cccc c2c2 c4 | \n!p! c2!<(!   c2 c2c2 c2c2 c2c2!<)! | !f!cc!>(!cc cccc cccc cccc!>)! | !pp! c2c2 !<(! c2c2 c2c2 c2c2 | cccc ccc!<)!c !ff!c4 z4| "
+    }
+  ]
+}

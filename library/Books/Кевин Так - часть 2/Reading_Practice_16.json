@@ -1,0 +1,21 @@
+{
+  "title": "Reading Practice #16",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 80,
+  "version": "1.0",
+  "created": "2025-12-07",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "v.1",
+      "abc": "c2c2 c2c2 z2c2 c2c2 | c4 c4 z2c2 c4 | c2c2 z2c2 z2c2 c4 | c2c2 c2c2 c4 c4 | \nc4 z2c2 c4 z2c2 | c2c2 z2c2 c4 c4 | c2c2 z2c2 c4 c2c2 | z2c2 c4 c4 z4 | \nc2c2 c2c2 c4 c4 | c2c2 c2c2 z2c2 c4 | c2c2 z2c2 z2c2 z2c2 | c2c2 c2c2 c4 z4 | \nc2c2 c4 z4 c2c2 | c4 z4 c2c2 c4 | c2c2 z2c2 z2c2 z2c2 | c2c2 c2c2 c4 z4 | "
+    },
+    {
+      "id": 1,
+      "title": "v.2",
+      "abc": "c2c2 z2c2 c4 (3c2c2c2 | c2c2 c2c2 c4 z4 | c2c2 z2c2 c4 c4 | (3c2c2c2 (3c2c2c2 c4 z4 | \nc2c2 z2c2 (3c2c2c2 c4 | c6 c2 c2c2 c4 | c2c2 c2c2 c2c2 c4 | c2c2 (3c2c2c2 z2c2 c4 | \nc2c2 z2c2 cccc c4 | cccc cccc z2c2 c4 | cccc c2c2 z2c2 cccc | c2c2 cccc c2c2 z4  | \nc2c2 c2c2 z2c2 c4 | (3c2c2c2 c2c2 c2c2 c4 | (3c2c2c2 c2c2 cccc c4 | c2c2 z2c2 z2c2 c4 | "
+    }
+  ]
+}

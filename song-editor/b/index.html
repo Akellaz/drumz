@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Редактор партий ударных — Drumz</title>
+  <meta name="description" content="Создавайте, редактируйте и проигрывайте ритмы для ударных. Сохраняйте и делитесь упражнениями.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/abcjs-audio.min.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      background: #f9f9f9;
+      height: 100vh;
+      overflow: hidden;
+      font-size: 14px;
+    }
+
+    .container {
+      display: flex;
+      height: 100%;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: #fff;
+      border-right: 1px solid #ddd;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      padding: 8px;
+    }
+
+    /* Audio versions panel */
+    #audio-versions {
+      display: none;
+      margin-bottom: 6px;
+    }
+
+    .audio-variant {
+      flex: 1;
+      padding: 2px 4px;
+      font-size: 11px;
+      border: 1px solid #ccc;
+      background: #f8f9fa;
+      border-radius: 3px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .audio-variant:hover {
+      background: #e9ecef;
+    }
+
+    .audio-variant.active {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+
+    #audio-player-container {
+      display: none;
+      margin-top: 4px;
+    }
+
+    #external-audio {
+      width: 100%;
+      height: 28px;
+      font-size: 11px;
+    }
+
+    /* Project header */
+    .project-header {
+      margin-bottom: 6px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .project-header input {
+      padding: 4px 6px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 13px;
+    }
+
+    .project-header input[type="text"] {
+      flex: 1;
+    }
+
+    .project-header input[type="number"] {
+      width: 60px;
+      text-align: center;
+    }
+
+  /* Fragments — успокоенная версия */
+.fragments-section {
+  margin-bottom: 6px;
+}
+
+.fragment-section-header {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.fragment-section-header button {
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+}
+
+.fragment-section-header button:hover {
+  background: #e9ecef;
+  border-color: #ccc;
+}
+
+.fragment-section-header button.danger {
+  color: #dc3545;
+}
+
+.fragment-section-header button.danger:hover {
+  background: #f8d7da;
+}
+
+#fragment-list {
+  max-height: 120px;
+  margin-bottom: 6px;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  background: #fafafa;
+  font-size: 11px;
+}
+
+.fragment-item {
+  padding: 2px 6px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fragment-item:last-child {
+  border-bottom: none;
+}
+
+.fragment-item:hover {
+  background: #f8f9fa;
+}
+
+.fragment-item.active {
+  background: #e3f2fd;
+  color: #007bff;
+}
+
+.fragment-item.active:hover {
+  background: #d0e6fc;
+}
+
+.fragment-title-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.fragment-edit {
+  flex-shrink: 0;
+  margin-left: 4px;
+  opacity: 0.4;
+  cursor: pointer;
+  user-select: none;
+  font-size: 10px;
+}
+
+.fragment-item.active .fragment-edit {
+  opacity: 0.8;
+  color: #007bff;
+}
+
+    .editor-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      margin-top: 6px;
+    }
+
+    .note-btn {
+      padding: 2px 6px;
+      background: #e9ecef;
+      color: #495057;
+      border: 1px solid #ced4da;
+      border-radius: 3px;
+      font-size: 12px;
+      cursor: pointer;
+      min-width: 36px;
+      text-align: center;
+    }
+    .note-btn:hover {
+      background: #dee2e6;
+    }
+
+    .sidebar textarea {
+      flex: 1;
+      font-family: monospace;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      resize: none;
+      font-size: 12px;
+      line-height: 1.3;
+      margin-top: 6px;
+    }
+
+    /* Group selector */
+    .group-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .group-btn {
+      font-size: 11px;
+      padding: 2px 6px;
+      border: 1px solid #ccc;
+      background: #f8f9fa;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .group-btn.active {
+      background: #e9ecef;
+      border-color: #007bff;
+    }
+
+    .group-btn:hover {
+      background: #e2e6ea;
+    }
+
+    #active-note-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+      min-height: 24px;
+    }
+
+    /* Dynamics */
+    .dynamics-section {
+      display: none;
+      margin-top: 6px;
+    }
+
+    .dynamics-toggle {
+      font-size: 11px;
+      color: #666;
+      cursor: pointer;
+      user-select: none;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .dynamics-toggle:hover {
+      color: #007bff;
+    }
+
+    /* Actions */
+    .editor-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      margin-bottom: 4px;
+      justify-content: flex-start;
+      border-top: 1px solid #eee;
+      padding-top: 6px;
+    }
+
+    .editor-actions button {
+      width: 32px;
+      height: 32px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      padding: 0;
+    }
+
+    .editor-actions button:hover {
+      border-color: #007bff;
+      color: #007bff;
+      background: #f0f8ff;
+    }
+
+    .resizer {
+      width: 4px;
+      background: #ccc;
+      cursor: col-resize;
+      user-select: none;
+    }
+
+    .main {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    #paper {
+      background: white;
+      padding: 12px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      width: 100%;
+      margin-bottom: 12px;
+      text-align: center;
+      max-height: calc(100vh - 200px);
+      overflow: auto;
+	  padding-bottom: 30px;
+    }
+
+    #paper svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    #audio-controls {
+      margin: 6px 0;
+    }
+
+    .main-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .main-controls label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .main-controls label input {
+      cursor: pointer;
+    }
+
+    .abcjs-dragging {
+      stroke: blue !important;
+      fill: blue !important;
+    }
+
+    .fragment-edit-input {
+      width: 100%;
+      font-size: 12px;
+      border: 1px solid #007bff;
+      border-radius: 2px;
+      padding: 2px 4px;
+      outline: none;
+    }
+
+    /* === Library Modal === */
+    .library-folder {
+      margin: 2px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .library-folder > span.toggle {
+      font-size: 12px;
+      opacity: 0.6;
+      user-select: none;
+    }
+    .library-folder.open > span.toggle::after { content: "▼"; }
+    .library-folder.collapsed > span.toggle::after { content: "▶"; }
+    .library-file {
+      margin: 2px 0 2px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+    .library-file:hover {
+      background: #eef2ff;
+      color: #4f46e5;
+    }
+    .library-file span {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 250px;
+      }
+    }
+	/* Скрыть заголовок "Фрагменты" — его уже нет, отлично */
+/* Обновлённые кнопки — тонкие и ненавязчивые */
+.fragment-section-header {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.icon-btn {
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+}
+
+.icon-btn:hover {
+  background: #e9ecef;
+  border-color: #ccc;
+}
+
+.icon-btn.danger {
+  color: #dc3545;
+}
+
+.icon-btn.danger:hover {
+  background: #f8d7da;
+}
+
+
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/dist/abcjs-basic.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <!-- Audio versions panel -->
+      <div id="audio-versions">
+        <div style="display: flex; gap: 4px;">
+          <button type="button" class="audio-variant" data-type="plus">🥁 Plus</button>
+          <button type="button" class="audio-variant" data-type="click">⏱ Click</button>
+          <button type="button" class="audio-variant" data-type="minus">🎸 Minus</button>
+        </div>
+        <div id="audio-player-container">
+          <audio id="external-audio" controls></audio>
+        </div>
+      </div>
+
+      <!-- Project title + tempo -->
+      <div class="project-header">
+        <div style="display: flex; gap: 6px;">
+          <input type="text" id="project-title" placeholder="Название" value="Новая песня">
+          <input type="number" id="project-tempo" placeholder="BPM" value="120" min="40" max="300">
+        </div>
+      </div>
+
+      <!-- Fragments list -->
+		<div class="fragments-section">
+		  <div class="fragment-section-header">
+			<button id="add-fragment" title="Добавить фрагмент" class="icon-btn">+</button>
+			<button id="delete-fragment" title="Удалить фрагмент" class="icon-btn danger">–</button>
+			<button id="renderBtn" title="Обновить ноты" class="icon-btn">↻</button>
+		  </div>
+		  <div id="fragment-list"></div>
+		</div>
+
+      <!-- Editor section -->
+      <div class="editor-section">
+        <!-- Group selector -->
+        <div class="group-selector" id="group-selector">
+          <button type="button" class="group-btn" data-group="basic">Базовые</button>
+          <button type="button" class="group-btn" data-group="sixteens">Шестнадцатые</button>
+          <button type="button" class="group-btn" data-group="syncop">Синкопы</button>
+		  <button type="button" class="group-btn" data-group="triplets">Триоли</button>
+		  <button type="button" class="group-btn" data-group="sextuplets">Секстоли</button>
+          <button type="button" class="group-btn" data-group="complex">Комплекс</button>
+		  <button type="button" class="group-btn" data-group="pauses">Паузы</button>
+		  <button type="button" class="group-btn" data-group="separator">Разделители</button>
+
+        </div>
+
+        <!-- Active note buttons (initially empty) -->
+        <div id="active-note-buttons"></div>
+
+        <!-- ABC textarea -->
+        <textarea id="abc" spellcheck="false">[F2g2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2 |</textarea>
+
+        <!-- Dynamics toggle -->
+        <div class="dynamics-toggle" id="toggle-dynamics">
+          ▶ Динамика
+        </div>
+
+        <!-- Dynamics panel -->
+        <div class="dynamics-section" id="dynamics-panel">
+          <div style="display: flex; flex-wrap: wrap; gap: 4px; width: 100%;">
+            <button type="button" class="note-btn" data-note="!pp!" title="Pianissimo">pp</button>
+            <button type="button" class="note-btn" data-note="!p!" title="Piano">p</button>
+            <button type="button" class="note-btn" data-note="!mp!" title="Mezzo-piano">mp</button>
+            <button type="button" class="note-btn" data-note="!mf!" title="Mezzo-forte">mf</button>
+            <button type="button" class="note-btn" data-note="!f!" title="Forte">f</button>
+            <button type="button" class="note-btn" data-note="!ff!" title="Fortissimo">ff</button>
+            <button type="button" class="note-btn" data-note="!<(! !<)! |" title="Крещендо">‹‹</button>
+            <button type="button" class="note-btn" data-note="!>(! !>)! |" title="Диминуэндо">››</button>
+          </div>
+        </div>
+
+        <div class="editor-actions">
+          <button id="new-project" title="Новый проект">🆕</button>
+          <button id="save-project" title="Сохранить проект">💾</button>
+          <button id="load-project" title="Загрузить проект">📂</button>
+          <button id="open-library" title="Открыть из библиотеки">📚</button>
+          <button id="download-pdf" title="Скачать PDF">📄</button>
+        </div>
+      </div>
+
+      <input type="file" id="file-input" accept=".json" style="display: none;">
+    </div>
+
+    <div class="resizer" id="resizer"></div>
+
+    <div class="main">
+      <div id="paper"></div>
+      <div id="audio-controls"></div>
+      <div class="main-controls">
+        <label>
+          <input type="checkbox" id="show-cursor" checked> Курсор
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Library Modal -->
+  <div id="library-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:white; width:90%; max-width:600px; height:80%; max-height:600px; border-radius:8px; display:flex; flex-direction:column; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+      <div style="padding:12px 16px; background:#f8f9fa; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+        <strong>📚 Библиотека упражнений</strong>
+        <button id="close-library-modal" style="background:none; border:none; font-size:18px; cursor:pointer;">×</button>
+      </div>
+      <div id="library-tree-container" style="flex:1; overflow:auto; padding:10px; font-family:monospace; font-size:13px;"></div>
+    </div>
+  </div>
+
+  <script>
+    // === Вставка текста в textarea в позицию курсора ===
+    function insertAtCursor(textarea, text) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const before = textarea.value.substring(0, start);
+      const after = textarea.value.substring(end);
+      textarea.value = before + text + after;
+      const newCursorPos = start + text.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+      textarea.focus();
+    }
+
+    // === Resizer ===
+    const resizer = document.getElementById("resizer");
+    const sidebar = document.querySelector(".sidebar");
+
+    resizer.addEventListener("mousedown", (e) => {
+      document.addEventListener("mousemove", resize);
+      document.addEventListener("mouseup", stopResize);
+      e.preventDefault();
+    });
+
+    function resize(e) {
+      const containerRect = document.querySelector(".container").getBoundingClientRect();
+      const newWidth = e.clientX - containerRect.left;
+      if (newWidth > 100 && newWidth < containerRect.width - 200) {
+        sidebar.style.width = newWidth + "px";
+      }
+    }
+
+    function stopResize() {
+      document.removeEventListener("mousemove", resize);
+      document.removeEventListener("mouseup", stopResize);
+    }
+
+    // === Группы нот ===
+	
+    const noteGroups = {
+      basic: [
+        { note: "c4", label: "c4", title: "Четверть" },
+        { note: "c2", label: "с2", title: "Восьмая" },
+        { note: "c2c2", label: "c2c2", title: "Восьмушки" },
+        { note: "cccc", label: "cccc", title: "Шестнадцатые" },
+		{ note: "c16 |", label: "c16", title: "Целая" },
+		{ note: "c8", label: "c8", title: "Половинная" }
+      ],
+      pauses: [
+        { note: "z16 |", label: "z16", title: "Целая пауза" },
+        { note: "z8", label: "z8", title: "Половинная пауза" },
+        { note: "z4", label: "z4", title: "Четвертная пауза" },
+        { note: "z2", label: "z2", title: "Восьмая пауза" }
+      ],
+      syncop: [
+		{ note: "c6", label: "c6", title: "Четверть с точкой" },
+        { note: "c3c", label: "c3c", title: "Восьмая с точкой + шестнадцатая" },
+		{ note: "cc2c", label: "cc2c", title: "Шестнадцатая + восьмая + шестнадцатая" },
+		{ note: "z2c2", label: "z2c2", title: "Восьмая пауза+нота" }
+
+      ],
+	  triplets: [
+        { note: "(3c2c2c2", label: "(3c2c2c2", title: "Восьмая триоль" },
+		{ note: "(3c2z2c2", label: "(3c2z2c2", title: "Триоль пауза триоль" },
+		{ note: "(3z2c2z2", label: "(3z2c2z2", title: "Пауза триоль пауза" },
+		{ note: "(3c4c4c4", label: "(3c4c4c4", title: "Четвертная триоль" }
+
+      ],
+	  sextuplets: [
+        { note: "(3ccc(3ccc", label: "(3ccc(3ccc", title: "Секстоль" },
+		{ note: "c2(3ccc", label: "c2(3ccc", title: "Восьмая + секстоль" },
+		{ note: "(3cccc2", label: "(3cccc2", title: "Секстоль + восьмая" },
+		
+
+      ],
+	  sixteens: [
+	    { note: "c2cc", label: "c2cc", title: "Галоп" },
+        { note: "ccc2", label: "ccc2", title: "Обратный галоп" },
+        { note: "zccc", label: "zccc", title: "1/16 пауза+шестнадцатые" },
+        { note: "z2cc", label: "z2cc", title: "Восьмая пауза+шестнадцатые" }
+
+        
+      ],
+      complex: [
+        { note: "[F4g]", label: "[F4g]", title: "Бочка+хэт четверть" },
+		{ note: "[c4g]", label: "[c4g]", title: "Малый+хэт четверть" },
+		
+		{ note: "[F2g2]g2", label: "[F2g2]g2", title: "[Бочка хэт]+хэт восьмые" },
+		{ note: "[c2g2]g2", label: "[c2g2]g2", title: "[Малый хэт]+хэт восьмые" },
+        { note: "g2[F2g2]", label: "g2[F2g2]", title: "Хэт+[бочка хэт] восьмые" }
+		
+		
+		
+      ],
+	  separator: [
+        { note: "|", label: "|", title: "Тактовая черта" }
+      ]
+    };
+
+    const activeGroups = new Set();
+    const activeNoteButtons = document.getElementById("active-note-buttons");
+    const groupButtons = document.querySelectorAll(".group-btn");
+
+    // === Обработка кликов по группам ===
+    groupButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const groupKey = btn.dataset.group;
+        const isActive = activeGroups.has(groupKey);
+
+        if (isActive) {
+          // Удаляем все кнопки этой группы
+          Array.from(activeNoteButtons.children).forEach(child => {
+            if (child.dataset.group === groupKey) {
+              activeNoteButtons.removeChild(child);
+            }
+          });
+          activeGroups.delete(groupKey);
+          btn.classList.remove("active");
+        } else {
+          // Добавляем кнопки группы
+          noteGroups[groupKey].forEach(item => {
+            const button = document.createElement("button");
+            button.className = "note-btn";
+            button.dataset.note = item.note;
+            button.dataset.group = groupKey;
+            button.title = item.title;
+            button.textContent = item.label;
+            activeNoteButtons.appendChild(button);
+          });
+          activeGroups.add(groupKey);
+          btn.classList.add("active");
+        }
+      });
+    });
+
+    // === ABCJS Core ===
+    let synthControl = null;
+    let visualObj = null;
+    let abcString = document.getElementById("abc").value;
+    const abcTextarea = document.getElementById("abc");
+    const paperDiv = document.getElementById("paper");
+    const audioDiv = document.getElementById("audio-controls");
+    const showCursor = document.getElementById("show-cursor");
+    const renderBtn = document.getElementById("renderBtn");
+    const fragmentList = document.getElementById("fragment-list");
+    const addFragmentBtn = document.getElementById("add-fragment");
+    const deleteFragmentBtn = document.getElementById("delete-fragment");
+    const saveProjectBtn = document.getElementById("save-project");
+    const loadProjectBtn = document.getElementById("load-project");
+    const fileInput = document.getElementById("file-input");
+    const projectTitle = document.getElementById("project-title");
+    const projectTempo = document.getElementById("project-tempo");
+
+    // === External audio ===
+    const audioVersions = document.getElementById("audio-versions");
+    const audioVariants = document.querySelectorAll(".audio-variant");
+    const audioPlayerContainer = document.getElementById("audio-player-container");
+    const externalAudio = document.getElementById("external-audio");
+    let currentAudio = null;
+    let audioBaseUrl = null;
+
+    const percNotes = ['F', 'c', 'g', 'e', 'd', 'A', 'a'];
+
+    let fragments = [{ id: 0, title: "Вступление", abc: abcString }];
+    let currentFragmentId = 0;
+
+    let project = {
+      title: "Новая песня",
+      tempo: 120,
+      fragments: fragments,
+      audio: null
+    };
+
+    // === Dynamics toggle ===
+    const toggleDynamics = document.getElementById("toggle-dynamics");
+    const dynamicsPanel = document.getElementById("dynamics-panel");
+
+    toggleDynamics.addEventListener("click", () => {
+      const isVisible = dynamicsPanel.style.display === "block";
+      dynamicsPanel.style.display = isVisible ? "none" : "block";
+      toggleDynamics.textContent = isVisible ? "▶ Динамика" : "▼ Динамика";
+    });
+
+    function extractNotesFromABC(fullABC) {
+      const lines = fullABC.split('\n');
+      return lines.filter(line => {
+        const t = line.trim();
+        return t && !/^[A-Z]:/.test(t) && !/^%%/.test(t) && !/^X:|^T:|^L:|^M:|^K:|^Q:|^V:|^U:/.test(t);
+      }).join('\n');
+    }
+
+    function createFullABCFromNotes(notes, fragmentTitle) {
+      const tempo = parseInt(projectTempo.value) || 120;
+      return `X:1
+T:${project.title} - ${fragmentTitle}
+L:1/16
+M:4/4
+K:C clef=perc
+Q:1/4=${tempo}
+V:Drums stem=up
+U:n=!style=x!
+%%percmap F  acoustic-bass-drum
+%%percmap c  acoustic-snare
+%%percmap g  closed-hi-hat x
+%%percmap e  high-tom
+%%percmap d  hi-mid-tom
+%%percmap A  low-tom
+%%percmap a  crash-cymbal-1  x
+${notes.trim()}`;
+    }
+
+    function modifyPercNote(note, step) {
+      const index = percNotes.indexOf(note);
+      if (index === -1) return note;
+      const newIndex = Math.max(0, Math.min(percNotes.length - 1, index - step));
+      return percNotes[newIndex];
+    }
+
+    function tokenize(str) {
+      const arr = str.split(/(!.+?!|".+?")/);
+      const output = [];
+      for (let i = 0; i < arr.length; i++) {
+        const token = arr[i];
+        if (token.length > 0) {
+          if (token[0] !== '"' && token[0] !== '!') {
+            const arr2 = token.split(/([A-Ga-g][,']*)/);
+            output.push(...arr2.filter(t => t.length > 0));
+          } else {
+            output.push(token);
+          }
+        }
+      }
+      return output;
+    }
+
+    function clickListener(abcelem, tuneNumber, classes, analysis, drag) {
+      if (drag && drag.step && abcelem.el_type === 'note' && abcelem.startChar >= 0 && abcelem.endChar >= 0) {
+        const originalText = abcString.substring(abcelem.startChar, abcelem.endChar);
+        const tokens = tokenize(originalText);
+        let modified = false;
+        for (let i = 0; i < tokens.length; i++) {
+          if (percNotes.includes(tokens[i])) {
+            tokens[i] = modifyPercNote(tokens[i], drag.step);
+            modified = true;
+          }
+        }
+        if (modified) {
+          const newText = tokens.join("");
+          abcString = abcString.substring(0, abcelem.startChar) + newText + abcString.substring(abcelem.endChar);
+          const notesOnly = extractNotesFromABC(abcString);
+          abcTextarea.value = notesOnly;
+          const currentFragment = fragments.find(f => f.id === currentFragmentId);
+          if (currentFragment) currentFragment.abc = notesOnly;
+          refreshTune();
+        }
+      }
+    }
+
+    function CursorControl() {
+      const self = this;
+      self.onEvent = function(ev) {
+        let cursor = document.querySelector("#paper svg .abcjs-cursor");
+        if (!cursor) {
+          const svg = document.querySelector("#paper svg");
+          if (svg) {
+            cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            cursor.setAttribute("class", "abcjs-cursor");
+            svg.appendChild(cursor);
+          }
+        }
+        if (cursor && showCursor.checked && ev && ev.left != null) {
+          cursor.setAttribute("x1", ev.left - 2);
+          cursor.setAttribute("x2", ev.left - 2);
+          cursor.setAttribute("y1", ev.top || 0);
+          cursor.setAttribute("y2", (ev.top || 0) + (ev.height || 30));
+        } else if (cursor) {
+          cursor.setAttribute("x1", -10);
+          cursor.setAttribute("x2", -10);
+        }
+      };
+      self.onFinished = function() {
+        const cursor = document.querySelector("#paper svg .abcjs-cursor");
+        if (cursor) {
+          cursor.setAttribute("x1", -10);
+          cursor.setAttribute("x2", -10);
+        }
+      };
+    }
+
+    function stopExternalAudio() {
+      if (externalAudio) {
+        externalAudio.pause();
+        externalAudio.currentTime = 0;
+        audioPlayerContainer.style.display = "none";
+        currentAudio = null;
+        audioVariants.forEach(btn => btn.classList.remove("active"));
+      }
+    }
+
+    function stopAbcPlayback() {
+      if (synthControl) {
+        synthControl.pause();
+        synthControl.disable(true);
+      }
+    }
+
+    function refreshTune() {
+      stopExternalAudio();
+      paperDiv.innerHTML = "";
+      audioDiv.innerHTML = "";
+
+      const currentFragment = fragments.find(f => f.id === currentFragmentId);
+      if (!currentFragment) return;
+
+      const notesOnly = abcTextarea.value;
+      currentFragment.abc = notesOnly;
+      const fullABC = createFullABCFromNotes(notesOnly, currentFragment.title);
+      abcString = fullABC;
+
+      if (!abcString.trim()) return;
+
+      try {
+        const options = {
+          add_classes: true,
+          responsive: "resize",
+          dragging: true,
+          clickListener: clickListener
+        };
+
+        const vo = ABCJS.renderAbc(paperDiv, abcString, options);
+        if (!vo || vo.length === 0) throw new Error("Render failed");
+        visualObj = vo[0];
+
+        if (ABCJS.synth.supportsAudio()) {
+          const cursorControl = new CursorControl();
+          synthControl = new ABCJS.synth.SynthController();
+          synthControl.load(audioDiv, cursorControl, {
+            displayLoop: false,
+            displayRestart: false,
+            displayPlay: true,
+            displayProgress: false,
+            displayWarp: false
+          });
+          synthControl.disable(true);
+
+          const bpmMatch = abcString.match(/Q:\s*1\/4\s*=\s*(\d+)/i);
+          const bpm = bpmMatch ? parseInt(bpmMatch[1]) : parseInt(projectTempo.value) || 120;
+          const msPerMeasure = (4 / bpm) * 60 * 1000;
+
+          const midiBuffer = new ABCJS.synth.CreateSynth();
+          midiBuffer.init({
+            visualObj: visualObj,
+            millisecondsPerMeasure: msPerMeasure
+          }).then(() => {
+            synthControl.setTune(visualObj, false).then(() => {
+              synthControl.disable(false);
+            });
+          }).catch(err => {
+            console.error("Synth init error:", err);
+            audioDiv.innerHTML = "<p style='color:red;'>Ошибка аудио.</p>";
+          });
+        }
+      } catch (e) {
+        console.error("Render error:", e);
+        paperDiv.innerHTML = `<p style="color:red;font-size:12px;">Ошибка: ${e.message}</p>`;
+      }
+    }
+
+    function renderFragmentList() {
+      fragmentList.innerHTML = "";
+      fragments.forEach(fragment => {
+        const div = document.createElement("div");
+        div.className = "fragment-item";
+        if (fragment.id === currentFragmentId) div.classList.add("active");
+
+        const titleSpan = document.createElement("span");
+        titleSpan.className = "fragment-title-text";
+        titleSpan.textContent = fragment.title;
+
+        const editBtn = document.createElement("span");
+        editBtn.className = "fragment-edit";
+        editBtn.textContent = "✎";
+        editBtn.title = "Переименовать";
+
+        div.appendChild(titleSpan);
+        div.appendChild(editBtn);
+
+        div.onclick = (e) => {
+          if (e.target === editBtn) return;
+          selectFragment(fragment.id);
+        };
+
+        editBtn.onclick = (e) => {
+          e.stopPropagation();
+          startEditing(fragment, div, titleSpan, editBtn);
+        };
+
+        fragmentList.appendChild(div);
+      });
+    }
+
+    function startEditing(fragment, container, titleSpan, editBtn) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "fragment-edit-input";
+      input.value = fragment.title;
+      input.select();
+
+      container.replaceChild(input, titleSpan);
+      container.replaceChild(document.createTextNode(""), editBtn);
+
+      input.focus();
+
+      const finish = () => {
+        fragment.title = input.value.trim() || "Без названия";
+        renderFragmentList();
+      };
+
+      input.addEventListener("blur", finish);
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") finish();
+        if (e.key === "Escape") {
+          input.blur();
+          renderFragmentList();
+        }
+      });
+    }
+
+    function selectFragment(id) {
+      currentFragmentId = id;
+      const fragment = fragments.find(f => f.id === id);
+      if (fragment) {
+        abcTextarea.value = fragment.abc;
+        renderFragmentList();
+        refreshTune();
+        abcTextarea.focus(); // автофокус
+      }
+    }
+
+    function addFragment() {
+      const newId = fragments.length > 0 ? Math.max(...fragments.map(f => f.id)) + 1 : 0;
+      fragments.push({
+        id: newId,
+        title: `Фрагмент ${fragments.length + 1}`,
+        abc: "z16 | z16 | z16 | z16 |"
+      });
+      selectFragment(newId);
+    }
+
+    function deleteFragment() {
+      if (fragments.length <= 1) return;
+      fragments = fragments.filter(f => f.id !== currentFragmentId);
+      if (fragments.length > 0) selectFragment(fragments[0].id);
+    }
+
+    function newProject() {
+      projectTitle.value = "Новая песня";
+      projectTempo.value = 120;
+      fragments = [{ id: 0, title: "Вступление", abc: "z16 |" }];
+      currentFragmentId = 0;
+      project = { title: "Новая песня", tempo: 120, fragments: fragments, audio: null };
+      hideAudioPanel();
+      selectFragment(0);
+      history.replaceState(null, '', '/song-editor/');
+    }
+
+    function hideAudioPanel() {
+      audioVersions.style.display = "none";
+      stopExternalAudio();
+    }
+
+    function showAudioPanel(audioObj, baseUrl) {
+      project.audio = audioObj;
+      audioBaseUrl = baseUrl;
+      audioVersions.style.display = "block";
+    }
+
+    function setupAudioVariants() {
+      audioVariants.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const type = btn.dataset.type;
+          if (!project.audio || !project.audio[type]) {
+            alert(`Аудио "${type}" не доступно.`);
+            return;
+          }
+          stopAbcPlayback();
+          audioVariants.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const url = audioBaseUrl + project.audio[type];
+          externalAudio.src = url;
+          audioPlayerContainer.style.display = "block";
+          externalAudio.play().catch(e => {
+            console.error("Audio play failed:", e);
+            alert("Ошибка воспроизведения: " + e.message);
+          });
+        });
+      });
+      externalAudio.addEventListener("play", stopAbcPlayback);
+    }
+
+    function saveProject() {
+      const currentFragment = fragments.find(f => f.id === currentFragmentId);
+      if (currentFragment) currentFragment.abc = abcTextarea.value;
+
+      const fullProject = {
+        title: projectTitle.value || "Без названия",
+        category: "books",
+        difficulty: "beginner",
+        description: "",
+        tempo: parseInt(projectTempo.value) || 120,
+        version: "1.0",
+        created: new Date().toISOString().split('T')[0],
+        fragments: fragments,
+        ...(project.audio ? { audio: project.audio } : {})
+      };
+
+      const dataStr = JSON.stringify(fullProject, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json;charset=utf-8' });
+      const safeTitle = (projectTitle.value || "exercise").replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+      const filename = `${safeTitle}.json`;
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    function loadProject() {
+      fileInput.click();
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const projectData = JSON.parse(e.target.result);
+          loadProjectData(projectData);
+        } catch (error) {
+          console.error("Ошибка загрузки:", error);
+          paperDiv.innerHTML = `<p style="color:red;">Ошибка загрузки проекта.</p>`;
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function extractBaseUrlFromLoadUrl(loadUrl) {
+      if (!loadUrl) return null;
+      const clean = loadUrl.split('?')[0];
+      if (clean.endsWith('.json')) {
+        const parts = clean.split('/');
+        parts.pop();
+        return parts.join('/') + '/';
+      }
+      return null;
+    }
+
+    function loadProjectData(projectData, loadUrl = null) {
+      project.title = projectData.title || "Новая песня";
+      project.tempo = projectData.tempo || 120;
+      project.fragments = projectData.fragments || [{ id: 0, title: "Фрагмент", abc: "z16 |" }];
+      project.audio = projectData.audio || null;
+
+      projectTitle.value = project.title;
+      projectTempo.value = project.tempo;
+      fragments = [...project.fragments];
+
+      hideAudioPanel();
+      if (project.audio && loadUrl) {
+        const baseUrl = extractBaseUrlFromLoadUrl(loadUrl);
+        if (baseUrl) showAudioPanel(project.audio, baseUrl);
+      }
+
+      if (fragments.length > 0) {
+        currentFragmentId = fragments[0].id;
+        selectFragment(currentFragmentId);
+      }
+    }
+
+    // ========== Library Modal ==========
+    const modal = document.getElementById('library-modal');
+    const closeModalBtn = document.getElementById('close-library-modal');
+    const openLibraryBtn = document.getElementById('open-library');
+    const treeContainer = document.getElementById('library-tree-container');
+    let libraryTreeCache = null;
+
+    function renderLibraryTree(items, parent = null) {
+      const ul = document.createElement('div');
+      ul.style.paddingLeft = parent ? '16px' : '0';
+      for (const [name, item] of Object.entries(items)) {
+        if (item.type === 'dir') {
+          const folderDiv = document.createElement('div');
+          folderDiv.className = 'library-folder collapsed';
+          const toggle = document.createElement('span');
+          toggle.className = 'toggle';
+          const nameSpan = document.createElement('span');
+          nameSpan.textContent = name;
+          nameSpan.style.fontWeight = '600';
+          nameSpan.style.color = '#1e40af';
+          folderDiv.appendChild(toggle);
+          folderDiv.appendChild(document.createTextNode('📁 '));
+          folderDiv.appendChild(nameSpan);
+          ul.appendChild(folderDiv);
+          const childrenDiv = document.createElement('div');
+          childrenDiv.style.display = 'none';
+          folderDiv.appendChild(childrenDiv);
+          folderDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            folderDiv.classList.toggle('collapsed');
+            folderDiv.classList.toggle('open');
+            childrenDiv.style.display = folderDiv.classList.contains('collapsed') ? 'none' : 'block';
+          });
+          renderLibraryTree(item.children, childrenDiv);
+        } else if (item.type === 'file') {
+          const fileDiv = document.createElement('div');
+          fileDiv.className = 'library-file';
+          fileDiv.innerHTML = `📄 <span title="${item.title}">${item.title}</span>`;
+          fileDiv.addEventListener('click', async () => {
+            try {
+              const res = await fetch(item.url);
+              if (!res.ok) throw new Error('Файл не найден');
+              const data = await res.json();
+              loadProjectData(data, item.url);
+              modal.style.display = 'none';
+            } catch (err) {
+              alert('Ошибка загрузки: ' + err.message);
+            }
+          });
+          ul.appendChild(fileDiv);
+        }
+      }
+      if (parent) parent.appendChild(ul);
+      else { treeContainer.innerHTML = ''; treeContainer.appendChild(ul); }
+    }
+
+    async function loadLibraryTree() {
+      if (libraryTreeCache) { renderLibraryTree(libraryTreeCache); return; }
+      try {
+        treeContainer.innerHTML = '<p style="text-align:center; padding:20px;">Загрузка…</p>';
+        const res = await fetch('/library/tree.php');
+        if (!res.ok) throw new Error('Не удалось загрузить библиотеку');
+        libraryTreeCache = await res.json();
+        renderLibraryTree(libraryTreeCache);
+      } catch (err) {
+        treeContainer.innerHTML = `<p style="color:red; text-align:center; padding:20px;">Ошибка: ${err.message}</p>`;
+      }
+    }
+
+    openLibraryBtn.addEventListener('click', () => {
+      modal.style.display = 'flex';
+      if (!libraryTreeCache) loadLibraryTree();
+    });
+
+    closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+    // === PDF Export ===
+    function downloadAsPDF() {
+      const paper = document.getElementById("paper");
+      if (!paper || !paper.hasChildNodes()) { alert("Нет нот для экспорта."); return; }
+      const originalBg = paper.style.background;
+      const originalBoxShadow = paper.style.boxShadow;
+      paper.style.background = "white"; paper.style.boxShadow = "none";
+      html2canvas(paper, { scale: 2, backgroundColor: "#ffffff", useCORS: true, logging: false }).then(canvas => {
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new window.jspdf.jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+        const imgWidth = 210, pageHeight = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight, position = 0;
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        while (heightLeft >= 0) {
+          pdf.addPage(); position = heightLeft - imgHeight;
+          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+        paper.style.background = originalBg; paper.style.boxShadow = originalBoxShadow;
+        const filename = (projectTitle.value || "упражнение").replace(/[^a-zа-я0-9_-]/gi, "_") + ".pdf";
+        pdf.save(filename);
+      }).catch(err => {
+        console.error("Ошибка генерации PDF:", err);
+        alert("Не удалось создать PDF.");
+        paper.style.background = originalBg; paper.style.boxShadow = originalBoxShadow;
+      });
+    }
+
+    // === Делегирование кликов по активным кнопкам ===
+    activeNoteButtons.addEventListener("click", (e) => {
+      if (e.target.classList.contains("note-btn")) {
+        const note = e.target.dataset.note;
+        insertAtCursor(abcTextarea, note + " ");
+        const currentFragment = fragments.find(f => f.id === currentFragmentId);
+        if (currentFragment) currentFragment.abc = abcTextarea.value;
+        refreshTune();
+      }
+    });
+	
+	// Делегирование кликов по кнопкам динамики
+document.getElementById("dynamics-panel").addEventListener("click", (e) => {
+  if (e.target.classList.contains("note-btn")) {
+    const note = e.target.dataset.note;
+    insertAtCursor(abcTextarea, note + " ");
+    const currentFragment = fragments.find(f => f.id === currentFragmentId);
+    if (currentFragment) currentFragment.abc = abcTextarea.value;
+    refreshTune();
+  }
+});
+
+    // ========== INIT ==========
+    document.addEventListener("DOMContentLoaded", () => {
+      setupAudioVariants();
+      renderFragmentList();
+      refreshTune();
+
+      renderBtn.addEventListener("click", refreshTune);
+      addFragmentBtn.addEventListener("click", addFragment);
+      deleteFragmentBtn.addEventListener("click", deleteFragment);
+      saveProjectBtn.addEventListener("click", saveProject);
+      loadProjectBtn.addEventListener("click", loadProject);
+      document.getElementById("new-project")?.addEventListener("click", newProject);
+      document.getElementById("download-pdf")?.addEventListener("click", downloadAsPDF);
+      fileInput.addEventListener("change", handleFileSelect);
+
+      let debounceTimer;
+      abcTextarea.addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          const currentFragment = fragments.find(f => f.id === currentFragmentId);
+          if (currentFragment) currentFragment.abc = abcTextarea.value;
+          refreshTune();
+        }, 500);
+      });
+
+      const refreshOptions = () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(refreshTune, 100);
+      };
+      showCursor.addEventListener("change", refreshOptions);
+      projectTitle.addEventListener("input", () => { project.title = projectTitle.value; });
+      projectTempo.addEventListener("input", () => {
+        const tempo = parseInt(projectTempo.value);
+        if (!isNaN(tempo) && tempo >= 40 && tempo <= 300) project.tempo = tempo;
+      });
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const loadUrl = urlParams.get('load');
+      if (loadUrl) {
+        if (loadUrl.startsWith('/') || loadUrl.startsWith('https://drumz.ru/')) {
+          fetch(loadUrl)
+            .then(response => { if (!response.ok) throw new Error('Файл не найден'); return response.json(); })
+            .then(projectData => { loadProjectData(projectData, loadUrl); })
+            .catch(err => {
+              console.error("Ошибка загрузки упражнения:", err);
+              paperDiv.innerHTML = `<p style="color:red;">Ошибка загрузки: ${err.message}</p>`;
+            });
+        } else {
+          console.warn("Blocked unsafe load URL:", loadUrl);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

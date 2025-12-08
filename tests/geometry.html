@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Геометрия ритма</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+      background: #fafafa;
+      color: #333;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #2d3748;
+    }
+    .rhythm-circle {
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
+      position: relative;
+    }
+    .beat {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: #4299e1;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.2s;
+    }
+    .beat.on {
+      background: #3182ce;
+      transform: translate(-50%, -50%) scale(1.4);
+    }
+    .beat.off {
+      background: #cbd5e0;
+    }
+    .controls {
+      margin: 20px;
+    }
+    button {
+      padding: 8px 16px;
+      margin: 0 6px;
+      background: #edf2f7;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover { background: #e2e8f0; }
+    .caption {
+      margin-top: 10px;
+      font-style: italic;
+      color: #718096;
+    }
+  </style>
+</head>
+<body>
+  <h1>Геометрия ритма</h1>
+  <div class="rhythm-circle" id="circle"></div>
+  <div class="caption" id="rhythmName">Выберите ритм</div>
+
+  <div class="controls">
+    <button onclick="showRhythm('even')">Равномерный (4 удара)</button>
+    <button onclick="showRhythm('tresillo')">Tresillo (3/8)</button>
+    <button onclick="showRhythm('clave')">Сон-клáве (5/8)</button>
+    <button onclick="showRhythm('syncopation')">Синкопа</button>
+  </div>
+
+  <script>
+    const n = 16; // делим круг на 16 долей
+    const rhythms = {
+      even: {
+        pattern: [1,0,1,0,1,0,1,0, 1,0,1,0,1,0,1,0], // 8 восьмых
+        name: "Равномерный ритм (8 восьмых)"
+      },
+      tresillo: {
+        pattern: [1,0,0,1,0,0,1,0, 0,0,0,0,0,0,0,0], // 3 удара в первых 8 долях
+        name: "Tresillo — африканский пульс"
+      },
+      clave: {
+        pattern: [1,0,1,0,1,0,0,1, 0,1,0,0,0,0,0,0], // Cuban son clave
+        name: "Сон-клáве (Куба)"
+      },
+      syncopation: {
+        pattern: [0,1,1,0, 0,1,1,0, 0,1,1,0, 0,1,1,0], // акцент на слабые доли
+        name: "Синкопа (удар на долю + 1/16)"
+      }
+    };
+
+    function drawCircle() {
+      const container = document.getElementById('circle');
+      container.innerHTML = '';
+      const centerX = 150;
+      const centerY = 150;
+      const radius = 120;
+
+      for (let i = 0; i < n; i++) {
+        const angle = (i / n) * 2 * Math.PI - Math.PI / 2; // начать сверху
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+
+        const beat = document.createElement('div');
+        beat.className = 'beat off';
+        beat.id = `beat-${i}`;
+        beat.style.left = `${x}px`;
+        beat.style.top = `${y}px`;
+        container.appendChild(beat);
+      }
+    }
+
+    function showRhythm(key) {
+      const rhythm = rhythms[key];
+      if (!rhythm) return;
+
+      // Обновляем название
+      document.getElementById('rhythmName').textContent = rhythm.name;
+
+      // Обновляем точки
+      for (let i = 0; i < n; i++) {
+        const beat = document.getElementById(`beat-${i}`);
+        if (beat) {
+          beat.className = rhythm.pattern[i] ? 'beat on' : 'beat off';
+        }
+      }
+    }
+
+    // Инициализация
+    drawCircle();
+    showRhythm('even');
+  </script>
+</body>
+</html>

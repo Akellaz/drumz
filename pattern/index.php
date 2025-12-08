@@ -1,17 +1,12 @@
-<?php require_once __DIR__ . '/../includes/seo.php'; ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<title><?= htmlspecialchars($title) ?></title>
-<meta name="description" content="<?= htmlspecialchars($description) ?>">
-<meta name="keywords" content="паттерны для барабанов, ритмические паттерны, барабаны, уроки барабанов, Троицк, рок, джаз, фанк, брейки, филлы">
-<meta name="author" content="Сергей Щепотин">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://drumz.ru<?= htmlspecialchars($_SERVER['REQUEST_URI'], ENT_QUOTES) ?>">
+  <?php require_once __DIR__ . '/../includes/seo.php'; ?>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/assets/style.css?v=<?php echo time(); ?>">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/abcjs-audio.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/abcjs-audio.css  ">
+
   <style>
     .pattern-controls {
       background: var(--card-bg);
@@ -87,7 +82,7 @@
       gap: 20px;
       overflow-x: auto;
       padding: 8px 0;
-      scrollbar-width: thin; /* для Firefox */
+      scrollbar-width: thin;
     }
     .measures-horizontal::-webkit-scrollbar {
       height: 6px;
@@ -150,13 +145,33 @@
       width: 100%;
       margin: 0;
     }
+
+    /* === Стили курсора и подсветки === */
+    .highlight {
+      fill: #0a9ecc !important;
+    }
+    .abcjs-cursor {
+      stroke: red;
+      stroke-width: 2;
+    }
+
+    .cursor-nav {
+      margin: 15px 0;
+      text-align: center;
+    }
+    .cursor-nav label {
+      margin: 0 12px;
+      user-select: none;
+      font-size: 0.95em;
+      color: var(--text);
+    }
   </style>
 </head>
 <body>
   <?php require_once __DIR__ . '/../includes/header.php'; ?>
 
   <main class="container">
-    <h1>Библиотека ритмических рисунков</h1>
+    <h1>Паттерны ритмических рисунков</h1>
 
     <div class="pattern-controls">
       <label>Количество тактов (1–4):</label>
@@ -175,6 +190,16 @@
       <button id="applyPatternBtn">Применить паттерн</button>
     </div>
 
+    <!-- Управление курсором -->
+    <div class="cursor-nav">
+      <label>
+        <input type="checkbox" id="show-cursor"> Показывать курсор
+      </label>
+      <label>
+        <input type="checkbox" id="color-note" checked> Подсвечивать ноты
+      </label>
+    </div>
+
     <div id="paper"></div>
     <div id="audio-controls"></div>
     <button id="downloadPdfBtn">📥 Скачать в PDF</button>
@@ -182,23 +207,83 @@
 
   <?php require_once __DIR__ . '/../includes/footer.php'; ?>
 
-  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/dist/abcjs-basic.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Локальная ABCjs -->
+  <script src="../assets/abcjs-main/dist/abcjs-basic.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js  "></script>
 
   <script>
-  const allPatterns = [
+  // === Cursor Control (только курсор + подсветка) ===
+  var lastHighlighted = [];
+  var showCursor = null;
+  var colorNote = null;
 
+  function CursorControl() {
+    var self = this;
+
+    self.onStart = function() {};
+    self.onBeat = function() {};
+
+    self.onEvent = function(ev) {
+      // Подсветка нот
+      lastHighlighted.forEach(el => el.classList.remove("highlight"));
+      lastHighlighted = [];
+
+      if (ev && ev.elements && colorNote && colorNote.checked) {
+        ev.elements.forEach(note => {
+          note.forEach(el => {
+            el.classList.add("highlight");
+            lastHighlighted.push(el);
+          });
+        });
+      }
+
+      // Курсор
+      var cursor = document.querySelector("#paper svg .abcjs-cursor");
+      if (!cursor) {
+        var svg = document.querySelector("#paper svg");
+        if (svg) {
+          cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          cursor.setAttribute("class", "abcjs-cursor");
+          svg.appendChild(cursor);
+        }
+      }
+
+      if (cursor && showCursor && showCursor.checked && ev && ev.left != null) {
+        cursor.setAttribute("x1", ev.left - 2);
+        cursor.setAttribute("x2", ev.left - 2);
+        cursor.setAttribute("y1", ev.top || 0);
+        cursor.setAttribute("y2", (ev.top || 0) + (ev.height || 30));
+      } else if (cursor) {
+        cursor.setAttribute("x1", -10);
+        cursor.setAttribute("x2", -10);
+      }
+    };
+
+    self.onFinished = function() {
+      lastHighlighted.forEach(el => el.classList.remove("highlight"));
+      lastHighlighted = [];
+
+      var cursor = document.querySelector("#paper svg .abcjs-cursor");
+      if (cursor) {
+        cursor.setAttribute("x1", -10);
+        cursor.setAttribute("x2", -10);
+      }
+    };
+  }
+
+  // === Основной код ===
+  const allPatterns = [
     // Basic
     { id: 'gb1',  name: 'Rock Basic',           abc: '[g2F]g2 [g2c]g2 [g2F]g2 [g2c]g2' },
     { id: 'gb2',  name: 'Disco Beat',     		abc: '[g2F]g2 [g2Fc]g2 [g2F]g2 [g2Fc]g2' },
-	{ id: 'gb4',  name: 'Arena Rock',      		abc: '[g2F][g2F] [g2c]g2 [g2F][g2F] [g2c]g2' },
+    { id: 'gb4',  name: 'Arena Rock',      		abc: '[g2F][g2F] [g2c]g2 [g2F][g2F] [g2c]g2' },
     { id: 'gb3',  name: 'Arena Pop', 			abc: '[g2F]g2 [g2c]g2 [g2F][g2F] [g2c]g2' },
-	{ id: 'gb9',  name: 'Arena Pop Ending',     abc: '[g2F]g2 [g2c]g2 [g2F][g2F] [g2c][g2F]' },
+    { id: 'gb9',  name: 'Arena Pop Ending',     abc: '[g2F]g2 [g2c]g2 [g2F][g2F] [g2c][g2F]' },
     { id: 'gb5',  name: 'Ballad',               abc: '[g2F]g2 [g2c][g2F] [g2F]g2 [g2c]g2' },
-    { id: 'gb6',  name: 'Pop Ballad',			abc: '[g2F]g2 [g2c][g2F] [g2F][g2F] [g2c]g2' },
-    { id: 'gb7',  name: 'Arena Ballad',         abc: '[g2F][g2F] [g2c][g2F] [g2F]g2 [g2c]g2' },
-    { id: 'gb8',  name: 'Arena Rock Ballad',    abc: '[g2F][g2F] [g2c][g2F] [g2F][g2F] [g2c]g2' },
-    { id: 'gb10', name: 'Pop Ballad Ending',    abc: '[g2F]g2 [g2c][g2F] [g2F][g2F] [g2c][g2F]' },
+	{ id: 'gb7',  name: 'Ballad Rock',         abc: '[g2F][g2F] [g2c][g2F] [g2F]g2 [g2c]g2' },
+    { id: 'gb6',  name: 'Ballad Arena Pop',			abc: '[g2F]g2 [g2c][g2F] [g2F][g2F] [g2c]g2' },
+    { id: 'gb8',  name: 'Ballad Arena Rock',    abc: '[g2F][g2F] [g2c][g2F] [g2F][g2F] [g2c]g2' },
+    { id: 'gb10', name: 'Ballad Pop Ending',    abc: '[g2F]g2 [g2c][g2F] [g2F][g2F] [g2c][g2F]' },
     { id: 'gb11', name: 'Heavy Rock',           abc: '[g2F][g2F] [g2c][g2F] [g2F][g2F] [g2c][g2F]' },
     { id: 'gb12', name: 'Synco Pop',  			abc: '[g2F]g2 [g2c][g2F] g2g2 [g2c]g2' },
     { id: 'gb13', name: 'Synco Rock',     		abc: '[g2F]g2 [g2c]g2 g2[g2F] [g2c]g2' },
@@ -206,47 +291,30 @@
     { id: 'gb15', name: 'Synco Arena',      	abc: '[g2F][g2F] [g2c][g2F] g2[g2F] [g2c]g2' },
     { id: 'gb16', name: 'Synco Pop Ending',     abc: '[g2F]g2 [g2c][g2F] g2[g2F] [g2c][g2F]' },
     
-    // Брейки
-    { id: 'b1', name: 'Break: 4 c4', abc: 'c4 c4 c4 c4' },
-    { id: 'b2', name: 'Break: пауза', abc: 'z16' },
-    { id: 'b3', name: 'Break: F4na + паузы', abc: '[F4na] z4 z8' },
-    { id: 'b4', name: 'Break: F4na → c4', abc: '[F4na] z4 z4 c4' },
-    { id: 'b5', name: 'Break: c4 → F2 c2F2', abc: 'c4 z4 z2 F2 c2F2' },
-    { id: 'b6', name: 'Break: сложный №1', abc: '[g2F][g2F] [g2c][g2F] [F4na] [c4na]' },
-    { id: 'b7', name: 'Break: том-ролл', abc: '[F4na] !<(![c2A][c2A] [c2A][c2A] [c2A]!<)![c2A]' },
-    { id: 'b8', name: 'Break: томы + краш', abc: '[F4na] z2 ee d2d2 A2A2' },
+    // Fill (ранее "Брейки")
+    { id: 'b1', name: 'Fill: 4 c4', abc: 'c4 c4 c4 c4' },
+    { id: 'b2', name: 'Fill: пауза', abc: 'z16' },
+    { id: 'b3', name: 'Fill: F4na + паузы', abc: '[F4na] z4 z8' },
+    { id: 'b4', name: 'Fill: F4na → c4', abc: '[F4na] z4 z4 c4' },
+    { id: 'b5', name: 'Fill: c4 → F2 c2F2', abc: 'c4 z4 z2 F2 c2F2' },
+    { id: 'b7', name: 'Fill: том-ролл', abc: '[F4na] !<(![c2A][c2A] [c2A][c2A] [c2A]!<)![c2A]' },
+    { id: 'b8', name: 'Fill: томы + краш', abc: '[F4na] z2 ee d2d2 A2A2' },
     { id: 'b9', name: 'Amen Break', abc: 'c2c2 [F2c][F2c] c2c2 [F2c]F2' },
     { id: 'b10', name: 'Funky Drummer', abc: '[g2F][g2F] [g2c][g2F] [F4na] [c4na]' },
     { id: 'b11', name: 'Think Break', abc: '[F2c][F2c] F2[F2c] [F2c][F2c] F4' },
-    { id: 'b12', name: 'Apache Break', abc: 'c4 c4 c4 c4' },
+    { id: 'b12', name: 'Reggaeton break', abc: '[F2g]gc [F2g][g2c] (3[LcF]!pp!cc(3cc!f!Le [LA2F]Lc2' },
     
+	 
     // Advanced
-    { id: 'a1', name: 'Advanced 1', abc: '[g4F] c2c2 [g4F] c2c2' },
-    { id: 'a2', name: 'Advanced 2', abc: '[g2F][g2c] [g2F][g2c] [g2F][g2c] [g2F][g2c]' },
-    { id: 'a3', name: 'Advanced 3', abc: '[g3F]g [g3c]g [g3F]g [g3c]g' },
-    { id: 'a4', name: 'Advanced 4', abc: '[g2F][g3c]g [g2F][g3c]g [g2F][g3c]g [g2F][g3c]g' },
-    { id: 'a5', name: 'Advanced 5', abc: '[g4F] [g2c][g2F] [g4F] [g2c][g2F]' },
-    { id: 'a6', name: 'Advanced Syncopation', abc: 'g2[g2F] g2[g2c] g2[g2F] g2[g2c]' },
-    { id: 'a7', name: 'Advanced Flam', abc: '[g2F][g2F]c [g2c][g2c]F [g2F][g2F]c [g2c][g2c]F' },
-    { id: 'a8', name: 'Advanced Paradiddle', abc: '[g2F][g2c][g2F]g [g2c][g2F][g2c]c [g2F][g2c][g2F]g [g2c][g2F][g2c]c' },
-    { id: 'a9', name: 'Linear Groove', abc: '[g4F] c2c2 [g4F] c2c2' },
-    { id: 'a10', name: 'Double Time', abc: '[g2F][g2c] [g2F][g2c] [g2F][g2c] [g2F][g2c]' },
-    { id: 'a11', name: 'Syncopation', abc: '[g3F]g [g3c]g [g3F]g [g3c]g' },
-    { id: 'a12', name: 'Paradiddle Groove', abc: '[g2F][g2c][g2F]g [g2c][g2F][g2c]c [g2F][g2c][g2F]g [g2c][g2F][g2c]c' },
-    
-    // Fill
-    { id: 'f1', name: 'Fill 1', abc: 'g2c2 g2c2 g2c2 g4' },
-    { id: 'f2', name: 'Fill 2', abc: 'g2[g2F] c2[g2c] g2[g2F] c4' },
-    { id: 'f3', name: 'Fill 3', abc: '[g2F][g2c] [g2F][g2c] [g2F][g2c] g4' },
-    { id: 'f4', name: 'Fill 4', abc: 'g2c2 [g2F][g2c][g2F]g g2c2 g4' },
-    { id: 'f5', name: 'Fill 5', abc: '[g3F]g [g3c]g [g2F][g2F] g4' },
-    { id: 'f6', name: 'Fill 6', abc: 'g2[g2F]c g2[g2c]F g2[g2F]c g4' },
-    { id: 'f7', name: 'Fill 7', abc: '[g2F][g2c][g2F]g [g2c][g2F][g2c]c g2c2 g4' },
-    { id: 'f8', name: 'Fill 8', abc: 'g2c2 [g2F][g2c][g2F]g g2c2 g4' },
-    { id: 'f9', name: 'Basic Fill', abc: 'g2c2 g2c2 g2c2 g4' },
-    { id: 'f10', name: 'Tom-Tom Fill', abc: 'g2[g2F] c2[g2c] g2[g2F] c4' },
-    { id: 'f11', name: 'Paradiddle Fill', abc: '[g2F][g2c] [g2F][g2c] [g2F][g2c] g4' },
-    { id: 'f12', name: 'Flam Fill', abc: 'g2c2 [g2F][g2c][g2F]g g2c2 g4' },
+    { id: 'a1', name: 'Advanced 1', abc: '[F2g2]g2 [c2g2]gc [F2g2]g2 [c2g2]g2 ' },
+    { id: 'a2', name: 'Advanced 2', abc: '[F2g2]g2 [c2g2]gc [F2g2][g2F] [c2g2]g2  ' },
+    { id: 'a3', name: 'Advanced 3', abc: '[F2g2]g2 [c2g2]gc [F2g2]g2 [c2g2]gc' },
+    { id: 'a4', name: 'Advanced 4', abc: '[F2g2]g2 [c2g2]gc [F2g2][g2F] [c2g2][g2F]' },
+    { id: 'a5', name: 'Advanced 5', abc: '[F2g2]g2 [c2g2]gc [Fg]c[F2g] [c2g2]g2 ' },
+    { id: 'a6', name: 'Advanced 6', abc: '[F2g2][F2g] [c2g2]gc [Fg]c[F2g] [c2g2]g2 ' },
+    { id: 'a7', name: 'Advanced 7', abc: '[F2g2][F2g] [c2g2]gc [Fg]c[F2g] [c2g2][g2c2]' },
+    { id: 'a8', name: 'Advanced 8', abc: '[F2g2][F2g] [c2g2]gc [Fg]c[F2g] [c2g2][g2F2]' },
+
     
     // Jazz
     { id: 'j1', name: 'Jazz Walk', abc: '[g2F][g2c] [g2F][g2c] [g2F][g2c] [g2F][g2c]' },
@@ -256,15 +324,18 @@
     { id: 'j5', name: 'Latin Jazz', abc: '[g2F][g2c] [g2F][g2c] [g2F][g2c] [g2F][g2c]' },
     { id: 'j6', name: 'Bebop Groove', abc: '[g2F]g2 [g2c]g2 g2[g2F] [g2c]g2' },
     { id: 'j7', name: 'Bossa Nova1', abc: '[g2cF]g2 g2[g2cF] [g2F]g2 [g2c][g2F]' },
-	{ id: 'j8', name: 'Bossa Nova2', abc: '[g2F]g2 [g2c][g2F] [g2F][g2c] g2[g2F]' },
-	
+    { id: 'j8', name: 'Bossa Nova2', abc: '[g2F]g2 [g2c][g2F] [g2F][g2c] g2[g2F]' },
+    
     // Latin
+	
     { id: 'l1', name: 'Samba Basic', abc: '[g2F]g2 [g2c]g2 [g2F]g2 [g2c]g2' },
-    { id: 'l2', name: 'Bossa Nova', abc: '[g4F] z4 [g2c][g2F] z4' },
     { id: 'l3', name: 'Rumba', abc: '[g2F]g2 [g2c][g2F] [g2F]g2 [g2c]g2' },
     { id: 'l4', name: 'Cha-Cha', abc: '[g2F][g2F] [g2c]g2 [g2F][g2F] [g2c]g2' },
-    { id: 'l5', name: 'Mambo', abc: '[g2F]g2 [g2c][g2F] g2[g2F] [g2c]g2' }
+    { id: 'l5', name: 'Mambo', abc: '[g2F]g2 [g2c][g2F] g2[g2F] [g2c]g2' },
+	{ id: 'l6', name: 'Reggaeton', abc: '[F2g]gc [F2g][g2c] [F2g]gc [F2g][g2c]' },
+	{ id: 'l7', name: 'Reggaeton2', abc: '[F2g]gc [F2g][g2c] [Fg]cgc [F2g][g2c]' },
   ];
+
 
   const measureCountSelect = document.getElementById('measureCount');
   const measuresContainer = document.getElementById('measuresContainer');
@@ -277,6 +348,16 @@
   let currentTuneObject = null;
   let synthControl = null;
   let midiBuffer = null;
+
+  // === Инициализация чекбоксов курсора после DOM ready ===
+  document.addEventListener('DOMContentLoaded', () => {
+    showCursor = document.getElementById("show-cursor");
+    colorNote = document.getElementById("color-note");
+
+    measureCountSelect.addEventListener('change', updateMeasuresUI);
+    updateMeasuresUI();
+    applyBtn.click();
+  });
 
   function createMeasureSelector(measureIndex) {
     const div = document.createElement('div');
@@ -293,10 +374,8 @@
 
     const modes = [
       { id: 'basic', name: 'Basic', prefix: 'gb' },
-      // Категория "Ритм" удалена
-      { id: 'break', name: 'Брейк', prefix: 'b' },
+      { id: 'fill', name: 'Fill', prefix: 'b' },      // ← Было "Брейк", теперь "Fill"
       { id: 'advanced', name: 'Advanced', prefix: 'a' },
-      { id: 'fill', name: 'Fill', prefix: 'f' },
       { id: 'jazz', name: 'Jazz', prefix: 'j' },
       { id: 'latin', name: 'Latin', prefix: 'l' }
     ];
@@ -400,12 +479,13 @@ ${abcParts.join(' | ')} |
       currentTuneObject = visualObj[0];
 
       if (ABCJS.synth && ABCJS.synth.supportsAudio()) {
+        const cursorControl = new CursorControl();
         synthControl = new ABCJS.synth.SynthController();
-        synthControl.load(audioDiv, null, {
-          displayLoop: false,
+        synthControl.load(audioDiv, cursorControl, {
+          displayLoop: true,
           displayRestart: false,
           displayPlay: true,
-          displayProgress: true,
+          displayProgress: false,
           displayClock: false,
           displayWarp: false,
         });
@@ -484,12 +564,6 @@ ${abcParts.join(' | ')} |
     };
 
     img.src = url;
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    measureCountSelect.addEventListener('change', updateMeasuresUI);
-    updateMeasuresUI();
-    applyBtn.click();
   });
   </script>
 </body>

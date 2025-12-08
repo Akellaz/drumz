@@ -1,0 +1,16 @@
+{
+  "title": "Semi Madness",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 120,
+  "version": "1.0",
+  "created": "2025-12-04",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Snare Drum Solo",
+      "abc": "c2cc c2c2 c2c2 Lc4 | c2cc ccc2 c2c2 Lc4 | c2cc ccc2 c2cc ccc2 | c2cc cccc Lc4 z4 | \nc2cc Lc4 cccc Lc4 | c2cc cccc c2c2 Lc4 | c2cc c2c2 c2cc c2c2 | c2cc cccc Lc4 z4 | \nc4 Lc4 ccc2 Lc4 | c4 Lc4 cccc Lc2Lc2 | c2c2 c2c2 cccc c2c2 | cccc cccc c2c2 Lc4 | \nc4 Lc4 ccc2 Lc4 | c2cc c2cc cccc c4 | c4 Lc4 cccc Lc2Lc2 | ccc2 ccc2 c2c2 Lc4 | \nLc2c2 c2Lc2 c2c2 Lc4 | Lc2c2 c2Lc2 ccc2 Lc4 | Lc2c2 c2Lc2 c2c2 Lc4 | ccc2 Lc2Lc2 z2c2L c4 | \nLc2c2 c2Lc2 cccc Lc2c2 | Lc2c2 c2Lc2 c2c2 Lc4 | Lc2c2 c2Lc2 c2c2 Lc2c2 | Lc2c2 cccc c2c2 Lc4 | \nLc2cc c2Lc2 c2c2 Lc4 | Lc2cc ccLc2 c2c2 Lc4 | Lc2cc ccLc2 Lc2cc ccLc2 | Lc2cc cccc Lc4 z4 | \nc2cc Lc4 nc2ncnc Lnc4 | Lc2cc cccc Lc2Lc2 Lc4 | c2cc c2c2 nc2ncnc nc2nc2 | c2cc cccc Lc4 z4 | \nc4 Lc4 ccc2 Lc4 | c2nc2 c2nc2 cccc nc2nc2 | cccc cccc c2c2 c2c2 | ccc2 c2c2 c2c2 Lc4 | \n"
+    }
+  ]
+}

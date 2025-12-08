@@ -1,0 +1,51 @@
+<!-- hdrum.html -->
+<div class="hd-drum">
+  <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="hd-glow">
+        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+        <feMerge>
+          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <filter id="hd-glow-white">
+        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+        <feMerge>
+          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+    <!-- Петли нот: 15 штук -->
+    <g data-petal="1"><path d="M200,200 L220,180"/></g>
+    <g data-petal="2"><path d="M200,200 L230,170"/></g>
+    <g data-petal="3"><path d="M200,200 L240,160"/></g>
+    <g data-petal="4"><path d="M200,200 L250,150"/></g>
+    <g data-petal="5"><path d="M200,200 L260,140"/></g>
+    <g data-petal="6"><path d="M200,200 L270,130"/></g>
+    <g data-petal="7"><path d="M200,200 L280,120"/></g>
+    <g data-petal="8"><path d="M200,200 L290,110"/></g>
+    <g data-petal="9"><path d="M200,200 L300,100"/></g>
+    <g data-petal="10"><path d="M200,200 L310,90"/></g>
+    <g data-petal="11"><path d="M200,200 L320,80"/></g>
+    <g data-petal="12"><path d="M200,200 L330,70"/></g>
+    <g data-petal="13"><path d="M200,200 L340,60"/></g>
+    <g data-petal="14"><path d="M200,200 L350,50"/></g>
+    <g data-petal="15"><path d="M200,200 L360,40"/></g>
+  </svg>
+</div>
+
+<div class="hd-controls">
+  <button class="hd-rec"></button>
+  <button class="hd-play"></button>
+  <button class="hd-share"></button>
+  <button class="hd-gamma"></button>
+  <button class="hd-close"></button>
+</div>
+
+<div class="hd-player hd-visible">
+  <div class="hd-timeline">
+    <input type="range" min="0" max="1000" value="0" />
+  </div>
+</div>

@@ -3,8 +3,6 @@
   
       <div class="footer-links">
       <p>
-        <a href="/library/">Библиотека</a> 
-        <a href="/pro/">Прогресс</a> 
 		<a href="/sandbox/">Песочница</a>
       </p>
     </div>

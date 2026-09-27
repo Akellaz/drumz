@@ -1,0 +1,19 @@
+{
+  "title": "Final Countdown ",
+  "category": ["четверти", "восьмые", "шестнадцатые", "синкопы"],
+  "difficulty": "3",
+  "description": "",
+  "tempo": 117,
+  "version": "1.0",
+  "created": "2025-12-23",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "[F4a] g4 g4 g2[F2a]| [F4a] g4 g4 g4|[F4a] g4 g4 g2[F2a]|[F4a] g4 g4 g4|\n[F4a] [c4g] g4 [c2g][F2a]|[F4a] [c4g] g4 [c4g] | [F4a] [c4g] g4 [c2g][F2a]|[F4a] [c4g] g4 [c4g] | \n[F4a] g2cc [F4a] g2cc| [F2a][F2a] [F2a][F2a][F4a] [F4a]  |\n [F4a] g4g4g4| ee2e dd2d AA2A Lc4| \n[F4a] g4g4g3e | ee2d dd2A AAz2 L[c4F] |\n[F4a] z4z4z4 | ee3 dd3 AA3 L[c4F]|]  "
+    }
+  ],
+  "audio": {
+    "plus": "Final_Countdown_plus.wav"
+  }
+}

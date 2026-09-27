@@ -1,0 +1,20 @@
+{
+  "title": "Deutschland",
+  "category": ["четверти", "шестнадцатые"],
+  "difficulty": "3",
+  "description": "",
+  "tempo": 120,
+  "version": "1.0",
+  "created": "2026-05-18",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "Z4| \n[F4a] z4 z4 z4 | z4 z4 [F4a] [F4a] | [F4a] z4 z4 z4 | z4 z4 [F4a] [F4a] | [F4a] z4 z4 z4 | z4 z4 z4 z4 |\n[F4a] z4 ^f4 z4 | ^f4 z4 ^f4 z4 | [F4a] z4 ^f4 z4 | ^f4 z4 [F4a] [F4a] | \n[F4a] z4 ^f4 z4 | ^f4 z4  [F4a] [F4a] | [F4a] z4 ^f4 z4 | ^f4 z4 ^f4 z4 |\n[F4a] z4 ^f4 z4 | ^f4 z4 ^f4 z4 | \n!pp! cccc cccc cccc cccc  | cccc cccc cccc cccc | \ncccc cccc cccc cccc | cccc cccc cccc !ff!cccc|",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Deutschland.mp3"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "title": "Ядрёна вошь",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 132,
+  "version": "1.0",
+  "created": "2026-02-18",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "g4g4g2c2 c2c2 | [a4F] g2F2 g4 [g4F4] | [g4F] g2F2 g4 [g4F4] |[g4F] g2F2 g4 [g4F4] | [g4F] g2F2 g4 [g4F4] |\n[g4F] g2F2 g4 [g4F4] | [g4F] g2F2 g4 [g4F4] | [g4F] g2F2 g4 [g4F4] | [g4F] g2F2 g4 [g4F4] |\n[g4F] g2F2 g4 [g4F4] | [g4F] g2F2 g4 [g4F4] | [g4F] g2F2 g4 [g4F4] | [g4F] g2F2 g2[e2c] [d2c][A2c] |"
+    }
+  ]
+}

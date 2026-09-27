@@ -1,0 +1,20 @@
+{
+  "title": "We Will Rock You",
+  "category": ["четверти", "восьмые", "шестнадцатые"],
+  "difficulty": "2",
+  "description": "",
+  "tempo": 80,
+  "version": "1.0",
+  "created": "2026-05-17",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "Z2 |:F2F2 c4 F2F2 c4 |  F2F2 c4 F2F2 c4 |  F2F2 c4 F2F2 c4 |  F2F2 c4 F2F2 c4 :|\n[F2A][F2A] c4 [F2A][F2A] c4 | [F2A][F2A] c4 [F2A][F2A] c4 | [F2A][F2A] c4 [F2A][F2A] c4 | [F2A][F2A] c4 [F2A][F2A] c4  \n[F2A][F2A] c4 [F2A][F2A] c4 | [F2A][F2A] c4 [F2A][F2A] c4 | [F2A][F2A] c4 [F2A][F2A] c4 | [F4a] z4 c2c2 cccc | \n[F2g2][F2g2] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2][F2g2] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2][F2g2] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2][F2g2] [c4a]  [F2g2][F2g2] [c4a] | \n[F2g2][F2g2] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2][F2g2] [c2g2]g2  [F2g2][F2g2] [c4a] | [F2g2][F2g2] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2][F2g2] [c2g2]g2 [F2g2][c2g2] [c4g] |",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "We Will Rock You.mp3"
+  }
+}

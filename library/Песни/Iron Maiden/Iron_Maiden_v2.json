@@ -1,0 +1,19 @@
+{
+  "title": "Iron Maiden v.2",
+  "category": ["четверти", "восьмые", "шестнадцатые", "синкопы"],
+  "difficulty": "4",
+  "description": "",
+  "tempo": 100,
+  "version": "1.0",
+  "created": "2025-12-15",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Hallowed Be Thy Name",
+      "abc": "|:[F4a] z4 z4 z2c2 | [F4a] z4 z4 z2c2 |[F4a] z4 z4 z2c2 |[F2a]c[Fa] z c[F2a] zcce ddAA :| \n"
+    }
+  ],
+  "audio": {
+    "plus": "Iron_Maiden2_plus.mp3"
+  }
+}

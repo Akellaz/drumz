@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход через Google - drumz.ru</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            padding: 20px; 
+            max-width: 500px; 
+            margin: 50px auto; 
+            text-align: center;
+        }
+        .btn-google {
+            background: white;
+            border: 2px solid #4285f4;
+            color: #4285f4;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-google:hover {
+            background: #4285f4;
+            color: white;
+        }
+        .btn-logout {
+            background: #ea4335;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .user-info {
+            background: #f1f3f4;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .user-info img {
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: block;
+            margin: 0 auto 15px;
+        }
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>Вход на drumz.ru</h2>
+    
+    <div id="loginSection">
+        <button class="btn-google" id="googleSignInBtn">
+            Войти через Google
+        </button>
+    </div>
+
+    <div id="userInfoSection" style="display: none;">
+        <div class="user-info">
+            <img id="userPhoto" src="" alt="Фото">
+            <h3 id="userName"></h3>
+            <p><strong>Email:</strong> <span id="userEmail"></span></p>
+            <p><strong>UID:</strong> <small id="userUid"></small></p>
+        </div>
+        <button class="btn-logout" id="logoutBtn">Выйти</button>
+    </div>
+
+    <p id="status"></p>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCb4mcornYDLKr36cfW8oGQtd_NE4Ktjd4",
+            authDomain: "drumz-c9989.firebaseapp.com",
+            projectId: "drumz-c9989",
+            storageBucket: "drumz-c9989.firebasestorage.app",
+            messagingSenderId: "51187561111",
+            appId: "1:51187561111:web:4c24867e255f2165592fd2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        const statusEl = document.getElementById('status');
+        const loginSection = document.getElementById('loginSection');
+        const userInfoSection = document.getElementById('userInfoSection');
+
+        // Вход через Google
+        document.getElementById('googleSignInBtn').addEventListener('click', async () => {
+            statusEl.textContent = "⏳ Вход...";
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                // Сохраняем/обновляем пользователя в Firestore
+                await saveUserToFirestore(user);
+                
+                statusEl.textContent = "✅ Успешный вход!";
+                statusEl.style.color = "green";
+            } catch (error) {
+                statusEl.textContent = "❌ Ошибка: " + error.message;
+                statusEl.style.color = "red";
+                console.error("Error signing in:", error);
+            }
+        });
+
+        // Выход
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                statusEl.textContent = "Вы вышли из системы";
+                statusEl.style.color = "gray";
+            } catch (error) {
+                console.error("Error signing out:", error);
+            }
+        });
+
+        // Сохранение пользователя в Firestore
+        async function saveUserToFirestore(user) {
+            const userDocRef = doc(db, "users", user.uid);
+            
+            // Проверяем, есть ли уже такой пользователь
+            const docSnap = await getDoc(userDocRef);
+            
+            if (!docSnap.exists()) {
+                // Новый пользователь - создаем запись
+                await setDoc(userDocRef, {
+                    name: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    provider: "google",
+                    createdAt: serverTimestamp(),
+                    lastLogin: serverTimestamp()
+                });
+                console.log("Новый пользователь создан в Firestore");
+            } else {
+                // Существующий пользователь - обновляем lastLogin
+                await setDoc(userDocRef, {
+                    lastLogin: serverTimestamp()
+                }, { merge: true });
+                console.log("Данные пользователя обновлены");
+            }
+        }
+
+        // Отслеживание состояния авторизации
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Пользователь вошел
+                loginSection.style.display = "none";
+                userInfoSection.style.display = "block";
+                
+                document.getElementById('userName').textContent = user.displayName || "Без имени";
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userUid').textContent = user.uid;
+                document.getElementById('userPhoto').src = user.photoURL || "https://via.placeholder.com/80";
+            } else {
+                // Пользователь вышел
+                loginSection.style.display = "block";
+                userInfoSection.style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>

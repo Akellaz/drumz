@@ -1,0 +1,19 @@
+{
+  "title": "Bohemian Rhapsody v.4",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "2",
+  "description": "",
+  "tempo": 142,
+  "version": "1.0",
+  "created": "2026-01-03",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "[F4a] z4 z8 | [F4a] z4 z8 | [F4a] z4 z8 | !fermata!z16 | !fermata!z16 |\nQ:1/4=71 \n[F2a2]g2 [c2g2]g2 [F2a2][g2F] [c2g2]g2 | [F2a2][g2F] [c2g2]g2 [F4a] [c4a] | [F4a] [c4a] [a2F]F2 [c4a] | \n!p![F2^f2][F2^f2] [c2^f2]^f2 [F2^f2][F2^f2] [c2^f2]^f2 |[F2^f2][F2^f2] [c2^f2]^f2 [F2^f2][F2^f2] [c2^f2]^f2 | [F2^f2][F2^f2] [c2^f2]^f2 [F2^f2][F2^f2] [c2^f2]^f2 | [F2^f2][F2^f2] [c2^f2]^f2 [F4a] z4 |"
+    }
+  ],
+  "audio": {
+    "plus": "Bohemian_Rhapsody_v.4_plus.mp3"
+  }
+}

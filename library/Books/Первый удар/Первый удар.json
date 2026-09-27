@@ -1,0 +1,17 @@
+{
+  "title": "Первый удар",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 60,
+  "version": "1.0",
+  "created": "2026-05-27",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Начало",
+      "abc": "[F4g] [c4g] [F4g] [c4g] ",
+      "startTime": 0
+    }
+  ]
+}

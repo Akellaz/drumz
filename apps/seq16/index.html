@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Секвенсор — Drumz</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #2d3748;
+      --border: #e2e8f0;
+      --primary: #4299e1;
+      --card-bg: #fafafa;
+      --success: #48bb78;
+      --radius: 8px;
+      --spacing: 16px;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: var(--spacing);
+    }
+    .sequencer {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f0f4f8;
+      border-radius: 8px;
+      border: 1px solid #d1dce5;
+    }
+    .drum-grid {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+    .track-row {
+      display: flex;
+      border-bottom: 1px solid #eee;
+    }
+    .track-row:last-child {
+      border-bottom: none;
+    }
+    .track-name {
+      width: 90px;
+      padding: 10px;
+      font-weight: bold;
+      background: #f8f9fa;
+      text-align: right;
+      border-right: 1px solid #eee;
+      font-size: 14px;
+    }
+    .track-steps {
+      display: flex;
+      flex: 1;
+      padding: 5px;
+    }
+    .step {
+      width: 30px;
+      height: 30px;
+      border: 2px solid #ddd;
+      margin: 2px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .step.group-0 { background-color: #fff3cd; border-color: #ffeaa7; }
+    .step.group-1 { background-color: #d1ecf1; border-color: #b8daff; }
+    .step.group-2 { background-color: #f8d7da; border-color: #f5c6cb; }
+    .step.group-3 { background-color: #d4edda; border-color: #c3e6cb; }
+    .step.group-0.active { background-color: #ffc107; border-color: #e0a800; }
+    .step.group-1.active { background-color: #17a2b8; border-color: #138496; }
+    .step.group-2.active { background-color: #dc3545; border-color: #bd2130; }
+    .step.group-3.active { background-color: #28a745; border-color: #1e7e34; }
+    .step:hover {
+      background-color: #e9ecef;
+    }
+    .step.playing {
+      background-color: #4299e1 !important;
+      border-color: #3182ce !important;
+      color: white;
+      transform: scale(1.1);
+    }
+    .sequencer-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .sequencer-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .sequencer-btn:hover {
+      border-color: var(--primary);
+      background: #ebf8ff;
+    }
+    .sequencer-btn.play { color: var(--success); border-color: var(--success); }
+    .sequencer-btn.stop { color: #e53e3e; border-color: #e53e3e; }
+    .tempo-control {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .tempo-label {
+      font-weight: bold;
+    }
+    input[type="range"] {
+      width: 180px;
+      margin: 0 10px;
+    }
+    .tracks-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+    .track-toggle-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 style="text-align:center;">Секвенсор (16 шагов)</h2>
+
+    <div class="tracks-toggle" id="tracksToggle"></div>
+
+    <div class="sequencer" id="sequencer">
+      <div class="drum-grid" id="drumGrid"></div>
+      <div class="sequencer-controls">
+        <button class="sequencer-btn play" id="playBtn">▶️ Играть</button>
+        <button class="sequencer-btn stop" id="stopBtn" disabled>⏹️ Стоп</button>
+        <button class="sequencer-btn" id="clearBtn">🧹 Очистить</button>
+      </div>
+      <div style="text-align: center; margin-top: 8px;">
+        <label>
+          <input type="checkbox" id="loopCheckbox"> Зациклить
+        </label>
+      </div>
+      <div class="tempo-control">
+        <span class="tempo-label">Темп:</span>
+        <input type="range" id="tempoSlider" min="40" max="240" value="120" />
+        <span id="tempoValue">120 BPM</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Фиксированный порядок дорожек (сверху вниз)
+    const trackOrder = ['crash', 'hihat', 'tom1', 'snare', 'tom3', 'kick'];
+
+    const trackNames = {
+      'kick': 'Kick',
+      'snare': 'Snare',
+      'hihat': 'HiHat',
+      'crash': 'Crash',
+      'tom1': 'Tom1',
+      'tom3': 'Tom3'
+    };
+
+    let currentSequencer = {
+      tracks: {},
+      visibleTracks: new Set(['hihat', 'snare', 'kick']), // по умолчанию — только эти три
+      bpm: 120,
+      loop: false,
+      isPlaying: false,
+      intervalId: null,
+      currentStep: 0
+    };
+
+    let audioContext = null;
+    let sounds = null;
+
+    // Инициализация всех треков
+    trackOrder.forEach(track => {
+      currentSequencer.tracks[track] = Array(16).fill(0);
+    });
+
+    // === DOM ===
+    const drumGrid = document.getElementById('drumGrid');
+    const tracksToggle = document.getElementById('tracksToggle');
+    const playBtn = document.getElementById('playBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const loopCheckbox = document.getElementById('loopCheckbox');
+    const tempoSlider = document.getElementById('tempoSlider');
+    const tempoValue = document.getElementById('tempoValue');
+
+    // === Аудио ===
+    async function initAudio() {
+      if (audioContext) return;
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const soundFiles = {
+        kick: 'sounds/kick.wav',
+        snare: 'sounds/snare.wav',
+        hihat: 'sounds/hihat.wav',
+        crash: 'sounds/crash.wav',
+        tom1: 'sounds/tom1.wav',
+        tom3: 'sounds/tom3.wav'
+      };
+      sounds = {};
+      for (const [name, url] of Object.entries(soundFiles)) {
+        try {
+          const resp = await fetch(url);
+          const buf = await resp.arrayBuffer();
+          sounds[name] = await audioContext.decodeAudioData(buf);
+        } catch (e) {
+          console.warn(`Звук "${name}" не загружен. Убедитесь, что файлы лежат в папке sounds/`);
+        }
+      }
+    }
+
+    // === UI: переключатели дорожек ===
+    function renderTrackToggles() {
+      tracksToggle.innerHTML = '';
+      trackOrder.forEach(track => {
+        const label = document.createElement('label');
+        label.className = 'track-toggle-item';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.dataset.track = track;
+        checkbox.checked = currentSequencer.visibleTracks.has(track);
+        checkbox.addEventListener('change', (e) => {
+          const t = e.target.dataset.track;
+          if (e.target.checked) {
+            currentSequencer.visibleTracks.add(t);
+          } else {
+            currentSequencer.visibleTracks.delete(t);
+          }
+          renderGrid();
+        });
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(trackNames[track] || track));
+        tracksToggle.appendChild(label);
+      });
+    }
+
+    // === UI: сетка секвенсора ===
+    function renderGrid() {
+      drumGrid.innerHTML = '';
+      // Отображаем только видимые, но в фиксированном порядке
+      trackOrder.forEach(track => {
+        if (!currentSequencer.visibleTracks.has(track)) return;
+
+        const row = document.createElement('div');
+        row.className = 'track-row';
+        const name = document.createElement('div');
+        name.className = 'track-name';
+        name.textContent = trackNames[track] || track;
+        row.appendChild(name);
+        const steps = document.createElement('div');
+        steps.className = 'track-steps';
+        for (let i = 0; i < 16; i++) {
+          const step = document.createElement('div');
+          step.className = `step group-${Math.floor(i / 4) % 4} ${currentSequencer.tracks[track][i] ? 'active' : ''}`;
+          step.dataset.track = track;
+          step.dataset.step = i;
+          step.addEventListener('click', () => toggleStep(step));
+          steps.appendChild(step);
+        }
+        row.appendChild(steps);
+        drumGrid.appendChild(row);
+      });
+    }
+
+    function toggleStep(cell) {
+      const track = cell.dataset.track;
+      const step = parseInt(cell.dataset.step);
+      const isActive = currentSequencer.tracks[track][step];
+      currentSequencer.tracks[track][step] = isActive ? 0 : 1;
+      cell.classList.toggle('active');
+    }
+
+    // === Playback ===
+    playBtn.addEventListener('click', async () => {
+      if (currentSequencer.isPlaying) return;
+      if (!audioContext) await initAudio();
+      if (audioContext.state === 'suspended') audioContext.resume();
+
+      currentSequencer.isPlaying = true;
+      currentSequencer.currentStep = 0;
+      stopBtn.disabled = false;
+
+      const stepTime = (60 / currentSequencer.bpm) / 4 * 1000;
+      currentSequencer.intervalId = setInterval(() => {
+        document.querySelectorAll('.step').forEach(el => el.classList.remove('playing'));
+        document.querySelectorAll(`.step[data-step="${currentSequencer.currentStep}"]`).forEach(el => {
+          el.classList.add('playing');
+          setTimeout(() => el.classList.remove('playing'), 100);
+        });
+
+        if (sounds) {
+          trackOrder.forEach(track => {
+            if (currentSequencer.visibleTracks.has(track) &&
+                currentSequencer.tracks[track][currentSequencer.currentStep] &&
+                sounds[track]) {
+              const src = audioContext.createBufferSource();
+              src.buffer = sounds[track];
+              src.connect(audioContext.destination);
+              src.start();
+            }
+          });
+        }
+
+        currentSequencer.currentStep++;
+        if (currentSequencer.currentStep >= 16) {
+          if (currentSequencer.loop) {
+            currentSequencer.currentStep = 0;
+          } else {
+            clearInterval(currentSequencer.intervalId);
+            currentSequencer.isPlaying = false;
+            stopBtn.disabled = true;
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('playing'));
+          }
+        }
+      }, stepTime);
+    });
+
+    stopBtn.addEventListener('click', () => {
+      if (!currentSequencer.isPlaying) return;
+      clearInterval(currentSequencer.intervalId);
+      currentSequencer.isPlaying = false;
+      currentSequencer.currentStep = 0;
+      stopBtn.disabled = true;
+      document.querySelectorAll('.step').forEach(el => el.classList.remove('playing'));
+    });
+
+    clearBtn.addEventListener('click', () => {
+      if (currentSequencer.isPlaying) stopBtn.click();
+      trackOrder.forEach(track => {
+        currentSequencer.tracks[track] = Array(16).fill(0);
+      });
+      renderGrid();
+    });
+
+    loopCheckbox.addEventListener('change', (e) => {
+      currentSequencer.loop = e.target.checked;
+    });
+
+    tempoSlider.addEventListener('input', (e) => {
+      const bpm = parseInt(e.target.value);
+      tempoValue.textContent = `${bpm} BPM`;
+      currentSequencer.bpm = bpm;
+      if (currentSequencer.isPlaying) {
+        stopBtn.click();
+        setTimeout(() => playBtn.click(), 50);
+      }
+    });
+
+    // Запуск
+    renderTrackToggles();
+    renderGrid();
+  </script>
+</body>
+</html>

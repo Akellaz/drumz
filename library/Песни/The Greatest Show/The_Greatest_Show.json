@@ -1,0 +1,20 @@
+{
+  "title": "The Greatest Show",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "2",
+  "description": "",
+  "tempo": 77,
+  "version": "1.0",
+  "created": "2026-07-10",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "z4 z4 z4 [F4A] | z4 z4 z2 [F2A] [F4A] | z4 z4 z4 [F4A] | z4 z4 z2 [F2A] [F4A] |\n[F4a] c4 F4 c4 | F4 c4 F2c2 c4 | F4 c4 F4 c4 | F4 c4 F2c2 c4 | \n[F4a] c4 F4 c4 | F4 c4 F2c2 c4 | F4 c4 F4 c4 | F4 c4 F2c2 c4 | \n[F4a] c4 F4 c4 | F4 c4 F2c2 c4 |  F4 c4 F4 c4 | F4 c4 [A2c][A2c] [A2c][A2c] | [F4a]z4 z4 [F4A] | \nF2g2 c4 F4 c4 | F2g2 c4 F4 c4 | F2g2 c4 F4 c4 | F2g2 c4 F4 c2c2| \nF2g2 c4 F4 c4 | F2g2 c4 F4 c4 | F2g2 c4 F4 c4 | F2g2 c4 F4 z4| \n[F4a] c4 F2F2 c4 | F4 c4 F2F2 c4 | [F4a] c4 F2F2 c4 | F4 c4 [F4A4] z4 | \nF4 [c4a] F2F2 c4 | F4 c4 F2F2 c4 | [F4a] c4 F2F2 c4 | F4 c4 [A2c][A2c] [A2c][A2c] | \n[F4a] c4 F2F2 c4 | F4 c4 F2F2 c4 | [F4a] c4 F2F2 c4 | [A2c][A2c] [A2c][A2c] [A2c][A2c] [A2c][A2c] | \n[F4a] z4 z4 z4 |] ",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "The_Greatest_Show.mp3"
+  }
+}

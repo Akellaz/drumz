@@ -1,0 +1,20 @@
+{
+  "title": "Попец",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 123,
+  "version": "1.0",
+  "created": "2026-08-30",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "all",
+      "abc": "\"In\"g4 g4 g4 \"hop\"g4 | [F2g2]g2 [c2g2][g2F] [F2g2]g2 [c2g2]g2 | z16 | z16 | [F2e2][e2] [c2][F2] [F2][d2] [c4d4] |\n\"V\"|:[F2a2]g2 [c2g2][g2F] [F2g2]g2 [c2g2]g2 | z16 | z16 | z16 :| \n\"Ch\"[c2g2][F2g2] [c2g2][F2g2] [c2g2][F2g2] [c2g2]cc| [F4a] z4 z4 z4 | [F2a2]g2 [c2g2][g2F] [F2g2]g2 [c2g2]g2 | z16 |z16 | [F2g2e]g2 [c2g2][g2Fe] [F2g2][g2e] [c2g2e]g2 |\n\"V\"|:[F2a2]g2 [c2g2][g2F] [F2g2]g2 [c2g2]g2 | z16 | z16 | z16 :| \n\"Ch\"[c2g2][F2g2] [c2g2][F2g2] [c2g2][F2g2] [c2g2]cc| [F4a] z4 z4 z4 | [F2g2]g2 [c2g2][g2F] [F2g2]g2 [c2g2]g2 | z16 |z16 | [F2e2][e2] [c2][F2] [F2]\"да\"[d2] \"вай\"[c2d2]A2 |\n\"Solo\"|:[F2a2]g2 [c2g2][g2F] [F2g2]g2 [c2g2]g2 | z16 | z16 | z16 :| \n[F2g2]g2 [c2g2][g2F] [F2g2]g2 [c2g2]g2 | [F4a] z4 z4 z4  |[F2g2]g2 [c2g2][g2F] [F2g2]g2 [c2g2]g2 | F2F2 c2[a2F]z4 z4  | \n[F2a2]g2 [c2g2][g2F] [F2g2]g2 [c2g2]g2 | z16 | z16 | z16 | \n[F2g2]g2 [c2g2][g2F] [F2g2]g2 [c2g2]g2 | z16 | z16 | [F2e2][e2] [c2][F2] [F2][d2] [c4d4] |\n\"Ch\"|:[F4a]  [c2g2][F2g2] [c2g2][F2g2] [c2g2]cc| [F4a] z4 z4 z4 \"only 1st\"| [F2a2]g2 [c2g2][g2F] [F2g2]g2 [c2g2]g2 | z16\"4\" :|c2F2 F2c2 z2 F2c2 z2 | [F4g] \nc",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Popec.mp3"
+  }
+}

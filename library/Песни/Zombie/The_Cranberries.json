@@ -1,0 +1,19 @@
+{
+  "title": "Zombie - The Cranberries",
+  "category": ["восьмые", "шестнадцатые"],
+  "difficulty": "4",
+  "description": "",
+  "tempo": 76,
+  "version": "1.0",
+  "created": "2025-12-29",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Окончание",
+      "abc": "[Fa]g[Fg]g Lgg[Fg]g [Fg]g[Fg]g Lgg[Fg]g | [Fg]ggg Lgg[Fg]g [Fg]g[Fg]g !open!g!open!g!open!g!open!g | \n[Fg]g[Fg]g Lgg[Fg]g [Fg]g[Fg]g Lgg[Fg]g | [Fg]ggg Lgg[Fg]g [Fg]g[Fg]g !open!g!open!gaa |\n[Fa]g[Fg]g Lgg[Fg]g [Fg]g[Fg]g Lgg[Fg]g | [Fg]ggg Lgg[Fg]g [Fg]g[Fg]g !open!g!open!g!open!g!open!g | \n[Fg]g[Fg]g Lgg[Fg]g !open![Fg]!open!g!open![Fg]!open!g !open!Lg!open!g!open![Fg]!open!g | !open![Fg]!open!g!open![Fg]!open!g !open![Fg]!open!g!open![Fg]!open!g !open![Fg]!open!g[Fc]c [Fc]c[Fc]c| \n[F2a2][F2g2] [c2g2F2][F2g2] [F2g2][F2g2] [c2a2F2][F2g2] | [F2g2][F2g2] [c2g2F2][F2g2] [F2g2][F2g2] [c2a2F2][c2a2F2] | [F2g2][F2g2] [c2g2F2][F2g2] [F2g2][F2g2] [c2a2F2][F2g2] | [F2g2][F2g2] [c2g2F2][F2g2] [F2g2][F2g2] [c2a2F2][c2a2F2] | \n[F2g2][F2g2] [c2g2F2][Fg]c [Fg]c[F2g2] [c2a2F2][F2g2] | [F2g2][F2g2] [c2g2F2][Fg]c [Fg]c[F2g2] [c2a2F2][F2a2c2] | [F2g2][F2g2] [c2g2F2][Fg]c [Fg]c[F2g2] [c2a2F2][F2g2] | [F2g2][F2g2] [c2g2F2][F2g2] [Fg]c[F2g2] [c2a2F2][F2e2] | \n[F2a2c2][F2g2] [F2a2c2][F2g2] [F2a2c2][F2g2] [F2a2c2][F2g2] | [F2a2c2][F2g2] [F2a2c2][F2g2] [F2a2c2][F2g2] [F2a2c2][F2g2] | [F2a2c2][F2g2] [F2a2c2][F2g2] [F2a2c2][F2g2] [F2a2c2][F2g2] |  [F2g2c2][F2g2c2] [F2g2c2][F2g2c2] [F2g2c2][F2a2c2] [Fc]c[Fe]e| \n[Fa]g[Fg]g Lgg[Fg]g [Fg]g[Fg]g Lgg[Fg]g | [Fg]ggg Lgg[Fg]g [Fg]g[Fg]g !open!g!open!g!open!g!open!g | \n[Fg]g[Fg]g Lgg[Fg]g [Fg]g[Fg]g Lgg[Fg]g | [Fg]ggg Lgg[Fg]g [Fg]g[Fg]g !open!g!open!gaa |\n[Fg]g[Fg]g Lgg[Fg]g [Fg]g[Fg]g Lgg[Fg]g | [Fg]ggg Lgg[Fg]g [Fg]gcg cccc| \n[F4a] z4 z8 |] \n"
+    }
+  ],
+  "audio": {
+    "plus": "The_Cranberries_plus.wav"
+  }
+}

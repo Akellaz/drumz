@@ -1,41 +1,44 @@
 RewriteEngine On
 RewriteBase /
 
-# Прямой доступ к song-editor (статический HTML)
+# 1. Прямой доступ к статическим папкам (без дальнейшей обработки правилами)
 RewriteRule ^song-editor/ - [L]
+RewriteRule ^apps/ - [L] # Разрешаем прямой доступ ко всем файлам внутри apps
+RewriteRule ^fire/ - [L]
 
-# Обработчик формы
-RewriteRule ^form/form_handler\.php$ form/form_handler.php [L]
-
-# Короткие ссылки на упражнения
+# 2. Короткие ссылки на упражнения
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^library/([a-zA-Z0-9_-]+)$ library/index.php?exercise=$1 [L,QSA]
 
-# Запрет прямого доступа к .php (кроме явно разрешённых)
+# 3. Запрет прямого доступа к .php (кроме явно разрешённых)
 RewriteCond %{THE_REQUEST} \s/+(.+)\.php [NC]
 RewriteCond %{REQUEST_URI} !^/admin/ [NC]
-RewriteCond %{REQUEST_URI} !^/form/form_handler\.php [NC]
 RewriteCond %{REQUEST_URI} !^/library/index\.php [NC]
 RewriteCond %{REQUEST_URI} !^/library/tree\.php [NC]
+RewriteCond %{REQUEST_URI} !^/pro/api\.php [NC]
+RewriteCond %{REQUEST_URI} !^/profile\.php [NC]      # <-- ДОБАВЛЕНО: разблокировка профиля
+RewriteCond %{REQUEST_URI} !^/stest/ [NC]
+RewriteCond %{REQUEST_URI} !^/ear/ [NC]
+RewriteCond %{REQUEST_URI} !^/apps/ [NC]             # <-- ДОБАВЛЕНО: разблокировка .php внутри apps (на всякий случай)
 RewriteRule ^ - [R=404,L]
 
-# ЧПУ: Орден
-RewriteRule ^orden/?$ orden/index.php [L]
-RewriteRule ^orden/manifest/?$ orden/manifest.php [L]
-RewriteRule ^orden/professions/?$ orden/professions.php [L]
-RewriteRule ^orden/achievements/?$ orden/achievements.php [L]
-RewriteRule ^orden/levels/?$ orden/levels.php [L]
-RewriteRule ^orden/ratings/?$ orden/ratings.php [L]
-RewriteRule ^orden/shadows/?$ orden/shadows.php [L]
+# 4. ЧПУ: Орден (Обновлено: указывает на новую папку apps/orden)
+# Если вы хотите, чтобы короткая ссылка /orden/ всё ещё работала, она теперь ведёт в apps:
+RewriteRule ^orden/?$ apps/orden/index.php [L]
+RewriteRule ^orden/manifest/?$ apps/orden/manifest.php [L]
+RewriteRule ^orden/professions/?$ apps/orden/professions.php [L]
+RewriteRule ^orden/achievements/?$ apps/orden/achievements.php [L]
+RewriteRule ^orden/levels/?$ apps/orden/levels.php [L]
+RewriteRule ^orden/ratings/?$ apps/orden/ratings.php [L]
+RewriteRule ^orden/shadows/?$ apps/orden/shadows.php [L]
 
-# Остальные страницы
-RewriteRule ^about/?$ about/index.php [L]
+# 5. Остальные страницы
 RewriteRule ^sequencer/?$ sequencer/index.php [L]
 RewriteRule ^student/([^/]+)$ student/index.php?slug=$1 [L,QSA]
 RewriteRule ^$ index.php [L]
 
-# Разрешить статические файлы
+# 6. Разрешить статические файлы
 <FilesMatch "\.(json|css|js|png|jpg|jpeg|svg|woff2|ico|html)$">
   Order Allow,Deny
   Allow from all

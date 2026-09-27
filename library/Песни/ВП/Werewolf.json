@@ -1,0 +1,21 @@
+{
+  "title": "Werewolf",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 120,
+  "version": "1.0",
+  "created": "2026-08-26",
+  "fragments": [
+    {
+      "id": 3,
+      "title": "All parts",
+      "abc": "\"Intro\"[F4a] D4  D4  D2AA | [F4a] ^f4 ^f4 ^f4|[F4a] D4  D4  D2AA | [F4a] ^f4 ^f4 ^f4|\n \"Inst\"[F2a2]g2 [c2g2]gF g2[g2F] [c2g2]g2 |  [F2g2]g2 [c2g2]gF g2[g2F] [c2g2]g2 |  [F2g2]g2 [c2g2]gF g2[g2F] [c2g2]g2 |  [F2g2]g2 [c2g2]gF g2[g2F] {/c}c4 | \n\"V.1\"[F2g2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2 | [F2g2]g2 [c2g2]gF g2[g2F] [c2g2]g2 | [F2g2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2 | [F2g2]g2 [c2g2]gF g2[g2F] [c2g2]g2 | \n[F2a2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2 | [F2g2]g2 [c2g2]gF g2[g2F] [c2g2]g2 | [F2g2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2 | [c2g2][c2g2] [g2]gF [c2g2][g2F] [c4a]| \n\"Pre\" [F2a2]g2 [c2g2]gF g2g2 [c2g2]g2 |  [F2g2]g2 [c2g2]gF g2g2 [c2g2]g2 |\n\"Ch.1\"[F2a2]^f2 [c2^f2]^fF ^f2[^f2F] [c2^f2]^f2 | [F2^f2]^f2 [c2^f2]^fF ^f2[^f2F] [c2^f2]^f2 | [F2^f2]^f2 [c2^f2]^fF ^f2[^f2F] [c2^f2]^f2 | [F2^f2]^f2 [c2^f2]^fF ^f2[^f2F] [c2^f2]^f2 |\n[F2a2]^f2 [c2^f2]^fF ^f2[^f2F] [c2^f2]^f2 | [F2^f2]^f2 [c2^f2]^fF ^f2[^f2F] [c2^f2]^f2 | [F2^f2]^f2 [c2^f2]^fF ^f2[^f2F] [c2^f2]^f2 | [F2a2c2]^fc [F2^f2][^f2c] [F^f]c^f2 [F4^f4c4]  | \n\"Inst\" [F2a2]g2 [c2g2]gF g2[g2F] [c2g2]g2 |  [F2g2]g2 [c2g2]gF gc[g2F] [c2g2]g2 |  [F2a2]g2 [c2g2]gF g2[g2F] [c2g2]g2 |  [F2g2]g2 [c2g2]gF g2[g2F] {/c}c4 | \nz",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "minus": "Werewolf_minus.mp3",
+    "plus": "Werewolf_plus.mp3"
+  }
+}

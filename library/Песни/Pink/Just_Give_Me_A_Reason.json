@@ -1,0 +1,20 @@
+{
+  "title": "Just Give Me A Reason",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 95,
+  "version": "1.0",
+  "created": "2026-09-12",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Pink Nate Ruess",
+      "abc": "|: ^f4^f4^f4^f4| ^f4^f4^f4^f4|^f4^f4^f4^f4|^f4^f4^f4^f4\"3\":|\n|: [^f4F]^f4[^f4F]^f4| [^f4F]^f4[^f4F]^f4|[^f4F]^f4[^f4F]^f4|[^f4F]^f4[^f4F]^f4:|\n[a4F][g4c][g4F][g4c]| [g4F][g4c][g4F][g4c]| [g4F][g4c][g4F][g4c]| [g4F][g4c][g4F][g4c]| \n[g4F][g4c][g4F][g4c]| [g4F][g4c][g4F][g4c]|[g4F][g4c][g4F][g4c]| \n[a4F][g4c][a4F][g4c]| [a4F] g4 g4 A4| \n|:[g4F][g4c][g4F][g4c]|[g4F][g4c][g4F][g4c]|[g4F][g4c][g4F][g4c]|[g4F][g4c][g4F][g4c]:|\n|:[a4F][g4c][a4F][g4c]|[a4F][g4c][g4F][g4c]|[a4F][g4c][a4F][g4c]|[a4F][g4c][g4F][g4c]:|\n[a4F][g4c][a4F][g4c]|[a4F]A2A2 A2A2 A2A2 | \n[a4F][^f4c][^f4F][^f4c]| [^f4F][^f4c][^f4F][^f4c]| [^f4F][^f4c][^f4F][^f4c]| [^f4F][^f4c][^f4F][^f4c]| \n[^f4F][^f4c][^f4F][^f4c]| [^f4F][^f4c][^f4F][^f4c]| [^f4F][^f4c][^f4F][^f4c]| [a4F][^f4c][a4F][^f4c]| \n[a4F]^f4^f4^f4|^f4^f4^f4^f4|^f4^f4^f4^f4|^f4^f4^f4^f4|\n[a4F]z4 z4 z4 |] ",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Just Give Me A Reason.mp3"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Octavarium",
+  "category": ["четверти", "восьмые", "шестнадцатые"],
+  "difficulty": "3",
+  "description": "",
+  "tempo": 65,
+  "version": "1.0",
+  "created": "2025-12-13",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Razor",
+      "abc": "[F4a] z4 z8 | z16 | z4 z4 z4 c2A2 |\n [F4g] g4 z4 g2AA |  [F4a] g4 z4 g4 |  [F4a] g4 z4 g2AA | [F4a] g4 z4 g2AA |\n [F4a] g4 z4 g2AA | [F4a] g4 z4 g4 | [F4a] g4 [F4a] g4 | [F4a] g4 z4 g2AA |\n [F4a] g4 z4 g4 | [F4a] g4 cFFF cFcF |"
+    }
+  ],
+  "audio": {
+    "plus": "Razor_plus.mp3",
+	"minus": "Razor_minus.mp3"
+  }
+}

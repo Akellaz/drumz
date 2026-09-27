@@ -1,0 +1,50 @@
+{
+  "title": "Poker Face",
+  "category": ["четверти", "восьмые"],
+  "difficulty": 3,
+  "description": "",
+  "tempo": 120,
+  "version": "1.0",
+  "created": "2026-09-12",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "|: z16 | z16 | z16 | z16 :|  \n[F4a][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] |  [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] \n\n",
+      "startTime": 0
+    },
+    {
+      "id": 1,
+      "title": "Куплет 1 + Припев 1 + Связка 1",
+      "abc": "|: [F4a][c4F][F4][c4F] | [F4][c4F][F4][c4F] | [F4][c4F][F4][c4F] | [F4][c4F][F4][c4F] :| \n[F4a][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | \n[F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4a]z4 z4 z4 | \n|: [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [A2F]A2[c2F]A2 [A2F]A2[c2F]A2 :|\n[F4a][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] |  [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] ",
+      "startTime": 24.2
+    },
+    {
+      "id": 4,
+      "title": "Куплет 2 + Припев 2 + Связка 2",
+      "abc": "[F4a][F4][F4][F4] | [F4][F4][F4][F4] | [F4][F4][F4][F4] | [F4][F4][F4][F4] | \n[F4][c4F][F4][c4F] | [F4][c4F][F4][c4F] | [F4][c4F][F4][c4F] | [F4][c4F][F4][c4F] |\n[F4a][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | \n[F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4a]z4 z4 z4 |\n|: [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [A2F]A2[c2F]A2 [A2F]A2[c2F]A2 :|\n|:[F4a][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] |  [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] :| ",
+      "startTime": 80.8
+    },
+    {
+      "id": 6,
+      "title": "Куплет 3 + Бридж + Припев 3",
+      "abc": "|:[F4a][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] :| \na4z4z4z4 | z16 | z16 | z16 |\n|: [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [A2F]A2[c2F]A2 [A2F]A2[c2F]A2 \"3\":| ",
+      "startTime": 145
+    },
+    {
+      "id": 7,
+      "title": "Окончание",
+      "abc": "|: [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] :|\nD4z4z4z4|]  \n",
+      "startTime": 193.6
+    },
+    {
+      "id": 8,
+      "title": "Вся песня",
+      "abc": "|: z16 | z16 | z16 | z16 :|\n[F4a][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] |  [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | \n\"Куплет\" |: [F4a][c4F][F4][c4F] | [F4][c4F][F4][c4F] | [F4][c4F][F4][c4F] | [F4][c4F][F4][c4F] :| \n[F4a][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | \n[F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4a]z4 z4 z4 | \n\"Припев\" |: [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [A2F]A2[c2F]A2 [A2F]A2[c2F]A2 :|\n\"Связка\" [F4a][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] |  [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | \n\"Куплет 2\" [F4][F4][F4][F4] | [F4][F4][F4][F4] | [F4][F4][F4][F4] | [F4][F4][F4][F4] | \n[F4][c4F][F4][c4F] | [F4][c4F][F4][c4F] | [F4][c4F][F4][c4F] | [F4][c4F][F4][c4F] |\n[F4a][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | \n[F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4a]z4 z4 z4 |\n\"Припев 2\" |: [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [A2F]A2[c2F]A2 [A2F]A2[c2F]A2 :|\n\"Связка 2\" |:[F4a][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] |  [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] :| \n\"Куплет 3\" |:[F4a][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] | [F4g][c4gF][F4g][c4gF] :| \n\"Бридж\" a4z4z4z4 | z16 | z16 | z16 |\n\"Припев 3\" |: [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [A2F]A2[c2F]A2 [A2F]A2[c2F]A2 \"3\":|\n\"Окончание\" |: [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] | [F4a][c4aF][F4a][c4aF] :|\nD4z4z4z4|]  \nz\n",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Poker_Face.mp3"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "title": "Снегурочка",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 188,
+  "version": "1.0",
+  "created": "2026-02-17",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "[F2g2]g2 [c2g2][c2g2] [F2g2]g2 [c2g2]g2 | [F2g2]g2 [c2g2][c2g2] [F2g2]g2 [c2g2][g2F] | \n[F2g2]g2 [c2g2][c2g2] [F2g2]g2 [c2g2]g2 | [F2g2]g2 [c2g2][c2g2] [F2g2]e2 e2e2 | "
+    }
+  ]
+}

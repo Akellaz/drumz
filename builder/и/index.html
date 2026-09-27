@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Drumz Builder</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+    background: #1a1a1f;
+    color: #e6e6e6;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  
+  /* Open Hat — светло-голубой, чтобы отличать от закрытого */
+.seq-step.hihat-open.active {
+    background-color: #38bdf8 !important;
+    box-shadow: 0 0 4px rgba(56, 189, 248, 0.5);
+}
+
+/* Акценты на закрытом хэте и снейре */
+.seq-step.active.accent {
+    background-color: #f59e0b !important;
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+    border: 1px solid #fff;
+}
+  
+  
+
+/* Опционально: маленькая точка в углу для еще более явного отличия */
+.seq-step.active.accent::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 5px;
+    height: 5px;
+    background-color: #fff;
+    border-radius: 50%;
+}
+  
+  
+
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    overflow: hidden;
+    min-height: 0;
+  }
+  aside {
+    background: #20202a;
+    border-right: 1px solid #333;
+    padding: 14px 10px;
+    overflow-y: auto;
+  }
+  aside h3 {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    color: #888; margin-bottom: 8px;
+  }
+  .palette-item {
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    cursor: grab;
+    font-size: 13px;
+    font-weight: 500;
+    border-left: 4px solid;
+    background: #2a2a34;
+    user-select: none;
+    transition: transform 0.1s;
+  }
+  .palette-item:hover { transform: translateX(2px); }
+  .palette-item:active { cursor: grabbing; }
+
+  .workspace {
+    padding: 16px;
+    overflow: auto;
+    background: #1a1a1f;
+    min-height: 0;
+  }
+  .timeline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 90px;
+    padding: 10px;
+    background: #22222a;
+    border-radius: 8px;
+    border: 1px dashed #3a3a45;
+    align-items: flex-start;
+  }
+  .timeline.drag-over { border-color: #4a7bd1; background: #262630; }
+  .timeline:empty::before {
+    content: "Перетащите сюда секции из панели слева";
+    color: #555; font-size: 13px; padding: 30px;
+    width: 100%; text-align: center;
+  }
+
+  .block {
+    border-radius: 6px;
+    padding: 8px 10px;
+    position: relative;
+    cursor: grab;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 70px;
+    border: 1px solid rgba(0,0,0,0.3);
+    user-select: none;
+    transition: box-shadow 0.15s;
+  }
+  .block:hover { box-shadow: 0 0 0 2px rgba(255,255,255,0.2); }
+  .block.dragging { opacity: 0.4; }
+  
+  .block.collapsed .block-bars, .block.collapsed .block-controls { display: none !important; }
+  .block.collapsed { 
+    min-height: 36px !important; 
+    width: 140px !important;
+    padding: 8px 10px; 
+  }
+  .block.collapsed .block-header::after { content: " (свернуто)"; font-size: 10px; color: #888; font-weight: normal; margin-left: 6px; }
+
+  .block-header {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(0,0,0,0.85);
+    cursor: pointer;
+  }
+  .block-controls {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 2;
+  }
+  .block:hover .block-controls { opacity: 1; }
+  .block-controls button {
+    background: rgba(0,0,0,0.25);
+    border: none;
+    color: rgba(0,0,0,0.85);
+    padding: 2px 6px;
+    font-size: 12px;
+    border-radius: 3px;
+    min-width: 22px;
+  }
+  .block-controls button:hover { background: rgba(0,0,0,0.4); }
+  
+  .block-controls button.active-page-break {
+    background: #4a7bd1;
+    color: #fff;
+  }
+
+  .block-bars {
+    display: flex;
+    gap: 2px;
+    margin-top: 6px;
+    margin-bottom: 22px;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+  .bar {
+    width: 32px;
+    height: 32px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.1s;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .bar:hover {
+    background: rgba(0,0,0,0.4);
+    border-color: rgba(255,255,255,0.3);
+  }
+  .bar.selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+  }
+  .bar.filled {
+    background: rgba(255,255,255,0.35);
+  }
+  .bar-number {
+    font-size: 9px;
+    color: rgba(0,0,0,0.6);
+    pointer-events: none;
+  }
+  .bar.filled .bar-number {
+    color: rgba(0,0,0,0.85);
+    font-weight: 700;
+  }
+
+  .phrase-divider {
+    width: 2px;
+    height: 32px;
+    background: rgba(0,0,0,0.55);
+    margin: 0 2px;
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+
+  .bottom-panel {
+    flex-shrink: 0;
+    background: #20202a;
+    border-top: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    transition: height 0.2s ease;
+    overflow: hidden;
+  }
+  .bottom-panel.collapsed { height: 0px !important; border: none; }
+  .bottom-panel.expanded { height: 360px; }
+
+  .bottom-header {
+    display: flex;
+    align-items: center;
+    padding: 6px 14px;
+    background: #2a2a34;
+    border-bottom: 1px solid #333;
+    gap: 12px;
+    flex-shrink: 0;
+    min-height: 32px;
+  }
+  .bottom-header .title { font-size: 12px; font-weight: 600; color: #ccc; }
+  .bottom-header .context { margin-left: auto; font-size: 11px; color: #888; }
+  .bottom-header .context b { color: #4a7bd1; }
+  .bottom-header .toggle-btn {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 14px;
+    padding: 2px 6px;
+    cursor: pointer;
+  }
+  .bottom-header .toggle-btn:hover { color: #fff; }
+
+  .bottom-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: #333;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .bottom-section {
+    background: #1a1a1f;
+    overflow: auto;
+    padding: 12px;
+  }
+  .bottom-section h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .section-header h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin: 0;
+  }
+  .view-toggle {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #666;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .view-toggle:hover {
+    color: #4a7bd1;
+    border-color: #4a7bd1;
+    background: rgba(74, 123, 209, 0.08);
+  }
+
+  .seq-container { display: flex; flex-direction: column; gap: 3px; }
+  .seq-row {
+    display: grid;
+    grid-template-columns: 50px repeat(16, 1fr);
+    gap: 2px;
+    align-items: center;
+  }
+  .seq-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-align: right;
+    padding-right: 6px;
+    color: #aaa;
+  }
+  .seq-step {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    border: 1px solid #333;
+    background: #2a2a34;
+    cursor: pointer;
+    transition: all 0.08s;
+    max-height: 22px;
+    user-select: none;
+  }
+  .seq-step:hover { border-color: #555; }
+  .seq-step.beat-start { border-left: 2px solid #555; }
+  .seq-step.hihat.active { background: linear-gradient(180deg, #f6ad55, #dd6b20); border-color: #c05621; }
+  .seq-step.snare.active { background: linear-gradient(180deg, #63b3ed, #2b6cb0); border-color: #2c5282; }
+  .seq-step.kick.active { background: linear-gradient(180deg, #fc8181, #c53030); border-color: #9b2c2c; }
+  .seq-step.tom1.active { background: linear-gradient(180deg, #a78bfa, #7c3aed); border-color: #6d28d9; }
+  .seq-step.tom2.active { background: linear-gradient(180deg, #f472b6, #db2777); border-color: #be185d; }
+  .seq-step.tom3.active { background: linear-gradient(180deg, #34d399, #059669); border-color: #047857; }
+  .seq-step.crash.active { background: linear-gradient(180deg, #fde047, #ca8a04); border-color: #a16207; }
+  .seq-step.ride.active { background: linear-gradient(180deg, #93c5fd, #3b82f6); border-color: #2563eb; }
+
+  .seq-beat-nums {
+    display: grid;
+    grid-template-columns: 50px repeat(16, 1fr);
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+  .seq-beat-num { text-align: center; font-size: 9px; color: #666; }
+  .seq-beat-num.main { color: #4a7bd1; font-weight: 700; }
+
+.seq-actions { 
+    display: flex; 
+    gap: 6px; 
+    margin-top: 10px; 
+    padding-top: 10px;
+    border-top: 1px solid #2a2a34;
+}
+.seq-actions button { 
+    font-size: 11px; 
+    padding: 5px 10px;
+    background: #2a2a34;
+    color: #ccc;
+    border: 1px solid #3a3a45;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    font-weight: 500;
+}
+.seq-actions button:hover { 
+    background: #3a3a45;
+    color: #fff;
+    border-color: #4a7bd1;
+}
+.seq-actions button:active {
+    transform: scale(0.97);
+}
+
+/* Специальные цвета для разных действий */
+.seq-actions button[data-seq-act="clear"] {
+    color: #fc8181;
+    border-color: rgba(252, 129, 129, 0.3);
+}
+.seq-actions button[data-seq-act="clear"]:hover {
+    background: rgba(252, 129, 129, 0.12);
+    border-color: #fc8181;
+}
+
+.seq-actions button[data-seq-act="random"] {
+    color: #93c5fd;
+    border-color: rgba(147, 197, 253, 0.3);
+}
+.seq-actions button[data-seq-act="random"]:hover {
+    background: rgba(147, 197, 253, 0.12);
+    border-color: #93c5fd;
+}
+
+.seq-actions button[data-seq-act="copy-all"] {
+    color: #4a7bd1;
+    border-color: rgba(74, 123, 209, 0.4);
+}
+.seq-actions button[data-seq-act="copy-all"]:hover {
+    background: rgba(74, 123, 209, 0.15);
+    border-color: #4a7bd1;
+}
+  .seq-placeholder { color: #555; font-size: 12px; text-align: center; padding: 40px 20px; }
+
+  .notation-box {
+    background: #1a1a1f;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 10px;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+  }
+  .notation-box svg { max-width: 100%; height: auto; display: block; color: #ffffff; }
+  .notation-box .placeholder { color: #888; font-size: 12px; }
+  .notation-error { color: #fc8181; font-size: 11px; margin-top: 6px; }
+
+  .full-notation-panel {
+    flex-shrink: 0;
+    background: #1a1a1f;
+    border-top: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    transition: height 0.25s ease;
+    overflow: hidden;
+  }
+  .full-notation-panel.collapsed { height: 0px !important; border: none; }
+  .full-notation-panel.expanded { height: 400px; }
+  
+  .full-notation-header {
+    display: flex;
+    align-items: center;
+    padding: 6px 14px;
+    background: #2a2a34;
+    border-bottom: 1px solid #333;
+    flex-shrink: 0;
+  }
+  .full-notation-header .title { font-size: 12px; font-weight: 600; color: #ccc; }
+  .full-notation-header .header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+  }
+  .full-notation-header .close-btn {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .full-notation-header .close-btn:hover { color: #fff; }
+  
+  .full-notation-content {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+    background: #fafbfc;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .full-notation-content svg { max-width: 100%; height: auto; display: block; }
+  .full-notation-content .placeholder { color: #888; font-size: 13px; margin-top: 40px; }
+
+  .full-notation-panel:fullscreen {
+    height: 100vh !important;
+    width: 100vw !important;
+    border: none !important;
+    background: #1a1a1f !important;
+  }
+  .full-notation-panel:fullscreen .full-notation-content { height: calc(100vh - 40px) !important; }
+  .full-notation-panel:fullscreen .full-notation-wrapper { max-width: 100% !important; height: 100%; overflow-y: auto; }
+
+  .stats-bar {
+    padding: 6px 20px;
+    background: #24242c;
+    border-top: 1px solid #333;
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .stats-bar span b { color: #4a7bd1; }
+
+  .color-intro { background: #6ba8d8; border-color: #5a97c7; }
+  .color-verse { background: #7bc47b; border-color: #6ab36a; }
+  .color-chorus { background: #e8a85c; border-color: #d7974b; }
+  .color-bridge { background: #c87bc4; border-color: #b76ab3; }
+  .color-solo { background: #e87b7b; border-color: #d76a6a; }
+  .color-outro { background: #8a8ad8; border-color: #7979c7; }
+
+  .drop-indicator {
+    width: 3px;
+    background: #4a7bd1;
+    align-self: stretch;
+    border-radius: 2px;
+    margin: 0 2px;
+  }
+
+  .timeline-break {
+    width: 100%;
+    height: 12px;
+    flex-basis: 100%;
+    border-bottom: 1px dashed #3a3a45;
+    margin: 4px 0;
+    position: relative;
+  }
+  .timeline-break::before {
+    content: "Новая строка";
+    position: absolute;
+    left: 10px;
+    top: -8px;
+    background: #22222a;
+    padding: 0 6px;
+    font-size: 10px;
+    color: #555;
+  }
+
+  .timeline.compact .bar {
+    width: 16px;
+    height: 16px;
+  }
+  .timeline.compact .bar-number {
+    display: none;
+  }
+  .timeline.compact .phrase-divider {
+    width: 1px;
+  }
+  .timeline.compact .block {
+    min-height: 46px !important;
+    padding: 6px 8px !important;
+    width: fit-content !important;
+  }
+  .timeline.compact .block.collapsed {
+    width: 140px !important;
+  }
+  .timeline.compact .block-header {
+    font-size: 11px !important;
+  }
+  .timeline.compact .block-controls {
+    bottom: 4px;
+    left: 6px;
+    gap: 1px;
+  }
+  .timeline.compact .block-controls button {
+    font-size: 10px;
+    padding: 1px 4px;
+    min-width: 18px;
+  }
+
+  .notation-chunk { margin-bottom: 4px; display: flex; align-items: flex-start; gap: 10px; }
+  .notation-chunk-label { font-size: 11px; color: #666; min-width: 55px; padding-top: 15px; text-align: right; flex-shrink: 0; }
+.notation-chunk-content { 
+    flex: 1; 
+    overflow-x: auto; 
+    cursor: pointer;
+    transition: filter 0.15s, background 0.15s;
+    border-radius: 4px;
+    padding: 4px;
+}
+.notation-chunk-content:hover {
+    filter: brightness(1.04);
+    background: rgba(74, 123, 209, 0.05);
+}
+.notation-chunk-content:active {
+    filter: brightness(0.98);
+}
+  .notation-chunk-content svg { max-width: 100%; height: auto; display: block; }
+  .full-notation-wrapper { max-width: 950px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; width: 100%; }
+  .section-divider { border-top: 2px dashed #ccc; margin: 12px 0; position: relative; }
+  .section-divider-label { position: absolute; top: -10px; left: 20px; background: white; padding: 0 8px; font-size: 11px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: #24242c;
+    border: 1px solid #333;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 560px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .modal-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .modal-header h2 { font-size: 15px; font-weight: 600; flex: 1; }
+  .modal-close {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 6px;
+  }
+  .modal-close:hover { color: #fff; }
+  .modal-body {
+    padding: 16px 20px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .songs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .song-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #1a1a1f;
+    border: 1px solid #333;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+  .song-item:hover { border-color: #4a7bd1; background: #1f1f28; }
+  .song-item.active {
+    border-color: #4a7bd1;
+    background: #262630;
+    box-shadow: 0 0 0 1px #4a7bd1 inset;
+  }
+  .song-item-info { flex: 1; min-width: 0; }
+  .song-item-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e6e6e6;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .song-item-meta {
+    font-size: 11px;
+    color: #888;
+    margin-top: 2px;
+  }
+  .song-item-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .song-item:hover .song-item-actions { opacity: 1; }
+  .song-item-actions button {
+    padding: 3px 7px;
+    font-size: 11px;
+  }
+  .modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid #333;
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .songs-count { font-size: 11px; color: #888; }
+  .empty-songs {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+    font-size: 13px;
+  }
+
+  #miniTimeline {
+    display: flex;
+    gap: 4px;
+    padding: 6px 8px;
+    background: #1a202c;
+    border-bottom: 1px solid #4a5568;
+    overflow-x: auto;
+    overflow-y: hidden;
+    min-height: 36px;
+    align-items: center;
+    scrollbar-width: thin;
+  }
+  #miniTimeline::-webkit-scrollbar { height: 4px; }
+  #miniTimeline::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 2px; }
+
+  .mini-block {
+    display: flex;
+    gap: 1px;
+    padding: 2px 3px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+  .mini-block:hover { opacity: 1; }
+
+  .mini-bar {
+    width: 6px;
+    height: 18px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 1px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .mini-bar:hover { background: rgba(255,255,255,0.4); transform: scaleY(1.2); }
+  .mini-bar.filled { background: rgba(255,255,255,0.5); }
+  .mini-bar.selected {
+    background: #fff;
+    box-shadow: 0 0 0 2px #4299e1, 0 0 8px rgba(66,153,225,0.6);
+    transform: scaleY(1.3);
+  }
+
+  .mini-empty { color: #718096; font-size: 12px; padding: 0 8px; font-style: italic; }
+
+  .nav-buttons { margin-left: 12px; display: inline-flex; gap: 4px; vertical-align: middle; }
+  .nav-btn {
+    background: #4a5568;
+    border: none;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: background 0.15s;
+  }
+  .nav-btn:hover { background: #4299e1; }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .context-menu {
+    position: fixed; display: none; background: #2a2a34; border: 1px solid #4a4a55;
+    border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 2000; min-width: 180px; overflow: hidden;
+  }
+  .context-menu-item {
+    padding: 8px 12px; font-size: 12px; color: #e6e6e6; cursor: pointer; transition: background 0.1s;
+  }
+  .context-menu-item:hover { background: #4a7bd1; }
+  .context-menu-item.disabled { color: #666; cursor: not-allowed; }
+  .context-menu-item.disabled:hover { background: transparent; }
+
+  @media print {
+    header, aside, .workspace, .bottom-panel, .stats-bar, .full-notation-header, .modal-overlay, .context-menu { display: none !important; }
+    html, body { height: auto !important; overflow: visible !important; background: white !important; }
+    body { display: block !important; }
+    main { display: none !important; }
+    .full-notation-panel { height: auto !important; overflow: visible !important; border: none !important; background: white !important; display: block !important; }
+    .full-notation-content { overflow: visible !important; background: white !important; padding: 0 !important; display: block !important; }
+    .full-notation-wrapper { box-shadow: none !important; padding: 10px !important; max-width: 100% !important; }
+    .notation-chunk { page-break-inside: avoid; break-inside: avoid; }
+    .section-divider { page-break-before: auto; }
+    
+    .page-break-before {
+      page-break-before: always !important;
+      break-before: page !important;
+    }
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<main>
+  <aside>
+    <h3>Секции</h3>
+    <div id="palette"></div>
+  </aside>
+  <section class="workspace">
+    <div class="timeline" id="timeline"></div>
+  </section>
+</main>
+
+<div class="bottom-panel collapsed" id="bottomPanel">
+  <div id="miniTimeline"></div>
+  <div class="bottom-header">
+    <div class="title">🎹 Редактор такта</div>
+    <div class="context" id="bottomContext">Такт не выбран</div>
+    <button class="toggle-btn" id="closeBottomBtn" title="Закрыть редактор">✕</button>
+  </div>
+  <div class="bottom-content">
+    <div class="bottom-section" id="seqSection">
+      <div class="section-header">
+        <h4>Секвенсор</h4>
+        <button id="seqModeToggle" class="view-toggle" title="Переключить вид">Полный вид</button>
+      </div>
+      <div id="sequencer">
+        <div class="seq-placeholder">Кликните по такту в кирпичике, чтобы редактировать</div>
+      </div>
+    </div>
+    <div class="bottom-section" id="notationSection">
+      <h4>Нотация такта</h4>
+      <div class="notation-box" id="notationPaper">
+        <span class="placeholder">Выберите такт</span>
+      </div>
+      <div id="notationError"></div>
+    </div>
+  </div>
+</div>
+
+<div class="full-notation-panel collapsed" id="fullNotationPanel">
+  <div class="full-notation-header">
+    <div class="title">🎼 Полная нотация песни</div>
+    <div class="header-actions">
+      <button class="close-btn" id="printNotationBtn" title="Печать (или Сохранить как PDF через диалог браузера)">🖨</button>
+      <button class="close-btn" id="downloadPdfBtn" title="Скачать PDF файл">📄</button>
+      <button class="close-btn" id="fullscreenNotationBtn" title="На весь экран">⛶</button>
+      <button class="close-btn" id="closeFullNotation" title="Закрыть">✕</button>
+    </div>
+  </div>
+  <div class="full-notation-content" id="fullNotationContent">
+    <span class="placeholder">Нажмите «Полная нотация» для генерации</span>
+  </div>
+</div>
+
+<div class="modal-overlay" id="songsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📂 Мои песни</h2>
+      <button class="modal-close" id="closeSongsModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="songs-list" id="songsList"></div>
+    </div>
+    <div class="modal-footer">
+      <span class="songs-count" id="songsCount">0 песен</span>
+      <button id="newSongBtn" class="primary">+ Новая песня</button>
+    </div>
+  </div>
+</div>
+
+<div class="context-menu" id="contextMenu">
+  <div class="context-menu-item" data-action="copy">📋 Копировать</div>
+  <div class="context-menu-item" data-action="paste">📌 Вставить</div>
+</div>
+
+<div class="stats-bar">
+  <span>Тактов: <b id="statBars">0</b></span>
+  <span>Строчек: <b id="statPhrases">0</b></span>
+  <span>Длительность: <b id="statTime">0:00</b></span>
+  <span>Секций: <b id="statSections">0</b></span>
+</div>
+
+<!-- Сначала утилиты и менеджеры -->
+<script src="js/storage_manager.js"></script>
+<script src="js/io_manager.js"></script>
+<script src="js/songs_modal.js"></script> 
+
+<!-- Затем UI и ядро -->
+<script src="js/abc2svg-1.js"></script>
+<script src="js/groove_utils.js"></script>
+<script src="js/header_ui.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="js/app_core.js"></script>
+
+
+
+
+  <!-- Скрипт авторизации Firebase -->
+  <script type="module">
+    console.log("🚀 [Auth] Скрипт запущен");
+
+    function waitForContainer() {
+      const container = document.getElementById('authContainer');
+      if (container) {
+        console.log("✅ [Auth] Элемент #authContainer найден!");
+        initAuth(container);
+      } else {
+        console.log("⏳ [Auth] Ждем отрисовку #authContainer...");
+        setTimeout(waitForContainer, 100);
+      }
+    }
+
+    async function initAuth(container) {
+      try {
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
+        const { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+        const { getFirestore, doc, setDoc, getDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+        
+        const firebaseConfig = {
+          apiKey: "AIzaSyCb4mcornYDLKr36cfW8oGQtd_NE4Ktjd4",
+          authDomain: "drumz-c9989.firebaseapp.com",
+          projectId: "drumz-c9989",
+          storageBucket: "drumz-c9989.firebasestorage.app",
+          messagingSenderId: "51187561111",
+          appId: "1:51187561111:web:4c24867e255f2165592fd2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        async function saveUserToFirestore(user) {
+          const userDocRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(userDocRef);
+          if (!docSnap.exists()) {
+            await setDoc(userDocRef, {
+              name: user.displayName, email: user.email, photoURL: user.photoURL,
+              provider: "google", createdAt: serverTimestamp(), lastLogin: serverTimestamp()
+            });
+          } else {
+            await setDoc(userDocRef, { lastLogin: serverTimestamp() }, { merge: true });
+          }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            await saveUserToFirestore(user);
+            
+            container.innerHTML = `
+              <div class="user-profile-auth">
+                <img src="${user.photoURL}" alt="Аватар" class="user-avatar-auth">
+                <button id="logoutBtn" class="btn-logout-auth" title="Выйти">✕</button>
+              </div>
+            `;
+
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+              await signOut(auth);
+              window.location.reload();
+            });
+
+            // 🔥 Показываем кнопку сохранения
+            if (window.HeaderUI) {
+              window.HeaderUI.showSaveButton();
+            }
+
+          } else {
+            container.innerHTML = `
+              <button id="loginBtn" class="btn-login-auth">
+                <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px">
+                  <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                  <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+                  <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                  <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+                </svg>
+                Войти
+              </button>
+            `;
+
+            document.getElementById('loginBtn').addEventListener('click', async () => {
+              try { await signInWithPopup(auth, provider); } 
+              catch (error) { alert("Ошибка входа: " + error.message); }
+            });
+
+            // 🔥 Скрываем кнопку сохранения
+            if (window.HeaderUI) {
+              window.HeaderUI.hideSaveButton();
+            }
+          }
+        });
+      } catch (error) {
+        console.error("❌ [Auth] ОШИБКА:", error);
+        container.innerHTML = `<span style="color:red;font-size:11px">Ошибка: ${error.message}</span>`;
+      }
+    }
+    
+    waitForContainer();
+  </script>
+</body>
+</html>

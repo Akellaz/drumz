@@ -1,0 +1,16 @@
+{
+  "title": "Колхозная",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 115,
+  "version": "1.0",
+  "created": "2026-04-05",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "ucccc ucccc ucccuc ucccc | ucccc ucccc !<(! cccc cccc  !<)! | "
+    }
+  ]
+}

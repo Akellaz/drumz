@@ -1,0 +1,16 @@
+{
+  "title": "Носки - Припев",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 133,
+  "version": "1.0",
+  "created": "2026-04-05",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "[F2g2][F2g2] [c2g2][F2g2] [F2g2][F2g2] [c2g2][F2g2] | [F2g2]c2 c2c2 c2c2 c2c2 | [F2a2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2 | [F2g2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2 | \n/!/!/[F2g2][F2g2] [c2g2]g2 [F2g2][F2g2] [c2g2][c2g2] | [F2g2]c2 c2c2 c2c2 c2c2 | [F2a2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2 | [F2g2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2 | \n"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "title": "Adam's song",
+  "category": "books",
+  "difficulty": "5",
+  "description": "",
+  "tempo": 136,
+  "version": "1.0",
+  "created": "2025-12-21",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "z16 | z16 | z16 | z16 | \n[F2g2][F2g2] [c2g2]g2 [F2g2]g2 [F2g2]g2 | [F2g2][F2g2] [c2g2]a2 [F2g2]g2 [F2g2]g2 | [F2g2][F2g2] [c2g2]g2 [F2g2]g2 [F2g2]g2 | [F2g2][F2g2] [c2g2]a2 [F2g2]g2 [F2g2]g2| \n|:[F2A][F2A] [c2A]n^f2 g4 [c2A](3AAA| [F2A][F2A] [c4A] A2A2 ceAA|[F2A][F2A] [c2A]n^f2 g4 [c2A](3AAA| [F2A][F2A] [c4A] A2[A2a] [A2c]A2:|\n|:[F2A][F2A] [c2A]n^f2 g4 [c2A](3AAA| [F2A][F2A] [c4A] A2A2 ceAA|[F2A][F2A] [c2A]n^f2 g4 [c2A](3AAA| [F2A][F2A] [c4A] A2[A2a] [A2c]A2:|\n"
+    }
+  ],
+  "audio": {
+    "plus": "Adam's_song_plus.mp3"
+  }
+}

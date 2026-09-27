@@ -1,0 +1,16 @@
+{
+  "title": "Пора домой",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 160,
+  "version": "1.0",
+  "created": "2026-02-17",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "g2e2 e3e z2e2 e2e2| a4"
+    }
+  ]
+}

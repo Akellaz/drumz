@@ -1,0 +1,26 @@
+{
+  "title": "Bolero",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 73,
+  "version": "1.0",
+  "created": "2026-08-16",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "no app",
+      "abc": "[M: 3/4]c2(3ccc c2(3ccc c2c2 | c2(3ccc c2(3ccc (3ccc(3ccc",
+      "startTime": 0
+    },
+    {
+      "id": 1,
+      "title": "app",
+      "abc": "[M: 3/4]^\"L\"c2^\"R\"(3ccc ^\"L\"c2^\"R\"(3ccc ^\"L\"c2^\"R\"c2 | ^\"L\"c2^\"R\"(3ccc ^\"L\"c2^\"R\"(3ccc ^\"L\"(3ccc(3ccc",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Bolero.mp3"
+  }
+}

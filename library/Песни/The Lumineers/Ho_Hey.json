@@ -1,0 +1,20 @@
+{
+  "title": "Ho Hey",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "1",
+  "description": "",
+  "tempo": 80,
+  "version": "1.0",
+  "created": "2026-08-13",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "The Lumineers",
+      "abc": "g4 z4 z4 z4 | g4 z4 z4 z4 | g4 z4 z4 z4 | g4 z4 z4 z4 | g4 z4 z4 z4 | g4 z4 z4 z4 | g4 z4 z4 z4 | \n[F4g] z4 z4 z4 | [F4g] z4 z4 z4 | [F4g] z4 z4 z4 | [F4g] z4 z4 z4 | [F4g] z4 z4 z4 | [F4g] F4 F4 F4  | \nF2g2 F2g2 F2g2 F2g2 | F2g2 F2g2 F2g2 F2g2 | F2g2 F2g2 F2g2 F4  | \n[F4a] z4 z4 z4 | [F4g] z4 z4 z4 |\n [F4g] F4 F4 F4  |  [F4g] F4 F4 F4  |  [F4g] F4 F4 F4  |  [F4g] F4 F4 F4  | \n [F4g] F4 F4 F4  |  [F4g] F4 F4 F4  |  [F4g] F4 F4 F4  |  [F4g] F4 F4 F4  | \n [F4g] F4 F4 F4  |  [F4g] F4 F4 F4  |   \n F2g2 F2g2 F2g2 F2g2 |  F2g2 F2g2 F2g2 F2g2 |  F2g2 F2g2 F2g2 F2g2 | F2g2 F2g2 F2g2 F4  | \n [F4g] F4 F4 F4  |z16 | z16 | z16 | \n F2g2 F2g2 F2g2 F2g2 |  F2g2 F2g2 F2g2 F2g2 |  F2g2 F2g2 F2g2 F2g2 | F2g2 F2g2 F2g2 F2g2 |  F2g2 F2g2 F2g2 F4  |\n[F4a] z4 z4 z4 | [F4a] z4 z4 z4 | [F4a] z4 z4 z4 | [F4a] z4 z4 z4 | \nz4 z4 z4 z4 |\n ",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Ho_Hey.mp3"
+  }
+}

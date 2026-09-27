@@ -1,0 +1,19 @@
+{
+  "title": "Dead Skin Mask",
+  "category": ["четверти", "восьмые", "шестнадцатые"],
+  "difficulty": "2",
+  "description": "",
+  "tempo": 115,
+  "version": "1.0",
+  "created": "2025-12-16",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "z4 n^f4 z4 n^f4 | z4 n^f4 z4 n^f4 | z4 n^f4 z4 n^f4 | z4 n^f4 z4 n^f4 | \nz4 n^f4 z4 n^f4 | z4 n^f4 z4 n^f4 | z4 n^f4 z4 n^f4 | z4 n^f4 z4 n^g4 | \nz4 A4 z4 A4 |z4 A4 z4 A2n^f2 |z4 A4 z4 A4 |z4 A4 z4 A2n^f2 |\nz4 A4 z4 A4 |z4 A4 z4 A2n^f2 |z4 A4 z4 A4 |z4 A4 cc z2 z4  | \n[F4a] z4 z8 "
+    }
+  ],
+  "audio": {
+    "plus": "Dead_Skin_Mask_plus.mp3"
+  }
+}

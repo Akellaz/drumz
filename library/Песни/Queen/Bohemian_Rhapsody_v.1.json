@@ -1,0 +1,19 @@
+{
+  "title": "Bohemian Rhapsody v.1",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "1",
+  "description": "",
+  "tempo": 71,
+  "version": "1.0",
+  "created": "2025-12-21",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "[F2a2]g2 [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2a2][F2g2] [c2g2]g2 [F4a] z4 \n|[M: 6/4] z16 | [M: 4/4] z16 | z16 | \n[F2a2]g2 [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2][F2g2] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 |\n"
+    }
+  ],
+  "audio": {
+    "plus": "Bohemian_Rhapsody_v.1_plus.mp3"
+  }
+}

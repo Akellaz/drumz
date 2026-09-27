@@ -1,0 +1,16 @@
+{
+  "title": "Дурак",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 194,
+  "version": "1.0",
+  "created": "2026-02-17",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "g4g4 g2c2 c2c2"
+    }
+  ]
+}

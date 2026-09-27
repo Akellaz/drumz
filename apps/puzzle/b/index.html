@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Конструктор ритмов</title>
+    <style>
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+            touch-action: none;
+            overflow: hidden;
+        }
+
+        /* Зона удаления (сверху) */
+        #delete-zone {
+            height: 60px;
+            background: linear-gradient(180deg, #ffcccc 0%, #ffe6e6 100%);
+            border-bottom: 2px dashed #ff6b6b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #c00;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        #delete-zone.drag-over {
+            background: #ff9999;
+            color: #900;
+        }
+
+        /* Рабочее поле */
+        #workspace {
+            flex: 1;
+            position: relative;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        /* Палитра (снизу) */
+        #palette {
+            height: 110px;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            gap: 12px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            scrollbar-color: #ccc transparent;
+        }
+        #palette::-webkit-scrollbar { height: 6px; }
+        #palette::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+        /* Кнопки палитры */
+        .palette-item {
+            flex: 0 0 auto;
+            width: 70px;
+            height: 70px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            padding: 5px;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .palette-item:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .palette-item:active {
+            transform: scale(0.95);
+        }
+        .palette-item img {
+            max-width: 100%;
+            max-height: 100%;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        /* Перетаскиваемые элементы на поле */
+        .draggable {
+            position: absolute;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-drag: none;
+            max-width: 120px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            background: #fff;
+            border: 1px solid #eee;
+            z-index: 10;
+            touch-action: none;
+        }
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(1.08);
+            z-index: 1000 !important;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            filter: drop-shadow(0 0 2px rgba(0,0,0,0.3));
+        }
+        
+        /* Счётчик */
+        #counter {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.05);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #666;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Зона удаления -->
+    <div id="delete-zone">🗑️ Перетащите сюда для удаления</div>
+
+    <!-- Рабочее поле -->
+    <div id="workspace">
+        <div id="counter">Элементов: 0</div>
+    </div>
+
+    <!-- Палитра инструментов -->
+    <div id="palette">
+        <div class="palette-item" data-src="black/1.png"><img src="black/1.png" alt="1"></div>
+        <div class="palette-item" data-src="black/8.png"><img src="black/8.png" alt="8"></div>
+        <div class="palette-item" data-src="black/16-4.png"><img src="black/16-4.png" alt="16-4"></div>
+        <div class="palette-item" data-src="black/3.png"><img src="black/3.png" alt="3"></div>       
+        <div class="palette-item" data-src="black/8-&amp;-16.png"><img src="black/8-&amp;-16.png" alt="8 & 16"></div>
+        <div class="palette-item" data-src="black/2.png"><img src="black/2.png" alt="2"></div>
+        <div class="palette-item" data-src="black/8_dot_16.png"><img src="black/8_dot_16.png" alt="8.16"></div>
+        <div class="palette-item" data-src="black/p.png"><img src="black/p.png" alt="p"></div>
+        <div class="palette-item" data-src="black/p2.png"><img src="black/p2.png" alt="p2"></div>
+    </div>
+
+    <script>
+        const workspace = document.getElementById('workspace');
+        const deleteZone = document.getElementById('delete-zone');
+        const paletteItems = document.querySelectorAll('.palette-item');
+        const counterEl = document.getElementById('counter');
+        
+        let activeDrag = null;
+        let dragOffset = { x: 0, y: 0 };
+        let elementCount = 0;
+
+        // === 1. Создание нового элемента из палитры ===
+        paletteItems.forEach(item => {
+            const activate = (e) => {
+                e.preventDefault();
+                const src = item.dataset.src;
+                spawnElement(src);
+            };
+            item.addEventListener('click', activate);
+            item.addEventListener('touchstart', activate, {passive: false});
+        });
+
+        function spawnElement(src, x = 100, y = 100) {
+            const img = document.createElement('img');
+            img.src = src;
+            img.className = 'draggable';
+            
+            const rect = workspace.getBoundingClientRect();
+            img.style.left = `${x === 100 ? rect.width/2 - 60 + Math.random()*40 : x}px`;
+            img.style.top = `${y === 100 ? rect.height/2 - 60 + Math.random()*40 : y}px`;
+            
+            img.style.zIndex = 100 + elementCount;
+            
+            setupDrag(img);
+            setupDoubleTapDelete(img);
+            
+            workspace.appendChild(img);
+            elementCount++;
+            updateCounter();
+        }
+
+        // === 2. Логика перетаскивания ===
+        function setupDrag(el) {
+            const start = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                activeDrag = el;
+                
+                const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                
+                const rect = el.getBoundingClientRect();
+                dragOffset.x = clientX - rect.left;
+                dragOffset.y = clientY - rect.top;
+                
+                el.style.zIndex = 2000;
+                el.style.transition = 'none';
+            };
+
+            el.addEventListener('mousedown', start);
+            el.addEventListener('touchstart', start, {passive: false});
+        }
+
+        // === 3. Удаление по двойному клику ===
+        function setupDoubleTapDelete(el) {
+            el.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                el.remove();
+                elementCount--;
+                updateCounter();
+            });
+        }
+
+        // Глобальные слушатели движения
+        const onMove = (e) => {
+            if (!activeDrag) return;
+            e.preventDefault();
+
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches?.[0]?.clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches?.[0]?.clientY;
+            if (clientX === undefined) return;
+
+            const wsRect = workspace.getBoundingClientRect();
+            
+            let newLeft = clientX - wsRect.left - dragOffset.x;
+            let newTop = clientY - wsRect.top - dragOffset.y;
+
+            activeDrag.style.left = `${newLeft}px`;
+            activeDrag.style.top = `${newTop}px`;
+
+            const deleteRect = deleteZone.getBoundingClientRect();
+            if (clientX >= deleteRect.left && clientX <= deleteRect.right &&
+                clientY >= deleteRect.top && clientY <= deleteRect.bottom) {
+                deleteZone.classList.add('drag-over');
+            } else {
+                deleteZone.classList.remove('drag-over');
+            }
+        };
+
+        const onEnd = (e) => {
+            if (!activeDrag) return;
+
+            if (deleteZone.classList.contains('drag-over')) {
+                activeDrag.remove();
+                elementCount--;
+                updateCounter();
+            }
+            
+            activeDrag.style.zIndex = 100 + elementCount; 
+            activeDrag.style.transition = 'transform 0.1s';
+            activeDrag = null;
+            deleteZone.classList.remove('drag-over');
+        };
+
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('touchmove', onMove, {passive: false});
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchend', onEnd);
+
+        // === Утилиты ===
+        function updateCounter() {
+            counterEl.textContent = `Элементов: ${elementCount}`;
+        }
+        
+        workspace.addEventListener('dblclick', (e) => {
+            if(e.target === workspace) {
+                if(confirm('Очистить всё поле?')) {
+                    document.querySelectorAll('.draggable').forEach(el => el.remove());
+                    elementCount = 0;
+                    updateCounter();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -359,7 +359,16 @@
                     <input type="number" id="tempo" min="60" max="180" value="80">
                 </div>
             </div>
-
+<div id="paper"></div>
+<div id="audio-controls"></div>
+            <div class="rhythm-controls">
+                <div class="control-group">
+                    <button id="generateBtn">Сгенерировать ритм</button>
+                </div>
+                <div class="control-group">
+                    <button id="resetBtn">🔄 Сброс</button>
+                </div>
+            </div>
             <div class="rhythm-options">
                 <div class="rhythm-grid">
                     <div class="rhythm-header">
@@ -452,17 +461,10 @@
                 </label>
             </div>
 
-            <div class="rhythm-controls">
-                <div class="control-group">
-                    <button id="generateBtn">Сгенерировать ритм</button>
-                </div>
-                <div class="control-group">
-                    <button id="resetBtn">🔄 Сброс</button>
-                </div>
-            </div>
 
-            <div id="paper"></div>
-            <div id="audio-controls"></div>
+
+            
+            
             <button id="downloadPdfBtn">📥 Скачать в PDF</button>
         </div>
         
@@ -661,7 +663,6 @@
 
     function generateRhythmABC(numMeasures, timeSig, tempo) {
         let abc = `X:1
-T:Ритм
 L:1/16
 M:4/4
 K:C clef=perc

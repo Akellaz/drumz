@@ -1,0 +1,19 @@
+{
+  "title": "Domination",
+  "category": ["четверти", "восьмые", "шестнадцатые"],
+  "difficulty": "2",
+  "description": "",
+  "tempo": 82,
+  "version": "1.0",
+  "created": "2025-12-14",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Pantera",
+      "abc": "[F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | \n[F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] cccc | \n[F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | \n[F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F2g]>F2 [c2g]cc | \n[F2g2][F2g2] [F2c2g2][F2g2] [F2g2][F2g2] [F2c2g2][F2g2] | [F2g2][F2g2] [F2c2g2][F2g2] [F2g2][F2g2] [F2c2g2][F2g2] | [F2g2][F2g2] [F2c2g2][F2g2] [F2g2][F2g2] [F2c2g2][F2g2] | [F2g2][F2g2] [F2c2g2][F2g2] [F2g2][F2g2] [F2c2g2][F2g2] | \n[F2g2][F2g2] [F2c2g2][F2g2] [F2g2][F2g2] [F2c2g2][F2g2] | [F2g2][F2g2] [F2c2g2][F2g2] [F2g2][F2g2] [F2c2g2][F2g2] | [F2g2][F2g2] [F2c2g2][F2g2] [F2g2][F2g2] [F2c2g2][F2g2] | [F2g2][F2g2] [F2c2g2][F2g2] [F2g2][F2g2] [F2c2g2]z2 |] "
+    }
+  ],
+  "audio": {
+    "plus": "Domination_plus.mp3"
+  }
+}

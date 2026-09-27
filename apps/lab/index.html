@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ABC + MP3 — Marker Sync</title>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/dist/abcjs-basic-min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
+    #paper { border: 1px solid #ccc; background: white; padding: 10px; border-radius: 4px; margin-top: 15px; }
+    .highlight { fill: #0a9ecc !important; stroke: #0a9ecc !important; }
+    
+    /* Кастомный плеер */
+    #player { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+    #playBtn { padding: 8px 16px; cursor: pointer; }
+    #progress { flex: 1; min-width: 200px; cursor: pointer; }
+    #time { font-family: monospace; font-size: 14px; min-width: 110px; }
+  </style>
+</head>
+<body>
+
+  <!-- Кастомный плеер с детальным временем -->
+  <div id="player">
+    <button id="playBtn">▶ Play</button>
+    <input type="range" id="progress" value="0" step="0.001" />
+    <span id="time">0:00.000 / 0:00.000</span>
+  </div>
+
+  <div id="paper"></div>
+
+  <script>
+    const abcString = `
+X:1
+M:4/4
+L:1/16
+K:C clef=perc
+V:Drums stem=up
+U:n=!style=x!
+%%percmap g  closed-hi-hat x
+z4z4z4z4c4| [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] |
+ [F4g] z4 [c4g] z4| [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] z4  [c4g] [c4g] |
+`;
+
+    const syncMarkers = [
+      { time: 0.0,  elementIndex: 0 },   // старт
+      { time: 2.8,  elementIndex: 5 },  // нота в первом такте
+      { time: 7.7,  elementIndex: 14 },  // середина
+      { time: 18.613657, elementIndex: 34 },
+	  { time: 20.4, elementIndex: 37 },
+    ];
+
+    const paper = document.getElementById("paper");
+    const audio = new Audio("Esperanto.mp3");
+    
+    // Элементы кастомного плеера
+    const playBtn = document.getElementById("playBtn");
+    const progress = document.getElementById("progress");
+    const timeDisplay = document.getElementById("time");
+
+    // Формат времени: m:ss.mmm
+    function formatTime(t) {
+      if (isNaN(t) || !isFinite(t)) return "0:00.000";
+      const m = Math.floor(t / 60);
+      const s = Math.floor(t % 60);
+      const ms = Math.floor((t % 1) * 1000);
+      return `${m}:${s.toString().padStart(2,'0')}.${ms.toString().padStart(3,'0')}`;
+    }
+
+    // Обновление отображения времени
+    function updateTime() {
+      timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+      if (audio.duration) {
+        progress.value = audio.currentTime / audio.duration * 100;
+      }
+    }
+
+    // Управление воспроизведением
+    playBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        playBtn.textContent = "⏸ Pause";
+      } else {
+        audio.pause();
+        playBtn.textContent = "▶ Play";
+      }
+    });
+
+    // Перемотка
+    progress.addEventListener("input", (e) => {
+      const pct = e.target.value / 100;
+      audio.currentTime = pct * audio.duration;
+    });
+
+    // Синхронизация подсветки
+    ABCJS.renderAbc(paper, abcString, { add_classes: true });
+    const elements = Array.from(paper.querySelectorAll('.abcjs-note, .abcjs-rest'));
+
+    function getElementIndexAtTime(t) {
+      if (!syncMarkers.length || !elements.length) return -1;
+      if (t <= syncMarkers[0].time) return syncMarkers[0].elementIndex;
+      if (t >= syncMarkers[syncMarkers.length - 1].time) {
+        return syncMarkers[syncMarkers.length - 1].elementIndex;
+      }
+      for (let i = 0; i < syncMarkers.length - 1; i++) {
+        const m1 = syncMarkers[i];
+        const m2 = syncMarkers[i + 1];
+        if (t >= m1.time && t < m2.time) {
+          const progress = (t - m1.time) / (m2.time - m1.time);
+          const idx = m1.elementIndex + progress * (m2.elementIndex - m1.elementIndex);
+          return Math.floor(idx);
+        }
+      }
+      return -1;
+    }
+
+    audio.addEventListener("timeupdate", () => {
+      updateTime();
+      elements.forEach(el => el.classList.remove("highlight"));
+      const idx = getElementIndexAtTime(audio.currentTime);
+      if (idx >= 0 && elements[idx]) {
+        elements[idx].classList.add("highlight");
+      }
+    });
+
+    audio.addEventListener("loadedmetadata", updateTime);
+    audio.addEventListener("ended", () => { playBtn.textContent = "▶ Play"; });
+  </script>
+</body>
+</html>

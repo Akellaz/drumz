@@ -1,0 +1,20 @@
+{
+  "title": "Xylograph",
+  "category": ["четверти", "восьмые", "шестнадцатые"],
+  "difficulty": "4",
+  "description": "",
+  "tempo": 82,
+  "version": "1.0",
+  "created": "2026-08-05",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "J Y D T",
+      "abc": "[A4F]z4[A4F]z4 | [A4F]z4[A4F]z4 | [A4F]z4[A4F]z4 | [A4F]z4[A4F]z4 | \n[A4F]z4[A4F]e2e2 | [A4F]z4[A4F]d2d2 | [A4F]z4[A4F]z4 | [A4F]z4[A4F]e2e2 | [A4F]z4[A4F]d2d2 | [A4F]z4[A4F]A2A2 |\n[AF]AAA A4 AAAA A4 | [AF]AAA A4 AAAA A4 | [AF]AAA A4 AAAA A4 | [AF]AAA A4 AAAA A4 | \n[F2a]AA A4 AAAA A4 | [AF]AAA A4 AAAA A4 | [AF]AAA A4 AAAA A4 | [AF]AAA A4 AAAA A4 | \n[F2a]AA A4 cccc c4 | [AF]AAA A4 cccc c4 | [AF]AAA A4 cccc c4 | [AF]AAA A4 cccc c4 | \n[F4a] ^f4 ^f4 ^f4 | ^f4 ^f4 ^f4 ^f4 | ^f4 ^f4 ^f4 ^f4 |\n[F2a2]A2 [F2A2]A2 [F2A2]A2 [F2A2]A2 | [F2A2]A2 [F2A2]A2 [F2A2]A2 [F2A2e2][A2e2] | [F2A2]A2 [F2A2]A2 [F2A2]A2 [F2A2]A2| [F2A2]A2 [F2A2]A2 [F2A2]A2 [F2A2e2][A2e2] |\n[F2a2]A2 [F2A2]A2 [F2A2]A2 [F2A2]A2 | [F2A2]A2 [F2A2]A2 [F2A2]A2 [F2A2]A2| [F2A2]A2 [F2A2]A2 [F2A2]A2 [F2A2]A2| [F2A2e2][A2e2] [F2A2d2][A2d2] [F2A2][A2] [F2A2]A2 | \n[F2a2]A2 [F2A2]A2 [F2A2]A2 [F2A2]A2 | [F2A2e2][A2e2] [F2A2d2][A2d2] [F2A2][A2] [F2A2]A2 | [F2A2]A2 [F2A2]A2 [F2A2]A2 [F2A2]A2| [F2A2e2][A2e2] [F2A2d2][A2d2] [F2A2][A2] [F2A2]A2 |\n[F2a2]A2 [F2A2]A2 [F2A2]A2 [F2A2]A2 | [F2A2e2][A2e2] [F2A2e2][A2e2] AAAA AAAA  |\n[A4F] z4 z4 z4 |] ",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Xylograph.mp3"
+  }
+}

@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Song Structure Builder</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+    background: #1a1a1f;
+    color: #e6e6e6;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    padding: 10px 20px;
+    background: #24242c;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+  header h1 { font-size: 16px; font-weight: 600; }
+  .settings { display: flex; gap: 12px; align-items: center; font-size: 12px; }
+  .settings label { display: flex; gap: 5px; align-items: center; }
+  .settings input, .settings select {
+    background: #1a1a1f; color: #e6e6e6; border: 1px solid #444;
+    border-radius: 4px; padding: 3px 6px; font-size: 12px; width: 60px;
+  }
+  .actions { margin-left: auto; display: flex; gap: 6px; }
+  button {
+    background: #3a3a45; color: #e6e6e6; border: 1px solid #4a4a55;
+    border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 12px;
+  }
+  button:hover { background: #4a4a55; }
+  button.danger { background: #a04040; border-color: #b05050; }
+  button.danger:hover { background: #b05050; }
+  button.warning { background: #d19a4a; border-color: #e1aa5a; }
+  button.warning:hover { background: #e1aa5a; }
+  button.primary { background: #4a7bd1; border-color: #5a8be1; }
+  button.primary:hover { background: #5a8be1; }
+
+  /* ===== MAIN LAYOUT ===== */
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    overflow: hidden;
+    min-height: 0;
+  }
+  aside {
+    background: #20202a;
+    border-right: 1px solid #333;
+    padding: 14px 10px;
+    overflow-y: auto;
+  }
+  aside h3 {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    color: #888; margin-bottom: 8px;
+  }
+  .palette-item {
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    cursor: grab;
+    font-size: 13px;
+    font-weight: 500;
+    border-left: 4px solid;
+    background: #2a2a34;
+    user-select: none;
+    transition: transform 0.1s;
+  }
+  .palette-item:hover { transform: translateX(2px); }
+  .palette-item:active { cursor: grabbing; }
+
+  .workspace {
+    padding: 16px;
+    overflow: auto;
+    background: #1a1a1f;
+    min-height: 0;
+  }
+  .ruler {
+    display: flex;
+    margin-bottom: 4px;
+    font-size: 10px;
+    color: #666;
+    height: 14px;
+  }
+  .ruler-tick {
+    width: 40px;
+    text-align: left;
+    padding-left: 2px;
+    border-left: 1px solid #333;
+  }
+  .timeline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 90px;
+    padding: 10px;
+    background: #22222a;
+    border-radius: 8px;
+    border: 1px dashed #3a3a45;
+    align-items: flex-start;
+  }
+  .timeline.drag-over { border-color: #4a7bd1; background: #262630; }
+  .timeline:empty::before {
+    content: "Перетащите сюда секции из панели слева";
+    color: #555; font-size: 13px; padding: 30px;
+    width: 100%; text-align: center;
+  }
+
+  .block {
+    border-radius: 6px;
+    padding: 8px 10px;
+    position: relative;
+    cursor: grab;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 70px;
+    border: 1px solid rgba(0,0,0,0.3);
+    user-select: none;
+    transition: box-shadow 0.15s;
+  }
+  .block:hover { box-shadow: 0 0 0 2px rgba(255,255,255,0.2); }
+  .block.dragging { opacity: 0.4; }
+  .block-header {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(0,0,0,0.85);
+  }
+  .block-controls {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 2;
+  }
+  .block:hover .block-controls { opacity: 1; }
+  .block-controls button {
+    background: rgba(0,0,0,0.25);
+    border: none;
+    color: rgba(0,0,0,0.85);
+    padding: 2px 6px;
+    font-size: 12px;
+    border-radius: 3px;
+    min-width: 22px;
+  }
+  .block-controls button:hover { background: rgba(0,0,0,0.4); }
+
+  .block-bars {
+    display: flex;
+    gap: 2px;
+    margin-top: 6px;
+    margin-bottom: 22px;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+  .bar {
+    width: 32px;
+    height: 32px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.1s;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .bar:hover {
+    background: rgba(0,0,0,0.4);
+    border-color: rgba(255,255,255,0.3);
+  }
+  .bar.selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+  }
+  .bar.filled {
+    background: rgba(255,255,255,0.35);
+  }
+  .bar-number {
+    font-size: 9px;
+    color: rgba(0,0,0,0.6);
+    pointer-events: none;
+  }
+  .bar.filled .bar-number {
+    color: rgba(0,0,0,0.85);
+    font-weight: 700;
+  }
+
+  .phrase-divider {
+    width: 2px;
+    height: 32px;
+    background: rgba(0,0,0,0.55);
+    margin: 0 2px;
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+
+  /* ===== НИЖНЯЯ ПАНЕЛЬ (СЕKVЕНСОР) ===== */
+  .bottom-panel {
+    flex-shrink: 0;
+    background: #20202a;
+    border-top: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    transition: height 0.2s;
+    overflow: hidden;
+  }
+  .bottom-panel.collapsed { height: 32px !important; }
+  .bottom-panel.expanded { height: 260px; }
+
+  .bottom-header {
+    display: flex;
+    align-items: center;
+    padding: 6px 14px;
+    background: #2a2a34;
+    border-bottom: 1px solid #333;
+    gap: 12px;
+    flex-shrink: 0;
+    min-height: 32px;
+  }
+  .bottom-header .title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #ccc;
+  }
+  .bottom-header .context {
+    margin-left: auto;
+    font-size: 11px;
+    color: #888;
+  }
+  .bottom-header .context b { color: #4a7bd1; }
+  .bottom-header .toggle-btn {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 14px;
+    padding: 2px 6px;
+    cursor: pointer;
+  }
+  .bottom-header .toggle-btn:hover { color: #fff; }
+
+  .bottom-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: #333;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .bottom-section {
+    background: #1a1a1f;
+    overflow: auto;
+    padding: 12px;
+  }
+  .bottom-section h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+
+  .seq-container { display: flex; flex-direction: column; gap: 3px; }
+  .seq-row {
+    display: grid;
+    grid-template-columns: 50px repeat(16, 1fr);
+    gap: 2px;
+    align-items: center;
+  }
+  .seq-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-align: right;
+    padding-right: 6px;
+    color: #aaa;
+  }
+  .seq-step {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    border: 1px solid #333;
+    background: #2a2a34;
+    cursor: pointer;
+    transition: all 0.08s;
+    max-height: 22px;
+  }
+  .seq-step:hover { border-color: #555; }
+  .seq-step.beat-start { border-left: 2px solid #555; }
+  .seq-step.hihat.active { background: linear-gradient(180deg, #f6ad55, #dd6b20); border-color: #c05621; }
+  .seq-step.snare.active { background: linear-gradient(180deg, #63b3ed, #2b6cb0); border-color: #2c5282; }
+  .seq-step.kick.active  { background: linear-gradient(180deg, #fc8181, #c53030); border-color: #9b2c2c; }
+
+  .seq-beat-nums {
+    display: grid;
+    grid-template-columns: 50px repeat(16, 1fr);
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+  .seq-beat-num {
+    text-align: center;
+    font-size: 9px;
+    color: #666;
+  }
+  .seq-beat-num.main { color: #4a7bd1; font-weight: 700; }
+
+  .seq-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .seq-actions button { font-size: 11px; padding: 4px 8px; }
+  .seq-placeholder { color: #555; font-size: 12px; text-align: center; padding: 40px 20px; }
+
+  .notation-box {
+    background: #fafbfc;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 10px;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+  }
+  .notation-box svg { max-width: 100%; height: auto; display: block; }
+  .notation-box .placeholder { color: #888; font-size: 12px; }
+  .notation-error { color: #fc8181; font-size: 11px; margin-top: 6px; }
+
+  /* ===== ПОЛНАЯ НОТАЦИЯ ===== */
+  .full-notation-panel {
+    flex-shrink: 0;
+    background: #1a1a1f;
+    border-top: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    transition: height 0.25s ease;
+    overflow: hidden;
+  }
+  .full-notation-panel.collapsed { height: 0px !important; border: none; }
+  .full-notation-panel.expanded { height: 400px; }
+  
+  .full-notation-header {
+    display: flex;
+    align-items: center;
+    padding: 6px 14px;
+    background: #2a2a34;
+    border-bottom: 1px solid #333;
+    flex-shrink: 0;
+  }
+  .full-notation-header .title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #ccc;
+  }
+  .full-notation-header .close-btn {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .full-notation-header .close-btn:hover { color: #fff; }
+  
+  .full-notation-content {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+    background: #fafbfc; /* Светлый классический фон для нот */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .full-notation-content svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  .full-notation-content .placeholder {
+    color: #888;
+    font-size: 13px;
+    margin-top: 40px;
+  }
+
+  /* ===== СТАТИСТИКА ===== */
+  .stats-bar {
+    padding: 6px 20px;
+    background: #24242c;
+    border-top: 1px solid #333;
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .stats-bar span b { color: #4a7bd1; }
+
+  /* ===== ЦВЕТА ===== */
+  .color-intro    { background: #6ba8d8; border-color: #5a97c7; }
+  .color-verse    { background: #7bc47b; border-color: #6ab36a; }
+  .color-chorus   { background: #e8a85c; border-color: #d7974b; }
+  .color-bridge   { background: #c87bc4; border-color: #b76ab3; }
+  .color-solo     { background: #e87b7b; border-color: #d76a6a; }
+  .color-outro    { background: #8a8ad8; border-color: #7979c7; }
+
+  .drop-indicator {
+    width: 3px;
+    background: #4a7bd1;
+    align-self: stretch;
+    border-radius: 2px;
+    margin: 0 2px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎵 Song Structure Builder</h1>
+  <div class="settings">
+    <label>BPM: <input type="number" id="bpm" value="120" min="30" max="300"></label>
+    <label>Размер:
+      <select id="timeSig">
+        <option value="4/4">4/4</option>
+        <option value="3/4">3/4</option>
+        <option value="6/8">6/8</option>
+        <option value="2/4">2/4</option>
+      </select>
+    </label>
+  </div>
+  <div class="actions">
+    <button id="fullNotationBtn" class="primary">🎼 Полная нотация</button>
+    <button id="resetBtn" class="warning" title="Сбросить все данные">🔄 Сброс</button>
+    <button id="exportBtn">📋 Экспорт</button>
+    <button id="clearBtn" class="danger">🗑 Очистить</button>
+  </div>
+</header>
+
+<main>
+  <aside>
+    <h3>Секции</h3>
+    <div id="palette"></div>
+  </aside>
+
+  <section class="workspace">
+    <div class="ruler" id="ruler"></div>
+    <div class="timeline" id="timeline"></div>
+  </section>
+</main>
+
+<!-- ===== НИЖНЯЯ ПАНЕЛЬ (СЕKVЕНСОР) ===== -->
+<div class="bottom-panel collapsed" id="bottomPanel">
+  <div class="bottom-header">
+    <div class="title">🎹 Редактор такта</div>
+    <div class="context" id="bottomContext">Такт не выбран</div>
+    <button class="toggle-btn" id="toggleBottom" title="Свернуть/развернуть">▲</button>
+  </div>
+  <div class="bottom-content">
+    <div class="bottom-section" id="seqSection">
+      <h4>Секвенсор</h4>
+      <div id="sequencer">
+        <div class="seq-placeholder">Кликните по такту в кирпичике, чтобы редактировать</div>
+      </div>
+    </div>
+    <div class="bottom-section" id="notationSection">
+      <h4>Нотация такта</h4>
+      <div class="notation-box" id="notationPaper">
+        <span class="placeholder">Выберите такт</span>
+      </div>
+      <div id="notationError"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ПОЛНАЯ НОТАЦИЯ ПЕСНИ ===== -->
+<div class="full-notation-panel collapsed" id="fullNotationPanel">
+  <div class="full-notation-header">
+    <div class="title">🎼 Полная нотация песни</div>
+    <button class="close-btn" id="closeFullNotation" title="Закрыть">✕</button>
+  </div>
+  <div class="full-notation-content" id="fullNotationContent">
+    <span class="placeholder">Нажмите «Полная нотация» для генерации</span>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <span>Тактов: <b id="statBars">0</b></span>
+  <span>Строчек: <b id="statPhrases">0</b></span>
+  <span>Длительность: <b id="statTime">0:00</b></span>
+  <span>Секций: <b id="statSections">0</b></span>
+</div>
+
+<!-- GrooveScribe -->
+<script src="js/abc2svg-1.js"></script>
+<script src="js/groove_utils.js"></script>
+
+<script>
+// ============ ДАННЫЕ ============
+const SECTIONS = [
+  { type: 'intro',   name: 'Вступление', color: 'intro' },
+  { type: 'verse',   name: 'Куплет',     color: 'verse' },
+  { type: 'chorus',  name: 'Припев',     color: 'chorus' },
+  { type: 'bridge',  name: 'Бридж',      color: 'bridge' },
+  { type: 'solo',    name: 'Соло',       color: 'solo' },
+  { type: 'outro',   name: 'Аутро',      color: 'outro' },
+];
+
+const TRACKS = [
+  { id: 'hihat', name: 'Hi-Hat', symbol: 'x', cssClass: 'hihat' },
+  { id: 'snare', name: 'Snare',  symbol: 'o', cssClass: 'snare' },
+  { id: 'kick',  name: 'Kick',   symbol: 'o', cssClass: 'kick' },
+];
+
+const STEPS = 16;
+const BARS_PER_PHRASE = 4;
+const BAR_SIZE = 32;
+const BAR_GAP = 2;
+const DATA_VERSION = 7;
+
+let song = loadSong() || {
+  bpm: 120, timeSig: '4/4',
+  blocks: [], version: DATA_VERSION
+};
+if (song.version !== DATA_VERSION) {
+  localStorage.removeItem('songBuilder');
+  song = { bpm: 120, timeSig: '4/4', blocks: [], version: DATA_VERSION };
+}
+
+let selectedBar = null;
+let dragData = null;
+
+// ============ УТИЛИТЫ ============
+function uid() { return Math.random().toString(36).slice(2, 10); }
+function saveSong() { localStorage.setItem('songBuilder', JSON.stringify(song)); }
+function loadSong() {
+  try { return JSON.parse(localStorage.getItem('songBuilder')); }
+  catch { return null; }
+}
+function beatsPerBar() { return parseInt(song.timeSig.split('/')[0]); }
+function barDurationSec() { return beatsPerBar() * (60 / song.bpm); }
+function formatTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+function phraseCount(bars) { return Math.ceil(bars / BARS_PER_PHRASE); }
+function nextLabel(type) {
+  const count = song.blocks.filter(b => b.type === type).length + 1;
+  const sec = SECTIONS.find(s => s.type === type);
+  return `${sec.name} ${count}`;
+}
+
+function emptyBarPattern() {
+  const p = {};
+  TRACKS.forEach(t => p[t.id] = new Array(STEPS).fill(0));
+  return p;
+}
+
+function getBarPattern(blockId, barIndex) {
+  const block = song.blocks.find(b => b.id === blockId);
+  if (!block) return null;
+  if (!block.patterns) block.patterns = {};
+  if (!block.patterns[barIndex]) block.patterns[barIndex] = emptyBarPattern();
+  return block.patterns[barIndex];
+}
+
+function isPatternFilled(pattern) {
+  if (!pattern) return false;
+  return TRACKS.some(t => pattern[t.id].some(v => v));
+}
+
+function calcBlockWidth(numBars) {
+  const padding = 20;
+  const barsWidth = numBars * BAR_SIZE;
+  const gapsWidth = (numBars - 1) * BAR_GAP;
+  const dividersWidth = Math.floor((numBars - 1) / BARS_PER_PHRASE) * 6;
+  return padding + barsWidth + gapsWidth + dividersWidth;
+}
+
+// ============ ПАЛИТРА ============
+function renderPalette() {
+  const pal = document.getElementById('palette');
+  pal.innerHTML = '';
+  SECTIONS.forEach(sec => {
+    const el = document.createElement('div');
+    el.className = `palette-item color-${sec.color}`;
+    el.textContent = sec.name;
+    el.draggable = true;
+    el.addEventListener('dragstart', e => {
+      dragData = { source: 'palette', type: sec.type };
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+    pal.appendChild(el);
+  });
+}
+
+// ============ ЛИНЕЙКА ============
+function renderRuler() {
+  const ruler = document.getElementById('ruler');
+  const totalBars = song.blocks.reduce((s, b) => s + b.length, 0);
+  ruler.innerHTML = '';
+  const count = Math.max(totalBars + 4, 16);
+  for (let i = 1; i <= count; i++) {
+    const t = document.createElement('div');
+    t.className = 'ruler-tick';
+    t.textContent = i;
+    ruler.appendChild(t);
+  }
+}
+
+// ============ ТАЙМЛАЙН ============
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+  song.blocks.forEach((block, idx) => {
+    const sec = SECTIONS.find(s => s.type === block.type);
+    const el = document.createElement('div');
+    el.className = `block color-${sec.color}`;
+    el.style.width = calcBlockWidth(block.length) + 'px';
+    el.draggable = true;
+    el.dataset.id = block.id;
+    el.title = `${block.length} такт. · ${phraseCount(block.length)} стр. · ${formatTime(block.length * barDurationSec())}`;
+
+    let barsHtml = '';
+    for (let i = 0; i < block.length; i++) {
+      const isSelected = selectedBar && selectedBar.blockId === block.id && selectedBar.barIndex === i;
+      const pattern = block.patterns && block.patterns[i];
+      const filled = isPatternFilled(pattern);
+      let classes = 'bar';
+      if (isSelected) classes += ' selected';
+      if (filled) classes += ' filled';
+      barsHtml += `<div class="${classes}" data-block="${block.id}" data-bar="${i}"><span class="bar-number">${i + 1}</span></div>`;
+      if ((i + 1) % BARS_PER_PHRASE === 0 && i < block.length - 1) {
+        barsHtml += '<div class="phrase-divider"></div>';
+      }
+    }
+
+    el.innerHTML = `
+      <div class="block-header"><span>${block.label}</span></div>
+      <div class="block-bars">${barsHtml}</div>
+      <div class="block-controls">
+        <button data-act="minus" title="Уменьшить">−</button>
+        <button data-act="plus" title="Увеличить">+</button>
+        <button data-act="dup" title="Дублировать">⎘</button>
+        <button data-act="del" title="Удалить">×</button>
+      </div>
+    `;
+
+    el.querySelectorAll('.bar').forEach(barEl => {
+      barEl.addEventListener('mousedown', e => e.stopPropagation());
+      barEl.addEventListener('click', e => {
+        e.stopPropagation();
+        selectBar(barEl.dataset.block, parseInt(barEl.dataset.bar));
+      });
+    });
+
+    el.addEventListener('dragstart', e => {
+      dragData = { source: 'timeline', blockId: block.id };
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', () => el.classList.remove('dragging'));
+
+    el.addEventListener('dragover', e => {
+      e.preventDefault();
+      const rect = el.getBoundingClientRect();
+      const before = (e.clientX - rect.left) < rect.width / 2;
+      clearIndicators();
+      const ind = document.createElement('div');
+      ind.className = 'drop-indicator';
+      ind.dataset.before = before;
+      ind.dataset.targetId = block.id;
+      if (before) tl.insertBefore(ind, el);
+      else tl.insertBefore(ind, el.nextSibling);
+    });
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      const ind = tl.querySelector('.drop-indicator');
+      if (!ind) return;
+      handleDrop(ind.dataset.targetId, ind.dataset.before === 'true');
+      clearIndicators();
+    });
+
+    el.addEventListener('click', e => {
+      const act = e.target.dataset.act;
+      if (!act) return;
+      if (act === 'plus')  block.length++;
+      if (act === 'minus') {
+        block.length = Math.max(1, block.length - 1);
+        if (block.patterns) {
+          Object.keys(block.patterns).forEach(k => {
+            if (parseInt(k) >= block.length) delete block.patterns[k];
+          });
+        }
+      }
+      if (act === 'dup') {
+        const copy = { ...block, id: uid(), label: nextLabel(block.type), patterns: undefined };
+        if (block.patterns) {
+          copy.patterns = {};
+          Object.keys(block.patterns).forEach(k => {
+            copy.patterns[k] = {};
+            TRACKS.forEach(t => copy.patterns[k][t.id] = [...block.patterns[k][t.id]]);
+          });
+        }
+        song.blocks.splice(idx + 1, 0, copy);
+      }
+      if (act === 'del') {
+        song.blocks = song.blocks.filter(b => b.id !== block.id);
+        if (selectedBar && selectedBar.blockId === block.id) selectedBar = null;
+      }
+      render();
+    });
+
+    tl.appendChild(el);
+  });
+}
+
+function clearIndicators() {
+  document.querySelectorAll('.drop-indicator').forEach(n => n.remove());
+}
+
+function handleDrop(targetId, before) {
+  if (!dragData) return;
+  if (dragData.source === 'palette') {
+    const newBlock = {
+      id: uid(), type: dragData.type,
+      label: nextLabel(dragData.type),
+      length: BARS_PER_PHRASE,
+      patterns: {}
+    };
+    if (targetId) {
+      const idx = song.blocks.findIndex(b => b.id === targetId);
+      song.blocks.splice(before ? idx : idx + 1, 0, newBlock);
+    } else {
+      song.blocks.push(newBlock);
+    }
+  } else if (dragData.source === 'timeline') {
+    const fromIdx = song.blocks.findIndex(b => b.id === dragData.blockId);
+    const [moved] = song.blocks.splice(fromIdx, 1);
+    let toIdx = song.blocks.findIndex(b => b.id === targetId);
+    if (!before) toIdx++;
+    song.blocks.splice(toIdx, 0, moved);
+  }
+  render();
+}
+
+// ============ ВЫБОР ТАКТА ============
+function selectBar(blockId, barIndex) {
+  selectedBar = { blockId, barIndex };
+  const panel = document.getElementById('bottomPanel');
+  panel.classList.remove('collapsed');
+  panel.classList.add('expanded');
+  document.getElementById('toggleBottom').textContent = '▼';
+  render();
+}
+
+// ============ СЕКВЕНСОР ============
+function renderSequencer() {
+  const container = document.getElementById('sequencer');
+  const ctx = document.getElementById('bottomContext');
+
+  if (!selectedBar) {
+    container.innerHTML = '<div class="seq-placeholder">Кликните по такту в кирпичике, чтобы редактировать</div>';
+    ctx.innerHTML = 'Такт не выбран';
+    return;
+  }
+
+  const block = song.blocks.find(b => b.id === selectedBar.blockId);
+  if (!block) { selectedBar = null; renderSequencer(); return; }
+
+  const pattern = getBarPattern(selectedBar.blockId, selectedBar.barIndex);
+  ctx.innerHTML = `Редактируется: <b>${block.label}</b> · такт <b>${selectedBar.barIndex + 1}</b>`;
+
+  let beatNumsHtml = '<div></div>';
+  for (let i = 0; i < STEPS; i++) {
+    const isMain = i % 4 === 0;
+    beatNumsHtml += `<div class="seq-beat-num${isMain ? ' main' : ''}">${isMain ? (i/4 + 1) : '·'}</div>`;
+  }
+
+  let tracksHtml = '';
+  TRACKS.forEach(track => {
+    let stepsHtml = '';
+    for (let i = 0; i < STEPS; i++) {
+      const active = pattern[track.id][i] ? ' active' : '';
+      const beatStart = i % 4 === 0 ? ' beat-start' : '';
+      stepsHtml += `<div class="seq-step ${track.cssClass}${active}${beatStart}" data-track="${track.id}" data-step="${i}"></div>`;
+    }
+    tracksHtml += `
+      <div class="seq-row">
+        <div class="seq-label">${track.name}</div>
+        ${stepsHtml}
+      </div>
+    `;
+  });
+
+  container.innerHTML = `
+    <div class="seq-container">
+      <div class="seq-beat-nums">${beatNumsHtml}</div>
+      ${tracksHtml}
+      <div class="seq-actions">
+        <button data-seq-act="clear">Очистить</button>
+        <button data-seq-act="random">Случайно</button>
+        <button data-seq-act="copy-all">Копировать на все такты блока</button>
+      </div>
+    </div>
+  `;
+
+  container.querySelectorAll('.seq-step').forEach(step => {
+    step.addEventListener('click', () => {
+      const t = step.dataset.track;
+      const s = parseInt(step.dataset.step);
+      pattern[t][s] = pattern[t][s] ? 0 : 1;
+      step.classList.toggle('active');
+      updateNotation();
+      updateBarInTimeline();
+      updateFullNotation();
+      saveSong();
+    });
+  });
+
+  container.querySelectorAll('[data-seq-act]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const act = btn.dataset.seqAct;
+      if (act === 'clear') {
+        TRACKS.forEach(t => pattern[t.id].fill(0));
+        renderSequencer();
+        updateNotation();
+        updateBarInTimeline();
+        updateFullNotation();
+        saveSong();
+      }
+      if (act === 'random') {
+        pattern.hihat = pattern.hihat.map((_, i) => (i % 2 === 0 || Math.random() > 0.6) ? 1 : 0);
+        pattern.snare.fill(0);
+        pattern.snare[4] = 1; pattern.snare[12] = 1;
+        if (Math.random() > 0.5) pattern.snare[10] = 1;
+        pattern.kick.fill(0);
+        pattern.kick[0] = 1; pattern.kick[8] = 1;
+        if (Math.random() > 0.5) pattern.kick[6] = 1;
+        renderSequencer();
+        updateNotation();
+        updateBarInTimeline();
+        updateFullNotation();
+        saveSong();
+      }
+      if (act === 'copy-all') {
+        const src = JSON.parse(JSON.stringify(pattern));
+        for (let i = 0; i < block.length; i++) {
+          block.patterns[i] = JSON.parse(JSON.stringify(src));
+        }
+        renderTimeline();
+        updateFullNotation();
+        alert(`Паттерн скопирован на все ${block.length} тактов блока "${block.label}"`);
+      }
+    });
+  });
+}
+
+function updateBarInTimeline() {
+  if (!selectedBar) return;
+  const barEl = document.querySelector(`.bar[data-block="${selectedBar.blockId}"][data-bar="${selectedBar.barIndex}"]`);
+  if (!barEl) return;
+  const pattern = getBarPattern(selectedBar.blockId, selectedBar.barIndex);
+  barEl.classList.toggle('filled', isPatternFilled(pattern));
+}
+
+// ============ НОТАЦИЯ (ОДИН ТАКТ) ============
+function updateNotation() {
+  const errorBox = document.getElementById('notationError');
+  const paper = document.getElementById('notationPaper');
+  errorBox.innerHTML = '';
+
+  if (!selectedBar) {
+    paper.innerHTML = '<span class="placeholder">Выберите такт</span>';
+    return;
+  }
+
+  if (typeof GrooveUtils === 'undefined') {
+    paper.innerHTML = '<span class="placeholder">GrooveScribe не загружен</span>';
+    errorBox.innerHTML = '<div class="notation-error">Проверьте, что файлы js/abc2svg-1.js и js/groove_utils.js существуют</div>';
+    return;
+  }
+
+  try {
+    const pattern = getBarPattern(selectedBar.blockId, selectedBar.barIndex);
+    const stepsToTab = (steps, sym) => '|' + steps.map(v => v ? sym : '-').join('') + '|';
+
+    const params = {
+      Mode: 'view', TimeSig: song.timeSig, Div: '16',
+      Tempo: song.bpm, Measures: '1',
+      H: stepsToTab(pattern.hihat, 'x'),
+      S: stepsToTab(pattern.snare, 'o'),
+      K: stepsToTab(pattern.kick, 'o')
+    };
+
+    const gu = new GrooveUtils();
+    const data = new gu.grooveDataNew();
+    data.timeDivision = 16;
+    data.tempo = song.bpm;
+    data.numberOfMeasures = 1;
+    data.numBeats = beatsPerBar();
+    data.noteValue = 4;
+    data.notesPerMeasure = data.timeDivision * data.numBeats / data.noteValue;
+
+    data.hh_array = gu.noteArraysFromURLData('H', params.H, data.notesPerMeasure, data.numberOfMeasures);
+    data.snare_array = gu.noteArraysFromURLData('S', params.S, data.notesPerMeasure, data.numberOfMeasures);
+    data.kick_array = gu.noteArraysFromURLData('K', params.K, data.notesPerMeasure, data.numberOfMeasures);
+
+    const abc = gu.createABCFromGrooveData(data, 400);
+    const svg = gu.renderABCtoSVG(abc);
+    paper.innerHTML = svg.svg;
+  } catch (e) {
+    console.error(e);
+    errorBox.innerHTML = `<div class="notation-error">Ошибка: ${e.message}</div>`;
+    paper.innerHTML = '<span class="placeholder">Ошибка рендера</span>';
+  }
+}
+
+// ============ ПОЛНАЯ НОТАЦИЯ ПЕСНИ ============
+function updateFullNotation() {
+  const content = document.getElementById('fullNotationContent');
+  const panel = document.getElementById('fullNotationPanel');
+  
+  if (panel.classList.contains('collapsed')) return;
+
+  const totalBars = song.blocks.reduce((sum, b) => sum + b.length, 0);
+  if (totalBars === 0) {
+    content.innerHTML = '<span class="placeholder">Добавьте секции для генерации нотации</span>';
+    return;
+  }
+
+  if (typeof GrooveUtils === 'undefined') {
+    content.innerHTML = '<span class="placeholder" style="color:#fc8181;">GrooveScribe не загружен</span>';
+    return;
+  }
+
+  try {
+    let hStr = '|', sStr = '|', kStr = '|';
+    
+    song.blocks.forEach(block => {
+      for (let i = 0; i < block.length; i++) {
+        let p = (block.patterns && block.patterns[i]) ? block.patterns[i] : emptyBarPattern();
+        for (let step = 0; step < 16; step++) {
+          hStr += p.hihat[step] ? 'x' : '-';
+          sStr += p.snare[step] ? 'o' : '-';
+          kStr += p.kick[step] ? 'o' : '-';
+        }
+        hStr += '|';
+        sStr += '|';
+        kStr += '|';
+      }
+    });
+
+    const gu = new GrooveUtils();
+    const data = new gu.grooveDataNew();
+    data.timeDivision = 16;
+    data.tempo = song.bpm;
+    data.numberOfMeasures = totalBars;
+    data.numBeats = beatsPerBar();
+    data.noteValue = 4;
+    data.notesPerMeasure = data.timeDivision * data.numBeats / data.noteValue;
+
+    data.hh_array = gu.noteArraysFromURLData('H', hStr, data.notesPerMeasure, data.numberOfMeasures);
+    data.snare_array = gu.noteArraysFromURLData('S', sStr, data.notesPerMeasure, data.numberOfMeasures);
+    data.kick_array = gu.noteArraysFromURLData('K', kStr, data.notesPerMeasure, data.numberOfMeasures);
+
+    // 1. Генерируем базовый ABC (ширину передаем небольшую, чтобы помочь движку)
+    let abc = gu.createABCFromGrooveData(data, 700);
+    
+    // 2. Формируем блок директив для САМОГО НАЧАЛА файла
+    // %%clef none убирает странный ключ и выравнивает первый такт
+    // %%barsperstaff 4 жестко заставляет делать перенос каждые 4 такта
+    const formatDirectives = [
+      '%%pagewidth 700',
+      '%%staffwidth 650',
+      '%%scale 0.85',
+      '%%barsperstaff 4',
+      '%%staffsep 35',
+      '%%clef none' 
+    ].join('\n') + '\n';
+    
+    // 3. Просто приклеиваем директивы в начало строки
+    abc = formatDirectives + abc;
+    
+    const svg = gu.renderABCtoSVG(abc);
+    content.innerHTML = svg.svg;
+    
+  } catch (e) {
+    console.error(e);
+    content.innerHTML = `<span class="placeholder" style="color:#fc8181;">Ошибка рендера: ${e.message}</span>`;
+  }
+}
+
+// ============ СТАТИСТИКА ============
+function renderStats() {
+  const totalBars = song.blocks.reduce((s, b) => s + b.length, 0);
+  const totalPhrases = song.blocks.reduce((s, b) => s + phraseCount(b.length), 0);
+  document.getElementById('statBars').textContent = totalBars;
+  document.getElementById('statPhrases').textContent = totalPhrases;
+  document.getElementById('statTime').textContent = formatTime(totalBars * barDurationSec());
+  document.getElementById('statSections').textContent = song.blocks.length;
+}
+
+// ============ РЕНДЕР ============
+function render() {
+  document.getElementById('bpm').value = song.bpm;
+  document.getElementById('timeSig').value = song.timeSig;
+  renderRuler();
+  renderTimeline();
+  renderSequencer();
+  updateNotation();
+  renderStats();
+  saveSong();
+}
+
+// ============ СОБЫТИЯ ============
+document.getElementById('bpm').addEventListener('input', e => {
+  song.bpm = Math.max(30, Math.min(300, parseInt(e.target.value) || 120));
+  render();
+  updateFullNotation();
+});
+document.getElementById('timeSig').addEventListener('change', e => {
+  song.timeSig = e.target.value;
+  render();
+  updateFullNotation();
+});
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm('Сбросить все данные?')) {
+    localStorage.removeItem('songBuilder');
+    song = { bpm: 120, timeSig: '4/4', blocks: [], version: DATA_VERSION };
+    selectedBar = null;
+    render();
+  }
+});
+document.getElementById('clearBtn').addEventListener('click', () => {
+  if (confirm('Очистить структуру?')) {
+    song.blocks = [];
+    selectedBar = null;
+    render();
+  }
+});
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const lines = song.blocks.map(b => {
+    const ph = phraseCount(b.length);
+    return `[${b.label} · ${b.length}т · ${ph}стр]`;
+  }).join(' → ');
+  const total = song.blocks.reduce((s, b) => s + b.length, 0);
+  const totalPh = song.blocks.reduce((s, b) => s + phraseCount(b.length), 0);
+  const text = `Структура песни\nBPM: ${song.bpm}, Размер: ${song.timeSig}\nВсего: ${total} тактов · ${totalPh} строчек · ${formatTime(total * barDurationSec())}\n\n${lines}`;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Скопировано!\n\n' + text);
+  }).catch(() => {
+    prompt('Скопируйте вручную:', text);
+  });
+});
+
+document.getElementById('toggleBottom').addEventListener('click', () => {
+  const panel = document.getElementById('bottomPanel');
+  const btn = document.getElementById('toggleBottom');
+  if (panel.classList.contains('collapsed')) {
+    panel.classList.remove('collapsed');
+    panel.classList.add('expanded');
+    btn.textContent = '▼';
+  } else {
+    panel.classList.add('collapsed');
+    panel.classList.remove('expanded');
+    btn.textContent = '▲';
+  }
+});
+
+// Управление полной нотацией
+document.getElementById('fullNotationBtn').addEventListener('click', () => {
+  const panel = document.getElementById('fullNotationPanel');
+  panel.classList.remove('collapsed');
+  panel.classList.add('expanded');
+  updateFullNotation();
+});
+
+document.getElementById('closeFullNotation').addEventListener('click', () => {
+  const panel = document.getElementById('fullNotationPanel');
+  panel.classList.add('collapsed');
+  panel.classList.remove('expanded');
+});
+
+const timeline = document.getElementById('timeline');
+timeline.addEventListener('dragover', e => {
+  e.preventDefault();
+  timeline.classList.add('drag-over');
+});
+timeline.addEventListener('dragleave', () => timeline.classList.remove('drag-over'));
+timeline.addEventListener('drop', e => {
+  timeline.classList.remove('drag-over');
+  if (e.target === timeline || e.target.classList.contains('timeline')) {
+    if (dragData && dragData.source === 'palette') {
+      song.blocks.push({
+        id: uid(), type: dragData.type,
+        label: nextLabel(dragData.type),
+        length: BARS_PER_PHRASE,
+        patterns: {}
+      });
+      render();
+    }
+  }
+  clearIndicators();
+});
+
+// ============ СТАРТ ============
+renderPalette();
+render();
+</script>
+</body>
+</html>

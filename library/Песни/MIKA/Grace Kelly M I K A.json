@@ -1,0 +1,20 @@
+{
+  "title": "Grace Kelly M I K A",
+  "category": ["четверти"],
+  "difficulty": "2",
+  "description": "",
+  "tempo": 120,
+  "version": "1.0",
+  "created": "2026-04-28",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "z16 | z16 | \n|: g4 g4 g4 g4 | g4 g4 g4 g4 | ^f4 g4 g4 g4 | g4 g4 g4 g4 :| \n^f4 g4 g4 g4 | g4 z4  z4 z4  | \n[F4g] [F4g] [F4g] [F4g] | [F4g] [F4g] [F4g] [F4g] | [F4g] [F4g] [F4g] [F4g] | [F4g] [F4g] [F4g] [F4g] | \n[F4g] [F4g] [F4g] [F4g] | [F4g] [F4g] [F4g] [F4g] | [F4g] [F4g] [F4g] [F4g] | [F4Ac] [F4Ac] [F4Ac] [F4Ac] |\n[F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4a] [c4a] | [F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4a] [c4a] | \n[F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4a] [c4a] | [F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4A] | \n[F4a] ^f4 [^f4c] ^f4 |  [^f4F][^f4F][^f4c]^f4 | [F4a] ^f4 [^f4c] ^f4 |  [^f4F][^f4F][^f4c]^f4 | \n[F4a] ^f4 [^f4c] ^f4 |  [^f4F][^f4F][^f4c]^f4 | [F4a] c4 e4 A4 | [F4a]z4 z4 z4 | \nz16 | z4 z4 z4 g4 | z16 | z4 z4 z4 g4 | \nF4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | [F4Ac] [F4Ac] [F4Ac] [F4Ac] |\n[F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4a] [c4a] | [F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4a] [c4a] | \n[F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4a] [c4a] | [F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4a] [c4a] | \n[F4a] ^f4 [^f4c] ^f4 |  [^f4F][^f4F][^f4c]^f4 | [F4a] ^f4 [^f4c] ^f4 | [F4a]z4 z4 z4 |\nz16 ",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Grace_Kelly.mp3"
+  }
+}

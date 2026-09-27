@@ -1,0 +1,19 @@
+{
+  "title": "Ghostbusters",
+  "category": ["четверти", "восьмые", "шестнадцатые"],
+  "difficulty": "4",
+  "description": "",
+  "tempo": 115,
+  "version": "1.0",
+  "created": "2026-01-06",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "[F2a]A2 [F4c] [Fe]eee [F4c] | [Fe]ed2 [F4c] [F2d]A2 [Fc]cc!open!g | [F2d]A2 [F4c] [Fe]eee [F4c] | [Fe]ed2 [F4c] [Fe]ee2 [Fc]cc!open!g |\n[F2d]A2 [F4c] [Fe]eee [F4c] | [Fe]ed2 [F4c] [F2d]A2 [Fc]cc!open!g | [F2d]A2 [F4c] [Fe]eee [F4c] | [Fe]ed2 [F4c] [Fc]ccc [Fd]ccc|"
+    }
+  ],
+  "audio": {
+    "plus": "Ghostbusters_plus.mp3"
+  }
+}

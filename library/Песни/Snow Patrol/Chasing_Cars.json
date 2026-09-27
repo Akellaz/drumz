@@ -1,0 +1,20 @@
+{
+  "title": "Chasing Cars",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "1",
+  "description": "",
+  "tempo": 102,
+  "version": "1.0",
+  "created": "2026-04-27",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "Z2|[F4^f]^f4^f4^f4 |  ^f4^f4^f4^f4 | [F4^f]^f4^f4^f4 |  ^f4^f4^f4^f4 | \n[F4^f]^f4^f4^f4 |  ^f4^f4^f4^f4 | [F4^f]^f4^f4^f4 |  ^f2^f2 ^f2^f2 ^f2^f2 ^f2^f2 | \n [F4a]^f4^f4^f4 |  ^f4^f4^f4^f4 | [F4^f]^f4^f4^f4 |  ^f4^f4^f4^f4 | \n [F4^f]^f4^f4^f4 |  ^f4^f4^f4^f4 | [F4^f]z4 z4 z4  |  z16 |  \n|:[F4a] [c4a] [F4a] [c4a] | [F4a] [c4a] [F4a] [c4a] | [F4a] [c4a] [F4a] [c4a] | [F4a] [c4a] [F4a] [c4a] | \n[F4a] [c4a] [F4a] [c4a] | [F4a] [c4a] [F4a] [c4a] | [F4a] [c4a] [F4a] [c4a] | c2c2 c2c2 c2c2 c2c2 :|\n|:[F4a] [c4a] [F4a] [c4a] | [F4a] [c4a] [F4a] [c4a] | [F4a] [c4a] [F4a] [c4a] | [F4a] [c4a] [F4a] [c4a] | \n[F4a] [c4a] [F4a] [c4a] | [F4a] [c4a] [F4a] [c4a] | [F4a] [c4a] [F4a] [c4a] | c2c2 c2c2 c2c2 c2c2 :|\n[F4g] z4 z4 z4 |] ",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Chasing Cars.mp3"
+  }
+}

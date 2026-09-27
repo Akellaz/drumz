@@ -1,0 +1,19 @@
+{
+  "title": "Milk",
+  "category": "books",
+  "difficulty": "3",
+  "description": "",
+  "tempo": 114,
+  "version": "1.0",
+  "created": "2025-12-21",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "z16 | z16 | z16 | z16 | z16 | z16 | z16 |  z8 z4 g4 | \n[F4a] [F4a] [F4a] g4| (3[F4a][F4a][F4a] [F4a] g4 | [F4a] [F4a] [F4a] g4| (3[F4a][F4a][F4a] [F4a] [F4a] |\n[F4a] [F4a] [F4a] g4| (3[F4a][F4a][F4a] [F4a] g4 | [F4a] [F4a] [F4a] g4| (3[F4a][F4a][F4a] [F4a] g4 |"
+    }
+  ],
+  "audio": {
+    "plus": "Milk_plus.mp3"
+  }
+}

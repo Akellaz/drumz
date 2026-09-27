@@ -1,0 +1,19 @@
+{
+  "title": "Can't Stop",
+  "category": "books",
+  "difficulty": "3",
+  "description": "",
+  "tempo": 91,
+  "version": "1.0",
+  "created": "2026-01-05",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "!pp! [Fc]ccc [Fc]ccc [Fc]ccc [Fc]ccc | [Fc]ccc [Fc]ccc [Fc]ccc [Fc]ccc | \n[Fc]ccc [Fc]ccc [Fc]ccc [Fc]ccc | !p! [Fc]ccc [Fc]ccc [Fc]ccc [Fc]ccc |!mp! [Fc]ccc [Fc]ccc [Fc]ccc [Fc]ccc |!mf! [Fc]ccc [Fc]ccc [Fc]ccc [Fc]ccc | \n!f!   [Fc]!<(!ccc [Fc]ccc [Fc]ccc [Fc]ccc | [Fc]ccc [Fc]ccc [Fc]ccc [Fc]ccc !<)! | \nL[c4F] z4z4z4| z16 | z16 | z16|\n{c/c/}[g2F][g2F] [c2g]gc gc[F2g] [g2c]g2| \n"
+    }
+  ],
+  "audio": {
+    "plus": "Cant_Stop_plus.mp3"
+  }
+}

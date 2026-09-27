@@ -1,0 +1,20 @@
+{
+  "title": "BANG BANG BANG",
+  "category": ["четверти", "восьмые", "шестнадцатые"],
+  "difficulty": "3",
+  "description": "",
+  "tempo": 135,
+  "version": "1.0",
+  "created": "2026-07-29",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "BIGBANG",
+      "abc": "g4 g4 g4 g4 | g4 g4 g4 g4 | g4 g4 g4 g4 | g4 g4 g4 g4 | \ng4 g4 g4 g4 | g4 g4 g4 g4 | g4 g4 g4 g4 | g4 g4 c2c2 c2c2 | \n[F4a] F4 F4 F4 | F4 F4 F4 F4 | F4 F4 F4 F4 | F4 F4 F4 F4 | \n[F4a] F4 F4 F4 | F4 F4 F4 F4 | F4 F4 F4 F4 | F4 F4 A2A2 A2A2  | \n[F4a][A4F][A4F][A4F] | [A4F][A4F][A4F][A4F]| [A4F][A4F][A4F][A4F]| [A4F][A4F][A4F][A4F]| \n[F4a][A4F][A4F][A4F] | [A4F][A4F][A4F][A4F]| [A4F][A4F][A4F][A4F]| [A4F]c2c2 c2c2 c2c2| \n[F4a][A4F][A4F][A4F] | [A4F][A4F][A4F][A4F]| [A4F][A4F][A4F][A4F]| [A4F][A4F][A4F][A4F]| \nc2c2 c2c2 c2c2 c2c2 | c2c2 c2c2 c2c2 c2c2 | cccc cccc cccc cccc | c4 z4 z4 z4 | \n[F4a] ^f4 [c4^f] [F4^f] | ^f4 ^f4 [c4^f] [F4^f] | ^f4 ^f4 [c4^f] [F4^f] | ^f4 [^f4F] [c4^f] [F4^f] | \n[F4a] ^f4 [c4^f] [F4^f] | ^f4 ^f4 [c4^f] [F4^f] | ^f4 ^f4 [c4^f] [F4^f] |[^f4F] [^f4F] [c4F] z4 | \n[F4a] ^f4 [c4^f] [F4^f] | ^f4 ^f4 [c4^f] [F4^f] | ^f4 ^f4 [c4^f] [F4^f] |^f4 [^f4F] [c4^f] [F4^f] | \n[F4a] ^f4 [c4^f] [F4^f] | ^f4 ^f4 [c4^f] [F4^f] | ^f4 ^f4 [c4^f] [F4^f] |[c4A][c4A][c4A][c4A]| \n[F4a] z4 z4 z4 |] \n",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "BANG_BANG_BANG.mp3"
+  }
+}

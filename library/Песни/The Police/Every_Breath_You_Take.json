@@ -1,0 +1,21 @@
+{
+  "title": "Every Breath You Take",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "3",
+  "description": "",
+  "tempo": 116,
+  "version": "1.0",
+  "created": "2025-12-13",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "z8 z4 Lc4 | F4 c2F2 F4 c4 | F4 c2F2 F4 c4  | F4 c2F2 F4 c4  | F4 c2F2 F4 c2c2 | \nF4 c2F2 F4 c4 | F4 c2F2 F2F2 c4 | F4 c2F2 F4 c4 | F4 c2F2 F2c2 c2F2| \nF4 c2F2 F4 c4 |F4 c2F2 F4 c2F2 |F4 c2F2 F4 c4 |F4 c2F2 F4 c2c2 |\nF4 c2F2 F4 c4 |F4 c2F2 F2F2 c4 |F4 c2F2 F4 c4 |F4 c2F2 F4 c2c2 |\nF4 c2F2 F4 c4 |F4 c2F2 F4 c2F2 |F4 c2F2 F4 c4 |F4 c2F2 F2c2 c2c2 |\n[F4] [c2g2]F2 F4 [c4g] |[F4] [c2g2]F2 F4 [c2g]F2 |[F4] [c2g2]F2 F4 [c4g] |F4 [Lc2]F2 F2F2 [c4a] |\n[F2a2]g2 [c2g2][F2g] [F2g2]g2 [c2g2]g2 | [F2g2]g2 [c2g2][F2g] [F2g2]g2 [c2g2]g2 |[F2a2]g2 [c2g2][F2g] [F2g2]g2 [c2g2]g2 | [F2g2]g2 [c2g2][F2g] [F2g2]g2 [c2g2][g2c] |\n[F2a2]g2 [c2g2][F2g] [F2g2]g2 [c2g2]g2 | [F2g2]g2 [c2g2][F2g] [F2g2]g2 [c2g2][F2g] | [F2a2]g2 [c2g2][F2g] [F2g2]g2 [c2g2]g2 | Lc2F2 Lc2F2 F2F2 Lc4 |\nz4"
+    }
+  ],
+  "audio": {
+    "plus": "Every_Breath_You_Take_plus.mp3",
+    "click": "Every_Breath_You_Take_click.mp3",
+    "minus": "Every_Breath_You_Take_minus.mp3"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "title": "Paint It Black",
+  "category": ["четверти"],
+  "difficulty": "2",
+  "description": "",
+  "tempo": 159,
+  "version": "1.0",
+  "created": "2026-08-03",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "The Rolling Stones",
+      "abc": "^f8  ^f8  |^f8 ^f8  |^f8 ^f8  | [a16F] | z8 e4 A4 | [F4a] g4 [g4c] g4 | g4 g4 [g4c] g4 | [F4g] g4 [g4c] g4 | g4 g4 [g4c] g4 | \n|:\"4\"[F4g] g4 [g4c] g4 | g4 g4 [g4c] g4 | [F4g] g4 [g4c] g4 | g4 g4 [g4c] g4 | \n[F4g] g4 [g4c] g4 | g4 g4 [g4c] g4 | [F4g] g4 [g4c] g4 | g4 g4 [g4c] [g4c] |\n[a4F] [^f4c] [^f4F] [^f4c] | [^f4F] [^f4c] [^f4F] [^f4c] | [^f4F] [^f4c] [^f4F] [^f4c] | [^f4F] [^f4c] [^f4F] [^f4c] |\n [^f4F] [^f4c] [^f4F] [^f4c] | [^f4F] [^f4c] [^f4F] [^f4c] | [^f4F] [^f4c] [^f4F] [^f4c] | [^f4F] [^f4c] [^f4c] [^f4c] \"4\":| \n[F4a] z4 z4 z4 |] ",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Paint_It_Black_plus.mp3",
+    "click": "Paint_It_Black_click.mp3"
+  }
+}

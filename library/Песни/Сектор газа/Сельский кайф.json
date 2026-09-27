@@ -1,0 +1,16 @@
+{
+  "title": "Сельский кайф",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 121,
+  "version": "1.0",
+  "created": "2026-02-18",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "g4g4g4 g2e2|a4"
+    }
+  ]
+}

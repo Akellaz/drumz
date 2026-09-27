@@ -1,0 +1,44 @@
+{
+  "title": "Engel",
+  "category": ["четверти", "восьмые", "шестнадцатые"],
+  "difficulty": "5",
+  "description": "",
+  "tempo": 96,
+  "version": "1.0",
+  "created": "2026-04-26",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "z16| z16| z16| z16| z16| z16| z16| z8 Fcg2 cccc|\n[F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [Fg]cg2 [c2g2F]g2 |  [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [Fg]cg2 [c2g2F]g2 | \n[F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [Fg]cg2 [c2g2F]g2 |  [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [Fg]cg2 [c2g2F]g2 | ",
+      "startTime": 0
+    },
+    {
+      "id": 1,
+      "title": "Куплет 1",
+      "abc": "[F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2] | [F2g2]g2 [c2g2F]g2 [F2g]!open!g2 [c2g2]gg | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2] | [F2g2]g2 [c2g2F]g2 [F2g]!open!g2 [c2g2]gg | \n[F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]gg | [F2g2]g2 [c2g2F]g2 [F2g]!open!g2 [c2g2]g2 | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]gg | [F2g2]g2 [c2g2F]g2 [Fg]cg2 [Fc]cg2 | \n[F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2] | [F2g2]g2 [c2g2F]g2 [Fg]c!open!g2 [c2g2F]g2 |  [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [Fg]c!open!g2 [c2g2F]g2 |\n[F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [F2g]!open!g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [Fg]c!open!g2 [F2c]cc | [F4c] z4z4 cccc | \n[F4g] [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [Fg]c!open!g2 [c2g2F]g2 |\n[F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [Fg]c!open!g2 [c2g2F]g2 | [F4a] z4 z4 zccc | ",
+      "startTime": 40
+    },
+    {
+      "id": 2,
+      "title": "Куплет 2",
+      "abc": "[F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 |  [F2g2]g2 [c2g2F]g2 [Fg]c!open!g2 [c2g2F]g2 |\n[F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [Fg]cg2 [Fc]cg2 | \n[F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [Fg]cg2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [Fg]cg2 [c2g2F]g2 | \n[F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [Fg]c!open!g2 [F2c]cc | [F4c] z4z4 cccc | \n[F4a] [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [Fg]c!open!g2 [c2g2F]g2 |\n[F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2] | [F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2  [c2g2F]g2 [F2g2]g2  [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [Fg]c!open!g2 [c2g2F]g2 |",
+      "startTime": 102.5
+    },
+    {
+      "id": 3,
+      "title": "Instrumental",
+      "abc": "[g2F]g2 [c2g2]g2 gc[g2F] [c2g2][g2F] | [g2F]g2 [c2g2]g2 gc[g2F] [c2g2][g2] | [g2F]g2 [c2g2]g2 g2[g2F] [c2g2][g2F] | [g2F]g2 [c2g2]g2 gc[g2F] [c2g2][g2] | \n[g2F]g2 [c2g2]g2 g2[g2F] [c2g2][g2F] | [g2F]g2 [c2g2]g2 gc[g2F] [c2g2][g2] | [g2F]g2 [c2g2]g2 g2[g2F] [c2g2][g2F] | [g2F]g2 [c2g2]g2 g2[g2F] [c2g2][g2F] |\n[F4g] z4 z4 z4 | z16 | z16 | z16 | \nz16 | z16 | z16 | z16 | \nz16 | z16 | z16 | [F4a] g4 gcg2 cccc | ",
+      "startTime": 162.5
+    },
+    {
+      "id": 4,
+      "title": "Окончание",
+      "abc": "[F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2] | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2] | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [Fg]cg2 [c2g2F]g2 | \n[F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2] | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2] | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [Fg]cg2 [c2g2F]g2 | \n[F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2] | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2] | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2F] | [F2g2]g2 [c2g2F]g2 [Fg]cg2 [c2g2F]g2 | \n[F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2] | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F][g2] | [F2g2]g2 [c2g2F]g2 [Fg]cg2 [c2g2F]g2 | [Fg]cg2 [c2g2F]g2 [Fg]cg2 [Fc]ccc | \n[F4a] z4 z4 z4 | ",
+      "startTime": 212.4
+    }
+  ],
+  "audio": {
+    "plus": "Engel.mp3"
+  }
+}

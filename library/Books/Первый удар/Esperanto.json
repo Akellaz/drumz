@@ -1,0 +1,20 @@
+{
+  "title": "Esperanto",
+  "category": "четверти",
+  "difficulty": "1",
+  "description": "",
+  "tempo": 109,
+  "version": "1.0",
+  "created": "2026-04-23",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "z4z4z4c4| [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] z4 [c4g] z4| \n[F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] z4  [c4g] [c4g] | "
+    }
+  ],
+  
+  "audio": {
+    "plus": "Esperanto.mp3"
+  }
+}

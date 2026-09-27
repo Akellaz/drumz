@@ -1,0 +1,20 @@
+{
+  "title": "Do I Wanna Know",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "2",
+  "description": "",
+  "tempo": 85,
+  "version": "1.0",
+  "created": "2026-08-04",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Arctic Monkeys",
+      "abc": "F4 [c4F] F4 [c4F] | F4 [c4F] F4 [c4F] | F4 [c4F] F4 [c4F] | F4 [c4F] F4 [c2F]c2 | \nF4 [c4F] F4 [c4F] | F4 [c4F] F4 [c4F] | F4 [c4F] F4 [c4F] | F4 [c4F] [c2F]c2 [c2F]c2 | \nF4 [c4F] F4 [c4F] | F4 [c4F] F4 [c4F] | F4 [c4F] F4 [c4F] | F4 [c4F] [e2F]e2 [c4F] | \nF4 [c4F] F4 [c4F] | F4 [c4F] F4 [c4F] | F4 [c4F] F4 [c4F] | e2e2 d4 d2d2 A2A2  | \n[F2g2]g2 [F2g2c2]g2 [F2g2]g2 [F2g2c2]g2 | [F2g2]g2 [F2g2c2]g2 [F2g2]g2 [F2g2c2]g2 | [F2g2]g2 [F2g2c2]g2 [F2g2]g2 [F2g2c2]g2 | c4 e2e2 d2d2 A4 | \n[F2g2]g2 [F2g2c2]g2 [F2g2]g2 [F2g2c2]g2 | [F2g2]g2 [F2g2c2]g2 [F2g2]g2 [F2g2c2]g2 | [F2g2]g2 [F2g2c2]g2 [F2g2]g2 [F2g2c2]g2 |z4 z4 d2d2 A2A2 | \n[F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] c4 c2c2  | \n[F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | c2c2 e2e2 d2d2 A2A2  | \n[F4a] \n",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Do_I_Wanna_Know.mp3"
+  }
+}

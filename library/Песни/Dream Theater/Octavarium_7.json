@@ -1,0 +1,19 @@
+{
+  "title": "7",
+  "category": "books",
+  "difficulty": "5",
+  "description": "",
+  "tempo": 130,
+  "version": "1.0",
+  "created": "2026-01-21",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "g4g4g4g4 | Lcggg gggLc gggg gLcgg | gggg Lcggg gggg Lcggg | \ngggLc gggg gLcgg gggg | Lcggg gggg"
+    }
+  ],
+  "audio": {
+    "plus": "7_plus.mp3"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Paradise city",
+  "category": ["четверти", "синкопы"],
+  "difficulty": "3",
+  "description": "",
+  "tempo": 100,
+  "version": "1.0",
+  "created": "2025-12-13",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "z4 g4 z4 g4 | z4 g4 z4 g4 | z4 g4 z4 g4 | z4 g4 z4 g4|\n|:F4 c4 z2F2 c4 | F4 c4 z2F2 c4 | F4 c4 F4 c4 | F4 c4 z2F2 c4 :| \nF4 c4 z2F2 c4 | F4 c4 z2F2 c4 | F4 c4 F4 c4 | F4 c4 F4 c4  | \n[F4a] c4 F4 c4 | [F4a] c4 z2F2 c4 | [F4a] c4 [F4a] c4 | [F4a] c4 z2F2 c4 | \n|:[F4a] c4  z2F2 c4 | [F4a] c4 z2F2 c4 | [F4a] c4 [F4a] c4 | [F4a] c2>F2 zF2Fc4 :| \n[F4a] c4  z2F2 c4 | [F4a] c4 z2F2 c4 | [F4a] c4 [F4a] c4 | [F4a] c4 F4 c2c2|]  \n"
+    }
+  ],
+  "audio": {
+    "plus": "Paradise_city_plus.mp3",
+    "minus": "Paradise_city_minus.mp3"
+  }
+}

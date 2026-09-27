@@ -1,0 +1,20 @@
+{
+  "title": "Girls Like You",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "1",
+  "description": "",
+  "tempo": 120,
+  "version": "1.0",
+  "created": "2026-08-13",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Maroon 5",
+      "abc": "z4 z4 c4 z4 | z4 z4 c4 z4 | z4 z4 c4 z4 | z4 z4 c4 z4 | \nz4 z4 c4 z4 | z4 z4 c4 z4 | z4 z4 c4 z4 | z4 z4 c4 c2c2 \nF4 ^f4 c4 z4 | F4 ^f4 c4 z4 | F4 F4 c4 z4 | F4 ^f4 c4 z4 |\nF4 ^f4 c4 z4 | F4 ^f4 c4 z4 | F4 F4 c4 z4 | F4 ^f4 c4 z4 |\n z16 | z16 | z16 | e4 e4 A4 A4 | \n[F4a] z4 z4 z4 | z16 | z16 | F4 F4 F4 F4 | \n|: g4 g4 g4 g4 | g4 g4 g4 g4 | g4 g4 g4 g4 | g4 g4 g4 g4 :| \n|:g4 g4 [c4g] g4 | g4 g4 [c4g] g4 | g4 g4 [c4g] g4 | g4 g4 [c4g] g4 :|  \n[F4a] z4 c4 z4 | F4 ^f4 c4 z4 | F4 F4 c4 z4 | F4 ^f4 c4 z4 |\n F4 ^f4 c4 z4 | F4 ^f4 c4 z4 | F4 F4 c4 z4 | F4 ^f4 c4 z4 |\n[F4a] z4 c4 z4 | F4 ^f4 c4 z4 | F4 F4 c4 z4 | F4 ^f4 c4 z4 |\n F4 ^f4 c4 z4 | F4 ^f4 c4 z4 | F4 F4 c4 z4 | F4 ^f4 c2c2  c4  |\nz4 \n\n\n",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Girls Like You.mp3"
+  }
+}

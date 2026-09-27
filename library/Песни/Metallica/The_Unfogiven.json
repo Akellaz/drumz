@@ -1,0 +1,22 @@
+{
+  "title": "The Unfogiven",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "3",
+  "description": "",
+  "tempo": 69,
+  "version": "1.0",
+  "created": "2025-12-12",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "[F2a2]g2 [c2g2][F2g] [F2g2]g2 [c2g2]g2 | [F2g2]g2 [c2g2][F2g] [F2g2]g2 [c2g2]g2 | [F2g2][F2g2] [c2g2][F2g] [F2g2]g2 [c2g2]g2 | [F2g2]g2 [c2g2][F2g] [F2g2]g2 [c2g2][F2a] | \n[F4a] g4 g4 g4 | [F4a] g4 g4 g4 | \n[F2a2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2  | [F2g2]g2 [c2g2]g2 [F2g2]g2 [c2a2]g2  | [F2g2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2  |[F2g2]g2 [c2g2]g2 [F2g2]c2 [c2g]c2  |\n[F2a2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2  | [F2g2]g2 [c2g2]g2 [F2g2]g2 [c2a2]g2  | [F2g2]g2 [c2g2]g2 [F2g2][F2g] [c2g2]g2 |[M:2/4][F2g2]g2 [c2g2]g2 | \n[M:4/4][c2g][F2g] [c2g][F2g] [c2g][F2g] [c2g][F2g] | [F2a2]g2 [c2g2]g2 [F2a2]g2 [c2g2]g2 | [c2g][F2g] [c2g][F2g] [c2g][F2g] [c2g][c2g] | [F2a2]g2 [c2g2]g2 [F2a2]g2 [c2g2]g2 | \n[M:2/4][F2a2]F2 Lc2F2 | [M:4/4][F4a] z4 z8 | "
+    }
+  ],
+  
+   "audio": {
+    "plus": "The_Unfogiven_plus.mp3",
+    "click": "The_Unfogiven_click.mp3",
+    "minus": "The_Unfogiven_minus.mp3"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Creepy Crawlies",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "3",
+  "description": "",
+  "tempo": 122,
+  "version": "1.0",
+  "created": "2026-07-12",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Michael Story",
+      "abc": "[c4F] c2c2 [c4F] c2c2 | [c4F] [c4F] [c2F]c2 [c2F]c2 | [c4F] z4  [c4F] z4 | [c4F] z4  z4 [c4F] | \n [c4F] z4  [c4F] z4 | [c4F] z4  z4 [c4F] | F4 c4 F4 c4 | F4 c4 c4 [c4F] | \nF4 c4 F4 c4 | F4 c4 c4 [c4F] | F4 c4 F4 c4 | F4 c4 c4 [c4F] | \n [c4F] z4  [c4F] z4 | F4 c4 [c2F]c2 [c4F] | [c2F]c2 [c4F] [c2F]c2 [c4F] | z4 z4 z4 [c4F] | \n[c2F]c2 [c4F] [c2F]c2 [c4F] | z4 z4 z4 [c4F] | F4 c4 F4 c4 | F4 c4 c4 [c4F] |\n [c4F] z4  [c4F] z4 | F4 c4 [F2c]c2 [F2c]c2 | [c4F] c2c2 [c4F] c2c2 | [c4F] [c4F] [c2F]c2 [c2F]c2 |\n[c4F][c4F]F4[c2F]c2 | [c4F]z4 z4 c4 | [c4F][c4F]F4[c2F]c2 | [c4F]z4 z4 c4 |\n[c4F][c4F]F4[c2F]c2 | [c4F]z4 z4 [c4F] | [c4F] c2c2 [c4F] c2c2 | [c4F] [c4F] [c2F]c2 [c2F]c2 | [c4F] z4 z8 | \nF4 c4 F4 c4 | F4 c4 c4 [c4F] | F4 c4 F4 c4 | F4 c4 c4 [c4F] | \nF4 c4 F4 c4 | F4 c4 c4 [c4F] |  [c4F] z4  [c4F] z4 | z16 | \n[c2F]c2 c4 [c2F]c2 c4 | [c2F]c2 [c2F]c2 [c4F] z4 |] \nc\n",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Creepy_Crawlies.mp3"
+  }
+}

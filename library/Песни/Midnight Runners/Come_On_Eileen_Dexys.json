@@ -1,0 +1,21 @@
+{
+  "title": "Come On Eileen Dexys",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "2",
+  "description": "",
+  "tempo": 105,
+  "version": "1.0",
+  "created": "2026-08-03",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Midnight Runners",
+      "abc": "F4 F4 F4 F4  | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | \n[F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4A] | \n[F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | c2c2 c4 c2c2 c4  | \n[F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | c2c2 e4 c2c2 A4  | \n[F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | c2c2 c4 c2c2 A4  | \n[F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | e2e2  d4  A2A2 A4 | \n[F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | e2e2 e4 A2A2 A4  | \n[F4a] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | c2c2 e4 A2c2 c4  |[M: 6/4] [F4a] [c4g] [F4g] [c4g]  c2c2 c2c2 |\n|:\"4\" [a4F] [^f4c] [^f4F] [^f4c] | [^f4F] [^f4c] [^f4F] [^f4c]|  [^f4F] [^f4c] [^f4F] [^f4c] | [^f4F] [^f4c] [^f2F]c2 c2c2  \"4\" :|\n[a4F]z4z4z4",
+      "startTime": 0
+    }
+  ],
+  
+  "audio": {
+    "plus": "Come_On_Eileen_Dexys.mp3"
+  }
+}

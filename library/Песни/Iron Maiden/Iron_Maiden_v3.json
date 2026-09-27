@@ -1,0 +1,19 @@
+{
+  "title": "Iron Maiden v.3",
+  "category": ["четверти", "восьмые", "шестнадцатые"],
+  "difficulty": "3",
+  "description": "",
+  "tempo": 105,
+  "version": "1.0",
+  "created": "2025-12-15",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Hallowed Be Thy Name",
+      "abc": "[F4a] zccc [F4a] zccc | [F2a]cc [F2a]cc [F2a]cc eedd|\n [F4a] zccc [F4a] zccc | [F2a]cc [F2a]cc [F2a]cc eedd| \n[F4a] zccc [F4a] zccc | [F2a]cc [F2a]cc [F2a]cc eedd|\n [F4a] zccc [F4a] zccc | [F2a]cc [F2a]c2 eedd ddAA| \n"
+    }
+  ],
+  "audio": {
+    "plus": "Iron_Maiden3_plus.mp3"
+  }
+}

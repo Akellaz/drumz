@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сет-лист</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: #1a1a1a;
+      color: #fff;
+      padding: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 16px 0 24px;
+      font-size: 24px;
+      color: #666;
+    }
+
+    .song {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .song-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .song-title {
+      font-size: 18px;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .song-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 14px;
+      color: #aaa;
+      min-width: max-content;
+      align-items: center;
+    }
+
+    .song-bpm {
+      text-align: right;
+    }
+
+    .toggle-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      transition: transform 0.3s;
+    }
+
+    .toggle-icon.open {
+      transform: rotate(90deg);
+      color: #fff;
+    }
+
+    .song-details {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #3a3a3a;
+    }
+
+    .song-details.open {
+      display: block;
+    }
+
+    .structure {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -2px -8px 0;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+
+    .structure-block {
+      flex: 0 0 auto;
+      margin: 0 2px 8px 0;
+      height: 52px;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+      white-space: nowrap;
+      padding: 4px 2px;
+    }
+
+    .structure-block:hover {
+      opacity: 0.8;
+      transform: translateY(-2px);
+    }
+
+    .block-label {
+      line-height: 1.2;
+    }
+
+    .block-bars {
+      font-size: 9px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.85);
+      margin-top: 2px;
+      opacity: 0.9;
+    }
+
+    /* Цвета блоков */
+    .intro      { background: #FF6B6B; color: #fff; }
+    .verse      { background: #4ECDC4; color: #1a1a1a; }
+    .chorus     { background: #45B7D1; color: #fff; }
+    .bridge     { background: #FFA500; color: #fff; }
+    .solo       { background: #FFD700; color: #1a1a1a; }
+    .outro      { background: #888; color: #fff; }
+    .prechorus  { background: #98D8C8; color: #1a1a1a; }
+    .mod        { background: #FF6B6B; color: #fff; }
+
+    .player {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .order-number {
+      color: #FF6B6B;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    /* Адаптив для узких экранов */
+    @media (max-width: 480px) {
+      .structure-block {
+        height: 46px;
+        font-size: 9px;
+        padding: 3px 2px;
+      }
+      .block-bars {
+        font-size: 8px;
+        margin-top: 1px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Ведьмин Пунш</h1>
+
+  <div id="songs-list"></div>
+
+  <script>
+    // 🔧 bars: 1–32 тактов. break: true — принудительный перенос ПОСЛЕ этого блока
+    const songs = [
+      {
+        order: 1,
+        title: "Свитпунш",
+        bpm: 120,
+        audio: "audio/01_Svitpunsh.mp3",
+        structure: [
+          { type: "intro",     time: 0,   label: "Intro",  bars: 8, break: true },
+          { type: "bridge",    time: 16,  label: "🎵",     bars: 8 },
+          { type: "prechorus", time: 32,  label: "Pre",    bars: 2 },
+          { type: "verse",     time: 36,  label: "Ver",    bars: 10 },
+          { type: "chorus",    time: 56,  label: "Chor",   bars: 8, break: true },
+          { type: "bridge",    time: 72,  label: "🎵",     bars: 8 },
+		  { type: "prechorus", time: 87,  label: "Pre",    bars: 2 },
+          { type: "verse",     time: 92,  label: "Ver",    bars: 10 },
+          { type: "chorus",    time: 112, label: "Chor",   bars: 8, break: true },
+          { type: "bridge",    time: 128, label: "🎵",     bars: 8 },
+          { type: "prechorus", time: 144,  label: "Pre",    bars: 2 },
+          { type: "verse",     time: 148,  label: "Ver",    bars: 6 },
+		  { type: "prechorus", time: 160,  label: "Pre",    bars: 2 },
+          { type: "outro",     time: 164, label: "Out",  bars: 2 }
+        ]
+      },
+	  
+	        {
+        order: 2,
+        title: "Таверна",
+        bpm: 115,
+        audio: "audio/02_Taverna.mp3",
+        structure: [
+          { type: "intro",     time: 28,   label: "Intro",  bars: 8, break: true },
+		  { type: "bridge",    time: 47,  label: "🎵",     bars: 8 },
+		  { type: "verse",     time: 64,  label: "Ver",    bars: 8 },
+		  { type: "prechorus", time: 80,  label: "Pre",    bars: 2 },
+		  { type: "chorus",    time: 85,  label: "Chor",   bars: 8, break: true },
+		  { type: "bridge",    time: 101,  label: "🎵",     bars: 8 },
+		  { type: "verse",     time: 118,  label: "Ver",    bars: 8 },
+		  { type: "prechorus", time: 134,  label: "Pre",    bars: 2 },
+		  { type: "chorus",    time: 139,  label: "Chor",   bars: 8, break: true },
+		  { type: "bridge",    time: 156,  label: "🎵",     bars: 8 },
+		  { type: "chorus",     time: 172,  label: "Chor",    bars: 8 },
+        ]
+      },
+	        {
+        order: 3,
+        title: "Оборотень",
+        bpm: 120,
+        audio: "audio/03_Oboroten.mp3",
+        structure: [
+          { type: "intro",     time: 0,   label: "Intro",  bars: 8, break: true },
+          { type: "verse",     time: 36,  label: "Ver",    bars: 8 },
+		  { type: "prechorus", time: 52,  label: "Pre",    bars: 2 },
+          { type: "chorus",    time: 55,  label: "Chor",   bars: 8, break: true },
+		  { type: "prechorus", time: 71,  label: "Pre",    bars: 4 },
+		  { type: "bridge",    time: 79,  label: "🎵",     bars: 8 },
+		  { type: "prechorus", time: 95,  label: "Pre",    bars: 2 },
+          { type: "chorus",    time: 99, label: "Chor",   bars: 8, break: true },
+          { type: "bridge",    time: 115, label: "🎵",     bars: 8 },
+          { type: "bridge", time: 131,  label: "🎵",    bars: 8 },
+		  { type: "prechorus", time: 147,  label: "Pre",    bars: 2 },
+          { type: "chorus",    time: 151,  label: "Chor",   bars: 8, break: true },
+		  { type: "prechorus", time: 167,  label: "Pre",    bars: 8 }
+        ]
+      },
+	  
+	  	        {
+        order: 4,
+        title: "Дракон и ведьма",
+        bpm: 110,
+        audio: "audio/04_Drakon_i_Vedma.mp3",
+        structure: [
+          { type: "intro",     time: 0,   label: "In",  bars: 2},
+		  { type: "intro",     time: 5,   label: "Intro",  bars: 8, break: true },
+          { type: "verse",     time: 22,  label: "Ver",    bars: 8 },
+		  { type: "verse",     time: 39,  label: "Ver",    bars: 9 },
+		  { type: "bridge",    time: 59,  label: "🎵",     bars: 8, break: true  },
+          { type: "verse",     time: 76,  label: "Ver",    bars: 8 },
+		  { type: "verse",     time: 93,  label: "Ver",    bars: 9 },
+		  { type: "bridge",    time: 114,  label: "🎵",     bars: 8, break: true   },
+          { type: "verse",     time: 131,  label: "Ver*",    bars: 8 },
+		  { type: "verse",     time: 148,  label: "Ver",    bars: 9 },
+          { type: "bridge",    time: 168, label: "🎵",     bars: 8   },
+          { type: "bridge", time: 185,  label: "🎵",    bars: 8, break: true  },
+          { type: "outro",     time: 205, label: "Out",  bars: 4 }
+        ]
+      },
+	  	  	        {
+        order: 5,
+        title: "Хаос (70)",
+        bpm: 210,
+        audio: "audio/05_Khaos_i_Besovschina.mp3",
+        structure: [
+		  { type: "intro",     time: 0,   label: "Intro",  bars: 8, break: true },
+          { type: "verse",     time: 20,  label: "Ver",    bars: 8 },
+		  { type: "prechorus", time: 47,  label: "Pre",    bars: 1 },
+		  { type: "chorus",    time: 51,  label: "Chor",   bars: 8 },
+          { type: "bridge",    time: 78, label: "🎵",     bars: 4, break: true   },
+		  { type: "verse",     time: 89,  label: "Ver",    bars: 8 },
+		  { type: "prechorus", time: 116,  label: "Pre",    bars: 1 },
+		  { type: "chorus",    time: 119,  label: "Chor",   bars: 8 },
+          { type: "bridge",    time: 147, label: "🎵",     bars: 4, break: true   },
+		  { type: "verse",     time: 161,  label: "Ver",    bars: 8 },
+		  { type: "prechorus", time: 188,  label: "Pre",    bars: 1 },
+		  { type: "chorus",    time: 191,  label: "Chor",   bars: 8 },
+          { type: "outro",     time: 218, label: "Out",  bars: 2 }
+        ]
+      },
+	  
+	  	  	        {
+        order: 6,
+        title: "Ведьмы в баре",
+        bpm: 110,
+        audio: "audio/06_Vedmy_v_bare.mp3",
+        structure: [
+		  { type: "intro",     time: 0,   label: "Intro",  bars: 8, break: true },
+          { type: "verse",     time: 17,  label: "Ver",    bars: 8 },
+		  { type: "prechorus", time: 34,  label: "Pre",    bars: 4 },
+		  { type: "chorus",    time: 43,  label: "Chor",   bars: 4 },
+		  { type: "bridge",    time: 52, label: "🎵",     bars: 8, break: true   },
+		  { type: "verse",     time: 70,  label: "Ver",    bars: 8 },
+		  { type: "prechorus", time: 87,  label: "Pre",    bars: 4 },
+		  { type: "chorus",    time: 96,  label: "Chor",   bars: 4 },
+          { type: "bridge",    time: 104, label: "🎵",     bars: 8, break: true   },
+		  { type: "verse",     time: 122,  label: "Ver",    bars: 8 },
+		  { type: "prechorus", time: 139,  label: "Pre",    bars: 4 },
+		  { type: "chorus",    time: 148,  label: "Chor",   bars: 4 },
+		  { type: "bridge",    time: 157, label: "🎵",     bars: 4 },
+		  { type: "bridge",    time: 165, label: "🎵",     bars: 8 },
+		  { type: "bridge",    time: 183, label: "🎵*",     bars: 4, break: true   },
+          { type: "outro",     time: 192, label: "Out",  bars: 4 }
+        ]
+      },
+	  	  	  	        {
+        order: 7,
+        title: "Дорога из светлячков",
+        bpm: 90,
+        audio: "audio/07_Doroga_iz_svetlyachkov.mp3",
+        structure: [
+		  { type: "intro",     time: 0,   label: "Intro",  bars: 4},
+		  { type: "prechorus", time: 11,   label: "Pre",  bars: 2, break: true },
+          { type: "verse",     time: 16,  label: "Ver",    bars: 8 },
+		  { type: "bridge", time: 37,  label: "🎵",    bars: 8, break: true },
+		  { type: "verse",     time: 64,  label: "Ver",    bars: 8 },
+          { type: "bridge",    time: 80, label: "🎵",     bars: 8, break: true   },
+		  { type: "verse",     time: 101,  label: "Ver",    bars: 3 },
+		  { type: "outro",     time: 109, label: "pause",  bars: 4 },
+		  { type: "bridge",    time: 120, label: "🎵",     bars: 8 },
+		  { type: "bridge",    time: 141, label: "🎵",     bars: 8 },
+        ]
+      },
+	  
+	  	  	  	  	        {
+        order: 8,
+        title: "Принцессе по дракону",
+        bpm: 105,
+        audio: "audio/08_Princesse_po_drakonu.mp3",
+        structure: [
+		  { type: "intro",     time: 0,   label: "Intro",  bars: 4, break: true   },
+		  { type: "verse",     time: 8,  label: "Ver",    bars: 8 },
+		  { type: "verse",     time: 27,  label: "Ver",    bars: 8 },
+		  { type: "chorus",    time: 45,  label: "Chor",   bars: 4 },
+		  { type: "bridge",    time: 54, label: "🎵",     bars: 4, break: true   },
+		  { type: "verse",     time: 63,  label: "Ver",    bars: 8 },
+		  { type: "verse",     time: 82,  label: "Ver",    bars: 8 },
+		  { type: "chorus",    time: 100,  label: "Chor",   bars: 4 },
+		  { type: "bridge",    time: 109, label: "🎵",     bars: 4 },
+		  { type: "prechorus", time: 118,  label: "Pre",    bars: 2, break: true   },
+		  { type: "verse",     time: 122,  label: "Ver",    bars: 8 },
+		  { type: "verse",     time: 141,  label: "Ver",    bars: 8 },
+		  { type: "chorus",    time: 159,  label: "Chor",   bars: 4 },
+		  { type: "bridge",    time: 168, label: "🎵",     bars: 4 },
+		  { type: "outro",     time: 178, label: "Out",  bars: 8}
+		
+        ]
+      },
+	  	  	  	  	  	        {
+        order: 9,
+        title: "Чёртов эль",
+        bpm: 115,
+        audio: "audio/09_Chortov_El.mp3",
+        structure: [
+		  { type: "intro",     time: 15,   label: "Intro",  bars: 4},
+		  { type: "intro",     time: 24,   label: "Intro",  bars: 4, break: true },
+		  { type: "verse",     time: 33,  label: "Ver",    bars: 8 },
+		  { type: "chorus",    time: 49,  label: "Chor",   bars: 4 },
+		  { type: "bridge",    time: 57, label: "🎵",     bars: 4, break: true  },
+		  { type: "verse",     time: 65,  label: "Ver",    bars: 8 },
+		  { type: "chorus",    time: 82,  label: "Chor",   bars: 4 },
+		  { type: "prechorus", time: 90,  label: "Pre",    bars: 2 },
+		  { type: "bridge",    time: 95, label: "🎵",     bars: 8 },
+		  { type: "bridge",    time: 111, label: "🎵",     bars: 8, break: true   },
+		  { type: "verse",     time: 128,  label: "Ver+stop",    bars: 9 },
+		  { type: "chorus",    time: 147,  label: "Chor",   bars: 4 },
+		  { type: "bridge",    time: 156, label: "🎵",     bars: 8 },
+		  { type: "chorus",    time: 173,  label: "Chor",   bars: 4 },
+		  { type: "chorus",    time: 181,  label: "Chor",   bars: 4 },
+		
+        ]
+      },
+    ];
+
+    const songsList = document.getElementById('songs-list');
+
+    songs.forEach((song, index) => {
+      const songEl = document.createElement('div');
+      songEl.className = 'song';
+      songEl.innerHTML = `
+        <div class="song-header" onclick="toggleSong(${index})">
+          <div class="song-title">
+            <span class="order-number">${song.order}.</span>${song.title}
+          </div>
+          <div class="song-meta">
+            <div class="song-bpm">${song.bpm} BPM</div>
+            <div class="toggle-icon" id="icon-${index}">▶</div>
+          </div>
+        </div>
+        <div class="song-details" id="details-${index}">
+          <div class="structure" id="structure-${index}"></div>
+          <audio class="player" controls src="${song.audio}" id="player-${index}"></audio>
+        </div>
+      `;
+      songsList.appendChild(songEl);
+
+      const structureEl = document.getElementById(`structure-${index}`);
+      
+      // Суммируем все такты песни для пропорционального расчёта ширины
+      const totalBars = song.structure.reduce((sum, b) => sum + (b.bars || 4), 0);
+
+      song.structure.forEach((block) => {
+        const blockEl = document.createElement('div');
+        blockEl.className = `structure-block ${block.type}`;
+        blockEl.onclick = () => seekTo(index, block.time);
+
+        // Ограничиваем максимум 32 тактами
+        const bars = Math.min(block.bars || 4, 32);
+        const widthPercent = (bars / totalBars) * 100;
+        
+        // Ширина = доля от общего числа тактов. -1px компенсирует margin-gap
+        blockEl.style.width = `calc(${widthPercent}% - 1px)`;
+
+        // Название секции
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'block-label';
+        labelSpan.textContent = block.label;
+        
+        // Количество тактов
+        const barsSpan = document.createElement('span');
+        barsSpan.className = 'block-bars';
+        barsSpan.textContent = bars;
+        
+        blockEl.appendChild(labelSpan);
+        blockEl.appendChild(barsSpan);
+        structureEl.appendChild(blockEl);
+        
+        // 🔀 Вставляем перенос ПОСЛЕ блока, если указано break: true
+        if (block.break) {
+          const spacer = document.createElement('div');
+          spacer.style.flexBasis = '100%';
+          spacer.style.height = '0';
+          spacer.style.margin = '0';
+          spacer.style.padding = '0';
+          structureEl.appendChild(spacer);
+        }
+      });
+    });
+
+    window.toggleSong = function(index) {
+      const details = document.getElementById(`details-${index}`);
+      const icon = document.getElementById(`icon-${index}`);
+      
+      if (details.classList.contains('open')) {
+        details.classList.remove('open');
+        icon.classList.remove('open');
+      } else {
+        document.querySelectorAll('.song-details').forEach(el => el.classList.remove('open'));
+        document.querySelectorAll('.toggle-icon').forEach(el => el.classList.remove('open'));
+        
+        details.classList.add('open');
+        icon.classList.add('open');
+      }
+    };
+
+    window.seekTo = function(songIndex, time) {
+      const player = document.getElementById(`player-${songIndex}`);
+      if (player) {
+        player.currentTime = time;
+        if (player.paused) player.play();
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "title": "Bohemian Rhapsody v.2",
+  "category": ["четверти", "восьмые", "шестнадцатые", "синкопы"],
+  "difficulty": "3",
+  "description": "",
+  "tempo": 71,
+  "version": "1.0",
+  "created": "2025-12-22",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "[F2a2]g2 [c2g2]g2 [F2g2][F2g2] [c2g2][F2g2] | [F2a2]g2 [c2g2]g2 [F2g2][F2g2] [c2g2][F2g2] |\n [F4a] z2 [F2a] [F4a] [F4a] | [F2a]F2 [c2g]cc cccc ccc/2c/2c"
+    }
+  ],
+  "audio": {
+    "plus": "Bohemian_Rhapsody_v.2_plus.mp3"
+  }
+}

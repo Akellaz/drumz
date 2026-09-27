@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-	  <?php
-	require_once __DIR__ . '/includes/seo.php';
-	echo "<title>$title</title>";
-	echo "<meta name='description' content='$description'>";
-	?>
+  <?php
+  require_once __DIR__ . '/includes/seo.php';
+  echo "<title>$title</title>";
+  echo "<meta name='description' content='$description'>";
+  ?>
 
   <link rel="stylesheet" href="/assets/style.css?v=<?php echo time(); ?>">
 </head>
@@ -16,7 +16,7 @@
   <?php require_once __DIR__ . '/includes/header.php'; ?>
 
   <main class="container">
- 
+    <?php include __DIR__ . '/includes/tools.php'; ?>
   </main>
 
   <?php require_once __DIR__ . '/includes/footer.php'; ?>

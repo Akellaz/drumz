@@ -1,0 +1,19 @@
+{
+  "title": "Uchikubi_Gokumon_Doukoukai",
+  "category": ["четверти", "восьмые", "шестнадцатые"],
+  "difficulty": "5",
+  "description": "",
+  "tempo": 87,
+  "version": "1.0",
+  "created": "2025-12-30",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "I don' t wanna get out of futon",
+      "abc": "z16 | z16 | z16 | z16 | \n[F4a] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2]g2 [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2]g2 [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2]g2 [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | \n[F4a] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2]g2 [c2g2]g2 [Fa][Fa] Lc/2c/2c/2c/2 Lc/2c/2c/2c/2  [Fa][Fa] |  Lc/2c/2c/2c/2 Lc/2c/2c/2c/2 [Fa][Fa] Lc/2c/2c/2c/2 Lc/2c/2c/2c/2  [F3a] [F3a] |\n[F4a] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2]g2 [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2]g2 [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2]g2 [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | \n[F4a] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2]g2 [c2g2]g2 [Fa][Fa] Lc/2c/2c/2c/2 Lc/2c/2c/2c/2  [Fa][Fa] |  Lc/2c/2c/2c/2 Lc/2c/2c/2c/2 [Fa][Fa] Lc/2c/2c/2c/2 Lc/2c/2c/2c/2  [F3g] [F3g] |\nQ:1/4=174\n[F4a]g4g4g4 | Lcccc Lcccc Lcccc Lcccc |\n[F2a][c2g] gF[g2c] [F2g][c2g] gF[g2c] | [F2g][c2g] gF[g2c] [F2g][c2g] gF[g2c] | [F2g][c2g] gF[g2c] [F2g][c2g] gF[g2c] | [F2g][c2g] gF[g2c] [F2g][c2g] gF[g2c] | \n[F2a][c2g] gF[g2c] [F2g][c2g] gF[g2c] | [F2g][c2g] gF[g2c] [F2g][c2g] gF[g2c] | [F2g][c2g] gF[g2c] [F2g][c2g] gF[g2c] | [F2g]cc [Fc]ccc [Fc]ccc [Fc]ccc | \n[F2a2]g2 [F2c2]g2 [F2]g2 [F2c2]g2 | [F2]g2 [F2c2]g2 [F2]g2 [F2c2]g2 | [F2a2]g2 [F2c2]g2 [F2]g2 [F2c2]g2 | [F2]g2 [F2c2]g2 [F2]g2 [F2c2]g2 | \n[F2a2]g2 [F2c2]g2 [F2]g2 [F2c2]g2 | [F2]g2 [F2c2]g2 [F2]g2 [F2c2]g2 | [F2a2]g2 [F2c2]g2 [F2]g2 [F2c2]g2 | [F2]g2 [F2c2]g2 [F2]g2 [F2c2]g2 | \n[F4a] [Fg]ggg [Fg]ggg [Fg]ggg | [F4a] z4 D4 D4 | \n[F4g] "
+    }
+  ],
+  "audio": {
+    "plus": "Uchikubi_Gokumon_Doukoukai_plus.mp3"
+  }
+}

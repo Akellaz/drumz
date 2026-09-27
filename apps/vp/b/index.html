@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сет-лист: Ведьмин Пунш</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/abcjs/6.5.2/abcjs-basic-min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: #1a1a1a;
+      color: #fff;
+      padding: 16px;
+    }
+
+    .app-container {
+      display: grid;
+      grid-template-columns: 1fr 450px;
+      gap: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 16px 0 24px;
+      font-size: 24px;
+      color: #666;
+      grid-column: 1 / -1;
+    }
+
+    .song {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .song-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .song-title {
+      font-size: 18px;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .song-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 14px;
+      color: #aaa;
+      min-width: max-content;
+      align-items: center;
+    }
+
+    .toggle-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      transition: transform 0.3s;
+    }
+
+    .toggle-icon.open {
+      transform: rotate(90deg);
+      color: #fff;
+    }
+
+    .song-details {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #3a3a3a;
+    }
+
+    .song-details.open {
+      display: block;
+    }
+
+    .structure {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -2px -8px 0;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+
+    .structure-block {
+      flex: 0 0 auto;
+      margin: 0 2px 8px 0;
+      height: 52px;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      padding: 4px 2px;
+      border: 2px solid transparent;
+    }
+
+    .structure-block:hover {
+      opacity: 0.8;
+      transform: translateY(-2px);
+    }
+
+    .structure-block.active {
+      border-color: #fff;
+      transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+      z-index: 10;
+    }
+
+    .block-label { line-height: 1.2; }
+    .block-bars {
+      font-size: 9px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.85);
+      margin-top: 2px;
+      opacity: 0.9;
+    }
+
+    .intro      { background: #FF6B6B; color: #fff; }
+    .verse      { background: #4ECDC4; color: #1a1a1a; }
+    .chorus     { background: #45B7D1; color: #fff; }
+    .bridge     { background: #FFA500; color: #fff; }
+    .solo       { background: #FFD700; color: #1a1a1a; }
+    .outro      { background: #888; color: #fff; }
+    .prechorus  { background: #98D8C8; color: #1a1a1a; }
+    .mod        { background: #FF6B6B; color: #fff; }
+
+    .player {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .order-number {
+      color: #FF6B6B;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    .abc-panel {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .abc-panel.visible {
+      display: flex;
+    }
+
+    .abc-header {
+      border-bottom: 1px solid #3a3a3a;
+      padding-bottom: 12px;
+      margin-bottom: 8px;
+    }
+
+    .abc-song-title {
+      font-size: 16px;
+      color: #FF6B6B;
+      font-weight: 600;
+    }
+
+    .abc-block-info {
+      font-size: 14px;
+      color: #aaa;
+      margin-top: 4px;
+    }
+
+    #paper {
+      background: #2a2a2a;
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: auto;
+      color: #ffffff;
+    }
+
+    #paper svg {
+      background: transparent !important;
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      display: block;
+    }
+
+    #paper svg [stroke="black"],
+    #paper svg [stroke="#000000"] {
+      stroke: #ffffff !important;
+    }
+
+    #paper svg [fill="black"],
+    #paper svg [fill="#000000"] {
+      fill: #ffffff !important;
+    }
+
+    .close-abc {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .close-abc:hover { color: #fff; }
+
+    /* Индикатор автосинка */
+    .autosync-indicator {
+      position: absolute;
+      top: 12px;
+      right: 50px;
+      font-size: 11px;
+      color: #4ECDC4;
+      display: none;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .autosync-indicator.active {
+      display: flex;
+    }
+
+    .autosync-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4ECDC4;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    @media (max-width: 900px) {
+      .app-container {
+        grid-template-columns: 1fr;
+      }
+      .abc-panel {
+        position: static;
+        margin-top: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .structure-block {
+        height: 46px;
+        font-size: 9px;
+        padding: 3px 2px;
+      }
+      .block-bars { font-size: 8px; margin-top: 1px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <h1>Ведьмин Пунш</h1>
+
+    <div id="songs-list"></div>
+
+    <div class="abc-panel" id="abc-panel">
+      <span class="autosync-indicator" id="autosync-indicator">
+        <span class="autosync-dot"></span>
+        АВТО
+      </span>
+      <button class="close-abc" onclick="closeAbcPanel()">✕</button>
+      <div class="abc-header">
+        <div class="abc-song-title" id="abc-song-title">Выберите блок</div>
+        <div class="abc-block-info" id="abc-block-info">Нажмите на часть песни для просмотра нотации</div>
+      </div>
+      <div id="paper"></div>
+    </div>
+  </div>
+
+  <script>
+    // === ОБЩИЙ ЗАГОЛОВОК ДЛЯ УДАРНЫХ ===
+    const DRUM_HEADER =
+      "X:1\n" +
+      "L:1/4\n" +
+      "M:4/4\n" +
+      "K:C clef=perc\n" +
+      "%%percmap c acoustic-snare\n" +
+      "%%percmap F acoustic-bass-drum\n" +
+      "%%percmap g closed-hi-hat x\n";
+
+    // === ДАННЫЕ СЕТ-ЛИСТА ===
+    const songs = [
+      {
+        order: 1,
+        title: "Свитпунш",
+        bpm: 120,
+        audio: "audio/01_Svitpunsh.mp3",
+        structure: [
+          { type: "intro", time: 0, label: "Intro", bars: 8, break: true, abc: "z2 g2 z2 g2 | F2 g2 c2 g2 | z2 g2 z2 g2 | F2 g2 c2 g2\nz2 g2 z2 g2 | F2 g2 c2 g2 | z2 g2 z2 g2 | F2 g2 c2 g2" },
+          { type: "bridge", time: 16, label: "🎵", bars: 8, abc: "F2 g2 c2 g2 | F2 g2 c2 g2 | F2 g2 c2 g2 | F2 g2 c2 g2\nF2 g2 c2 g2 | F2 g2 c2 g2 | F2 g2 c2 g2 | F2 g2 c2 g2" },
+          { type: "prechorus", time: 32, label: "Pre", bars: 2 },
+          { type: "verse", time: 36, label: "Ver", bars: 10 },
+          { type: "chorus", time: 56, label: "Chor", bars: 8, break: true },
+          { type: "bridge", time: 72, label: "🎵", bars: 8 },
+          { type: "prechorus", time: 87, label: "Pre", bars: 2 },
+          { type: "verse", time: 92, label: "Ver", bars: 10 },
+          { type: "chorus", time: 112, label: "Chor", bars: 8, break: true },
+          { type: "bridge", time: 128, label: "🎵", bars: 8 },
+          { type: "prechorus", time: 144, label: "Pre", bars: 2 },
+          { type: "verse", time: 148, label: "Ver", bars: 6 },
+          { type: "prechorus", time: 160, label: "Pre", bars: 2 },
+          { type: "outro", time: 164, label: "Out", bars: 2 }
+        ]
+      },
+      {
+        order: 2,
+        title: "Таверна",
+        bpm: 115,
+        audio: "audio/02_Taverna.mp3",
+        structure: [
+          { type: "intro", time: 28, label: "Intro", bars: 8, break: true, abc: "F2 g2 c2 g2 | F2 g2 c2 g2 | F2 g2 c2 g2 | F2 g2 c2 g2\nF2 g2 c2 g2 | F2 g2 c2 g2 | F2 g2 c2 g2 | F2 g2 c2 g2" },
+          { type: "bridge", time: 47, label: "🎵", bars: 8 },
+          { type: "verse", time: 64, label: "Ver", bars: 8 },
+          { type: "prechorus", time: 80, label: "Pre", bars: 2 },
+          { type: "chorus", time: 85, label: "Chor", bars: 8, break: true },
+          { type: "bridge", time: 101, label: "🎵", bars: 8 },
+          { type: "verse", time: 118, label: "Ver", bars: 8 },
+          { type: "prechorus", time: 134, label: "Pre", bars: 2 },
+          { type: "chorus", time: 139, label: "Chor", bars: 8, break: true },
+          { type: "bridge", time: 156, label: "🎵", bars: 8 },
+          { type: "chorus", time: 172, label: "Chor", bars: 8 }
+        ]
+      },
+      {
+        order: 3,
+        title: "Оборотень",
+        bpm: 120,
+        audio: "audio/03_Oboroten.mp3",
+        structure: [
+          { type: "intro", time: 0, label: "Intro", bars: 8, break: true },
+          { type: "verse", time: 36, label: "Ver", bars: 8 },
+          { type: "prechorus", time: 52, label: "Pre", bars: 2 },
+          { type: "chorus", time: 55, label: "Chor", bars: 8, break: true },
+          { type: "prechorus", time: 71, label: "Pre", bars: 4 },
+          { type: "bridge", time: 79, label: "🎵", bars: 8 },
+          { type: "prechorus", time: 95, label: "Pre", bars: 2 },
+          { type: "chorus", time: 99, label: "Chor", bars: 8, break: true },
+          { type: "bridge", time: 115, label: "🎵", bars: 8 },
+          { type: "bridge", time: 131, label: "🎵", bars: 8 },
+          { type: "prechorus", time: 147, label: "Pre", bars: 2 },
+          { type: "chorus", time: 151, label: "Chor", bars: 8, break: true },
+          { type: "prechorus", time: 167, label: "Pre", bars: 8 }
+        ]
+      },
+      {
+        order: 4,
+        title: "Дракон и ведьма",
+        bpm: 110,
+        audio: "audio/04_Drakon_i_Vedma.mp3",
+        structure: [
+          { type: "intro", time: 0, label: "In", bars: 2 },
+          { type: "intro", time: 5, label: "Intro", bars: 8, break: true },
+          { type: "verse", time: 22, label: "Ver", bars: 8 },
+          { type: "verse", time: 39, label: "Ver", bars: 9 },
+          { type: "bridge", time: 59, label: "🎵", bars: 8, break: true },
+          { type: "verse", time: 76, label: "Ver", bars: 8 },
+          { type: "verse", time: 93, label: "Ver", bars: 9 },
+          { type: "bridge", time: 114, label: "🎵", bars: 8, break: true },
+          { type: "verse", time: 131, label: "Ver*", bars: 8 },
+          { type: "verse", time: 148, label: "Ver", bars: 9 },
+          { type: "bridge", time: 168, label: "🎵", bars: 8 },
+          { type: "bridge", time: 185, label: "🎵", bars: 8, break: true },
+          { type: "outro", time: 205, label: "Out", bars: 4 }
+        ]
+      },
+      {
+        order: 5,
+        title: "Хаос (70)",
+        bpm: 210,
+        audio: "audio/05_Khaos_i_Besovschina.mp3",
+        structure: [
+          { type: "intro", time: 0, label: "Intro", bars: 8, break: true },
+          { type: "verse", time: 20, label: "Ver", bars: 8 },
+          { type: "prechorus", time: 47, label: "Pre", bars: 1 },
+          { type: "chorus", time: 51, label: "Chor", bars: 8 },
+          { type: "bridge", time: 78, label: "🎵", bars: 4, break: true },
+          { type: "verse", time: 89, label: "Ver", bars: 8 },
+          { type: "prechorus", time: 116, label: "Pre", bars: 1 },
+          { type: "chorus", time: 119, label: "Chor", bars: 8 },
+          { type: "bridge", time: 147, label: "🎵", bars: 4, break: true },
+          { type: "verse", time: 161, label: "Ver", bars: 8 },
+          { type: "prechorus", time: 188, label: "Pre", bars: 1 },
+          { type: "chorus", time: 191, label: "Chor", bars: 8 },
+          { type: "outro", time: 218, label: "Out", bars: 2 }
+        ]
+      },
+      {
+        order: 6,
+        title: "Ведьмы в баре",
+        bpm: 110,
+        audio: "audio/06_Vedmy_v_bare.mp3",
+        structure: [
+          { type: "intro", time: 0, label: "Intro", bars: 8, break: true },
+          { type: "verse", time: 17, label: "Ver", bars: 8 },
+          { type: "prechorus", time: 34, label: "Pre", bars: 4 },
+          { type: "chorus", time: 43, label: "Chor", bars: 4 },
+          { type: "bridge", time: 52, label: "🎵", bars: 8, break: true },
+          { type: "verse", time: 70, label: "Ver", bars: 8 },
+          { type: "prechorus", time: 87, label: "Pre", bars: 4 },
+          { type: "chorus", time: 96, label: "Chor", bars: 4 },
+          { type: "bridge", time: 104, label: "🎵", bars: 8, break: true },
+          { type: "verse", time: 122, label: "Ver", bars: 8 },
+          { type: "prechorus", time: 139, label: "Pre", bars: 4 },
+          { type: "chorus", time: 148, label: "Chor", bars: 4 },
+          { type: "bridge", time: 157, label: "🎵", bars: 4 },
+          { type: "bridge", time: 165, label: "🎵", bars: 8 },
+          { type: "bridge", time: 183, label: "🎵*", bars: 4, break: true },
+          { type: "outro", time: 192, label: "Out", bars: 4 }
+        ]
+      },
+      {
+        order: 7,
+        title: "Дорога из светлячков",
+        bpm: 90,
+        audio: "audio/07_Doroga_iz_svetlyachkov.mp3",
+        structure: [
+          { type: "intro", time: 0, label: "Intro", bars: 4 },
+          { type: "prechorus", time: 0, label: "Pre", bars: 2, break: true },
+          { type: "verse", time: 17, label: "Ver", bars: 8 },
+          { type: "bridge", time: 34, label: "🎵", bars: 12 },
+          { type: "chorus", time: 43, label: "Chor", bars: 4 },
+          { type: "bridge", time: 52, label: "🎵", bars: 8, break: true },
+          { type: "verse", time: 70, label: "Ver", bars: 8 },
+          { type: "prechorus", time: 87, label: "Pre", bars: 4 },
+          { type: "chorus", time: 96, label: "Chor", bars: 4 },
+          { type: "bridge", time: 104, label: "🎵", bars: 8, break: true },
+          { type: "verse", time: 122, label: "Ver", bars: 8 },
+          { type: "prechorus", time: 139, label: "Pre", bars: 4 },
+          { type: "chorus", time: 148, label: "Chor", bars: 4 },
+          { type: "bridge", time: 157, label: "🎵", bars: 4 },
+          { type: "bridge", time: 165, label: "🎵", bars: 8 },
+          { type: "bridge", time: 183, label: "🎵*", bars: 4, break: true },
+          { type: "outro", time: 192, label: "Out", bars: 4 }
+        ]
+      },
+      {
+        order: 8,
+        title: "Принцессе по дракону",
+        bpm: 105,
+        audio: "audio/08_Princesse_po_drakonu.mp3",
+        structure: [
+          { type: "intro", time: 0, label: "Intro", bars: 4, break: true },
+          { type: "verse", time: 8, label: "Ver", bars: 8 },
+          { type: "verse", time: 27, label: "Ver", bars: 8 },
+          { type: "chorus", time: 45, label: "Chor", bars: 4 },
+          { type: "bridge", time: 54, label: "🎵", bars: 4, break: true },
+          { type: "verse", time: 63, label: "Ver", bars: 8 },
+          { type: "verse", time: 82, label: "Ver", bars: 8 },
+          { type: "chorus", time: 100, label: "Chor", bars: 4 },
+          { type: "bridge", time: 109, label: "🎵", bars: 4 },
+          { type: "prechorus", time: 118, label: "Pre", bars: 2, break: true },
+          { type: "verse", time: 122, label: "Ver", bars: 8 },
+          { type: "verse", time: 141, label: "Ver", bars: 8 },
+          { type: "chorus", time: 159, label: "Chor", bars: 4 },
+          { type: "bridge", time: 168, label: "🎵", bars: 4 },
+          { type: "outro", time: 178, label: "Out", bars: 8 }
+        ]
+      },
+      {
+        order: 9,
+        title: "Чёртов эль",
+        bpm: 115,
+        audio: "audio/09_Chortov_El.mp3",
+        structure: [
+          { type: "intro", time: 15, label: "Intro", bars: 4 },
+          { type: "intro", time: 24, label: "Intro", bars: 4, break: true },
+          { type: "verse", time: 33, label: "Ver", bars: 8 },
+          { type: "chorus", time: 49, label: "Chor", bars: 4 },
+          { type: "bridge", time: 57, label: "🎵", bars: 4, break: true },
+          { type: "verse", time: 65, label: "Ver", bars: 8 },
+          { type: "chorus", time: 82, label: "Chor", bars: 4 },
+          { type: "prechorus", time: 90, label: "Pre", bars: 2 },
+          { type: "bridge", time: 95, label: "🎵", bars: 8 },
+          { type: "bridge", time: 111, label: "🎵", bars: 8, break: true },
+          { type: "verse", time: 128, label: "Ver+stop", bars: 9 },
+          { type: "chorus", time: 147, label: "Chor", bars: 4 },
+          { type: "bridge", time: 156, label: "🎵", bars: 8 },
+          { type: "chorus", time: 173, label: "Chor", bars: 4 },
+          { type: "chorus", time: 181, label: "Chor", bars: 4 }
+        ]
+      }
+    ];
+
+    // === СОСТОЯНИЕ ПРИЛОЖЕНИЯ ===
+    // Хранит текущий отслеживаемый блок, чтобы не рендерить повторно
+    let currentBlockKey = null;
+    let lastManualBlockKey = null; // Блок, выбранный вручную (для приоритета ручного клика)
+    let userJustClicked = false; // Флаг: только что был клик — пропустить обновление автосинка
+
+    // === РЕНДЕРИНГ СПИСКА ПЕСЕН ===
+    const songsList = document.getElementById('songs-list');
+
+    songs.forEach((song, index) => {
+      const songEl = document.createElement('div');
+      songEl.className = 'song';
+      songEl.innerHTML = `
+        <div class="song-header" onclick="toggleSong(${index})">
+          <div class="song-title">
+            <span class="order-number">${song.order}.</span>${song.title}
+          </div>
+          <div class="song-meta">
+            <div class="song-bpm">${song.bpm} BPM</div>
+            <div class="toggle-icon" id="icon-${index}">▶</div>
+          </div>
+        </div>
+        <div class="song-details" id="details-${index}">
+          <div class="structure" id="structure-${index}"></div>
+          <audio class="player" controls src="${song.audio}" id="player-${index}"></audio>
+        </div>
+      `;
+      songsList.appendChild(songEl);
+
+      const structureEl = document.getElementById(`structure-${index}`);
+      const totalBars = song.structure.reduce((sum, b) => sum + (b.bars || 4), 0);
+
+      song.structure.forEach((block, blockIndex) => {
+        const blockEl = document.createElement('div');
+        blockEl.className = `structure-block ${block.type}`;
+        blockEl.dataset.songIndex = index;
+        blockEl.dataset.blockIndex = blockIndex;
+
+        // Клик — ручной выбор блока
+        blockEl.onclick = () => {
+          userJustClicked = true;
+          lastManualBlockKey = `${index}-${blockIndex}`;
+          currentBlockKey = lastManualBlockKey;
+          seekTo(index, block.time);
+          showAbcForBlock(song, block, blockEl, false); // isAuto = false
+        };
+
+        const bars = Math.min(block.bars || 4, 32);
+        const widthPercent = (bars / totalBars) * 100;
+        blockEl.style.width = `calc(${widthPercent}% - 1px)`;
+
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'block-label';
+        labelSpan.textContent = block.label;
+
+        const barsSpan = document.createElement('span');
+        barsSpan.className = 'block-bars';
+        barsSpan.textContent = bars;
+
+        blockEl.appendChild(labelSpan);
+        blockEl.appendChild(barsSpan);
+        structureEl.appendChild(blockEl);
+
+        if (block.break) {
+          const spacer = document.createElement('div');
+          spacer.style.flexBasis = '100%';
+          spacer.style.height = '0';
+          spacer.style.margin = '0';
+          spacer.style.padding = '0';
+          structureEl.appendChild(spacer);
+        }
+      });
+    });
+
+    // === НАВИГАЦИЯ ПО ПЕСНЯМ ===
+    window.toggleSong = function(index) {
+      const details = document.getElementById(`details-${index}`);
+      const icon = document.getElementById(`icon-${index}`);
+
+      if (details.classList.contains('open')) {
+        details.classList.remove('open');
+        icon.classList.remove('open');
+      } else {
+        document.querySelectorAll('.song-details').forEach(el => el.classList.remove('open'));
+        document.querySelectorAll('.toggle-icon').forEach(el => el.classList.remove('open'));
+        details.classList.add('open');
+        icon.classList.add('open');
+      }
+    };
+
+    window.seekTo = function(songIndex, time) {
+      document.querySelectorAll('.player').forEach((p, i) => {
+        if (i !== songIndex) p.pause();
+      });
+      const player = document.getElementById(`player-${songIndex}`);
+      if (player) {
+        player.currentTime = time;
+        if (player.paused) player.play();
+      }
+    };
+
+    window.closeAbcPanel = function() {
+      document.getElementById('abc-panel').classList.remove('visible');
+      document.querySelectorAll('.structure-block').forEach(el => el.classList.remove('active'));
+      currentBlockKey = null;
+      document.getElementById('autosync-indicator').classList.remove('active');
+    };
+
+    // === ПОКАЗ ABC НОТАЦИИ ===
+    // isAuto: true если вызов произошёл от автосинка при проигрывании
+    function showAbcForBlock(song, block, blockElement, isAuto) {
+      // Снимаем подсветку со всех блоков
+      document.querySelectorAll('.structure-block').forEach(el => el.classList.remove('active'));
+      blockElement.classList.add('active');
+
+      const panel = document.getElementById('abc-panel');
+      panel.classList.add('visible');
+
+      document.getElementById('abc-song-title').textContent = song.title;
+      document.getElementById('abc-block-info').textContent = 
+        `${block.label} — ${block.bars} такт(ов) | ${song.bpm} BPM`;
+
+      // Индикатор автосинка
+      const indicator = document.getElementById('autosync-indicator');
+      if (isAuto) {
+        indicator.classList.add('active');
+      } else {
+        indicator.classList.remove('active');
+      }
+
+      const paperDiv = document.getElementById('paper');
+      paperDiv.innerHTML = '';
+
+      if (block.abc && block.abc.trim() !== '') {
+        try {
+          const fullAbcCode = DRUM_HEADER + block.abc;
+          ABCJS.renderAbc("paper", fullAbcCode, {
+            responsive: "resize",
+            scale: 1.0,
+            add_classes: false
+          });
+        } catch (e) {
+          paperDiv.innerHTML = '<p style="color:#fff; text-align:center; padding: 20px;">Ошибка синтаксиса ABC.</p>';
+          console.error("ABC Render Error:", e);
+        }
+      } else {
+        paperDiv.innerHTML = '<p style="color:#666; text-align:center; padding: 20px; font-style: italic;">Нотация для этого блока ещё не добавлена в код</p>';
+      }
+    }
+
+    // === АВТОСИНК: СЛЕДИМ ЗА ВОСПРОИЗВЕДЕНИЕМ ===
+    function setupAutoSync() {
+      document.querySelectorAll('.player').forEach((player, songIndex) => {
+        // Обработка timeupdate — главный цикл автосинка
+        player.addEventListener('timeupdate', function() {
+          const currentTime = player.currentTime;
+          const song = songs[songIndex];
+          const structure = song.structure;
+
+          // Находим текущий блок: последний, у которого time <= currentTime
+          let activeBlockIndex = -1;
+          for (let i = 0; i < structure.length; i++) {
+            if (structure[i].time <= currentTime) {
+              activeBlockIndex = i;
+            } else {
+              break; // время начинает превышать — дальше нет смысла искать
+            }
+          }
+
+          // Если трек только начался и currentTime < первого time
+          if (activeBlockIndex === -1 && structure.length > 0 && structure[0].time > currentTime) {
+            // Находим блок ДО первого time — обычно это intro
+            activeBlockIndex = 0;
+          }
+
+          if (activeBlockIndex === -1) return;
+
+          const blockKey = `${songIndex}-${activeBlockIndex}`;
+
+          // Пропускаем, если только что был ручной клик пользователя
+          if (userJustClicked) {
+            userJustClicked = false;
+            return;
+          }
+
+          // Если блок тот же — ничего не делаем (не перерисовываем)
+          if (currentBlockKey === blockKey) return;
+
+          // Блок изменился — обновляем
+          currentBlockKey = blockKey;
+          const block = structure[activeBlockIndex];
+          const structureEl = document.getElementById(`structure-${songIndex}`);
+          
+          // Ищем DOM-элемент блока по data-атрибутам
+          const blockEl = structureEl.querySelector(
+            `.structure-block[data-song-index="${songIndex}"][data-block-index="${activeBlockIndex}"]`
+          );
+
+          if (blockEl) {
+            showAbcForBlock(song, block, blockEl, true);
+          }
+        });
+
+        // Когда трек останавливается — убираем индикатор авто
+        player.addEventListener('pause', function() {
+          document.getElementById('autosync-indicator').classList.remove('active');
+        });
+
+        // При окончании трека
+        player.addEventListener('ended', function() {
+          document.getElementById('autosync-indicator').classList.remove('active');
+        });
+
+        // При старте — разрешаем автосинку подхватить текущий момент
+        player.addEventListener('play', function() {
+          // Принудительно сбрасываем currentBlockKey, чтобы автосинк сработал при первом timeupdate
+          const tempKey = currentBlockKey;
+          currentBlockKey = null;
+          // Триггерим timeupdate вручную для мгновенного отклика
+          player.dispatchEvent(new Event('timeupdate'));
+          // Восстанавливаем, если ничего не обновилось (на случай если тот же блок)
+          // (это уже не нужно, т.к. если блок тот же — он отрендерится снова, что нормально при play)
+        });
+      });
+    }
+
+    // Запускаем автосинк после построения DOM
+    setupAutoSync();
+  </script>
+</body>
+</html>

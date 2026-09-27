@@ -1,0 +1,21 @@
+{
+  "title": "Seven Nations Army",
+  "category": ["четверти", "восьмые", "синкопы"],
+  "difficulty": "3",
+  "description": "",
+  "tempo": 120,
+  "version": "1.0",
+  "created": "2025-12-04",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "z16 | z16 | z16 | z16 | \n|:[F4A] [F4A] [F4A] [F4A] |[F4A] [F4A] [F4A] [F4A] |[F4A] [F4A] [F4A] [F4A] |[F4A] [F4A] [F4A] [F4A] :|\n|:[F4A] [F4Ac] [F4A] [F4Ac] |[F4A] [F4Ac] [F4A] [F4Ac] |[F4A] [F4Ac] [F4A] [F4Ac] |[F4A] [F4Ac] [F4A] [F4Ac] :|\n[F4a] [c2A][c2A] [c2A][c2A] [c2A][c2A] | [F4a] [c2A][c2A] [c2A][c2A] [c2A][c2A]  | \n|:[F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] [c4g] | [F4g] [c4g] [F4g] z2c2 | [F4g] [c4g] [F4g] [c4g] :| \n[F4a] [c2A][c2A] [c2A][c2A] [c2A][c2A] | [F4a] [c2A][c2A] [c2A][c2A] [c2A][c2A] | [F4g] z4 z8 "
+    }
+  ],
+  "audio": {
+    "plus": "Seven_Nations_Army_plus.mp3",
+    "click": "Seven_Nations_Army_click.mp3",
+    "minus": "Seven_Nations_Army_minus.mp3"
+  }
+}

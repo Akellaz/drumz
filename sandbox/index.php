@@ -83,43 +83,65 @@ $description = 'Экспериментальные и разрабатываем
     <div class="dev-panel">
       <h2>🛠️ В разработке</h2>
       <ul class="dev-links">
-        <li>
-          <a href="/abc-editor/" target="_blank">ABC-редактор</a>
+	  
+	          <li>
+          <a href="/builder/" target="_blank">builder</a>
+          <span class="status experimental">🧪</span>
+        </li>
+	  
+		
+	  	 <li>
+          <a href="/apps/lab/" target="_blank">Синхронизация</a>
+          <span class="status experimental">🧪</span>
+        </li>
+		
+	  	 <li>
+          <a href="/apps/pro/" target="_blank">Pro</a>
+          <span class="status in-progress">🚧</span>
+        </li>
+		
+	  	   <li>
+          <a href="/apps/puzzle/" target="_blank">Puzzle</a>
           <span class="status ready">✅</span>
         </li>
+
+	   <li>
+          <a href="/GrooveScribe/" target="_blank">GrooveScribe</a>
+          <span class="status ready">✅</span>
+        </li>
+
+		
+	  <li>
+          <a href="/apps/cosmo/" target="_blank">Cosmo</a>
+          <span class="status ready">✅</span>
+        </li>		
+		
+	  
+	  	<li>
+          <a href="/apps/whitney/" target="_blank">Whitney Houston Drum Challenge</a>
+          <span class="status in-progress">🚧</span>
+        </li>
+	  	<li>
+          <a href="/apps/seq16/" target="_blank">Простой секвенсор</a>
+          <span class="status in-progress">🚧</span>
+        </li>
+		
+	  
         <li>
-          <a href="/hang/" target="_blank">Ханг</a>
+          <a href="/apps/hang/" target="_blank">Ханг</a>
           <span class="status experimental">🧪</span>
         </li>
         <li>
-          <a href="/timpani/" target="_blank">Литавры</a>
+          <a href="/apps/timpani/" target="_blank">Литавры</a>
           <span class="status in-progress">🚧</span>
         </li>
 		        <li>
-          <a href="/glukofon/" target="_blank">Глюкофон</a>
+          <a href="/apps/glukofon/" target="_blank">Глюкофон</a>
           <span class="status in-progress">🚧</span>
         </li>
 		
-		
-		
-		 <li>
-          <a href="/songs/Seven_nations_army/" target="_blank">Песни</a>
-          <span class="status in-progress">🚧</span>
-        </li>
-		<li>
-          <a href="/drum_book/" target="_blank">Книга барабанщика</a>
-          <span class="status in-progress">🚧</span>
-        </li>
-		<li>
-          <a href="/gen/" target="_blank">Секвенсор</a>
-          <span class="status in-progress">🚧</span>
-        </li>
 				<li>
-          <a href="/orden/" target="_blank">Система Орден</a>
-          <span class="status in-progress">🧪</span>
-        </li>
-				<li>
-          <a href="/art/" target="_blank">Статья</a>
+          <a href="/apps/art/" target="_blank">Статья</a>
           <span class="status in-progress">🚧</span>
         </li>
 						<li>
@@ -135,6 +157,24 @@ $description = 'Экспериментальные и разрабатываем
            <a href="/tests/" target="_blank">Математика Ритма</a>
           <span class="status in-progress">🧪</span>
         </li>
+	  
+			  <li>
+          <a href="/apps/vp/" target="_blank">Сет-ВП</a>
+          <span class="status ready">✅</span>
+        </li>
+		
+					  <li>
+          <a href="/gen_rhythms/" target="_blank">Генератор ритмов</a>
+          <span class="status ready">✅</span>
+        </li>
+		
+		
+					  <li>
+          <a href="/apps/pattern/" target="_blank">Паттерны ритмических рисунков</a>
+          <span class="status ready">✅</span>
+        </li>
+		
+		
       </ul>
     </div>
 

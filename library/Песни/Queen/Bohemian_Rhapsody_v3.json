@@ -1,0 +1,19 @@
+{
+  "title": "Bohemian Rhapsody v.3",
+  "category": ["четверти", "восьмые", "синкопы"],
+  "difficulty": "4",
+  "description": "",
+  "tempo": 142,
+  "version": "1.0",
+  "created": "2025-12-22",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "[F4a] z4 z8 | z16 | Z2 | Z2 |\n[F4a] [d2A2][d2A2] [d4A2][d4A2]| [d4A2][d4A2][d4A2][d4A2]| [F4a] z4 z8 |z16 | \nz16 |  [M: 6/4]z16 | [M: 4/4] z16 | z16 | \n[F4a] [d2A2][d2A2] [d4A2][d4A2]| [d2A2][d2A2] [d4A2][d4A2][d4A2]| [F4a] [d2A2][d2A2][F4a] [d2A2][d2A2]| [d4A2][d4A2][F4a]z4 | \nZ2 | z4 z4 z4 [d4A4]| [d4A4] [d4A4] [F4a] z2 A2| e2e2d2d2 A4 z4| \nz4 z4 z4 A2d2|  e2e2d2d2 A4 z4| z4 A4 e4 A2d2| e2e2d2d2 A4 z4| \ne2e2d2d2 A4 z4| e2e2d2d2 A4 z4| z16 | [F4a] [F4a] [F4a] [F4a] | [F4a] [F4a] [F4a] z4 | \nz4 z4 z4 [A2d2][A2d2]| [A2d2][A2d2][A2d2][A2d2] [F4a] z4 | [F6a][A2d2] [A4d4][A4d4]| [A2d2][A2d2][A2d2][A2d2] [A4d4][A4d4]| \n[F4a] A2A2 A2A2A2A2| A2A2A2A2 A2A2A2A2| (3 A2z2A2 (3 A2z2A2 (3 A2z2A2 (3 A2z2AA| (3 A2A2A2 (3 A2A2A2 (3 A2A2A2 (3 e2F2z2|\n[F4a]  |  \n"
+    }
+  ],
+  "audio": {
+    "plus": "Bohemian_Rhapsody_v.3_plus.mp3"
+  }
+}

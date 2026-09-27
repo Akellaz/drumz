@@ -19,21 +19,21 @@
       display: flex;
       height: 100%;
     }
-	.back-to-site {
-	  display: block;
-	  padding: 6px 0;
-	  font-size: 11px;
-	  color: #6c757d;
-	  text-align: center;
-	  text-decoration: none;
-	  border-top: 1px solid #eee;
-	  margin: 8px 0 0 0; /* только небольшой отступ сверху */
-	  cursor: pointer;
-	}
-	.back-to-site:hover {
-	  color: #007bff;
-	  background: #f8f9fa;
-	}
+    .back-to-site {
+      display: block;
+      padding: 6px 0;
+      font-size: 11px;
+      color: #6c757d;
+      text-align: center;
+      text-decoration: none;
+      border-top: 1px solid #eee;
+      margin: 8px 0 0 0;
+      cursor: pointer;
+    }
+    .back-to-site:hover {
+      color: #007bff;
+      background: #f8f9fa;
+    }
     .sidebar {
       width: 280px;
       background: #fff;
@@ -132,6 +132,7 @@
       border-radius: 3px;
       background: #fafafa;
       font-size: 11px;
+      overflow-y: auto;
     }
     .fragment-item {
       padding: 2px 6px;
@@ -160,6 +161,12 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       font-size: 11px;
+    }
+    .fragment-time {
+      font-size: 9px;
+      color: #666;
+      margin-left: 4px;
+      flex-shrink: 0;
     }
     .fragment-edit {
       flex-shrink: 0;
@@ -203,6 +210,7 @@
       font-size: 12px;
       line-height: 1.3;
       margin-top: 6px;
+      min-height: 100px;
     }
     .group-selector {
       display: flex;
@@ -232,11 +240,59 @@
       margin-top: 6px;
       min-height: 24px;
     }
+    
+    .drum-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+      margin-bottom: 6px;
+      padding: 6px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      border: 1px solid #e9ecef;
+    }
+    .drum-btn {
+      flex: 1;
+      min-width: 55px;
+      padding: 4px 2px;
+      font-size: 11px;
+      border: 1px solid #ced4da;
+      background: #fff;
+      border-radius: 3px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+      line-height: 1.2;
+    }
+    .drum-btn:hover {
+      background: #e9ecef;
+      border-color: #adb5bd;
+    }
+    .drum-btn.active {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+      font-weight: 600;
+    }
+    /* Дополнительный голос в аккорде (мультивыбор) */
+    .drum-btn.active-multi {
+      background: #28a745;
+      color: white;
+      border-color: #28a745;
+      font-weight: 600;
+    }
+    .drum-hint {
+      font-size: 10px;
+      color: #888;
+      margin: -2px 0 6px;
+    }
+
     .dynamics-section {
       display: none;
       margin-top: 6px;
     }
-    .dynamics-toggle {
+    .dynamics-toggle, .abc-toggle {
       font-size: 11px;
       color: #666;
       cursor: pointer;
@@ -245,8 +301,9 @@
       display: flex;
       align-items: center;
       gap: 4px;
+      font-weight: 500;
     }
-    .dynamics-toggle:hover {
+    .dynamics-toggle:hover, .abc-toggle:hover {
       color: #007bff;
     }
     .editor-actions {
@@ -278,6 +335,17 @@
       color: #007bff;
       background: #f0f8ff;
     }
+    /* Стиль для кнопки очистки */
+    .editor-actions button.danger-btn {
+      color: #dc3545;
+      border-color: #f5c6cb;
+    }
+    .editor-actions button.danger-btn:hover {
+      background: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+
     .resizer {
       width: 4px;
       background: #ccc;
@@ -337,6 +405,15 @@
     .fragment-edit-input {
       width: 100%;
       font-size: 12px;
+      border: 1px solid #007bff;
+      border-radius: 2px;
+      padding: 2px 4px;
+      outline: none;
+      margin-right: 4px;
+    }
+    .fragment-time-input {
+      width: 50px;
+      font-size: 11px;
       border: 1px solid #007bff;
       border-radius: 2px;
       padding: 2px 4px;
@@ -405,7 +482,26 @@
         width: 250px;
       }
     }
-	
+	.note-btn img {
+	  display: block;
+	  margin: 0 auto;
+	  max-height: 20px;
+	  width: auto;
+	  object-fit: contain;
+	}
+	.note-btn {
+	  min-height: 28px;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  padding: 2px 4px;
+	}
+    
+    #abc-editor-container {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/dist/abcjs-basic.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -450,7 +546,25 @@
           <button type="button" class="group-btn" data-group="separator">Разделители</button>
         </div>
         <div id="active-note-buttons"></div>
-        <textarea id="abc" spellcheck="false">[F2g2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2 |</textarea>
+        
+        <div class="abc-toggle" id="toggle-abc-editor">▶ Показать редактор ABC</div>
+        
+        <div id="abc-editor-container">
+          <textarea id="abc" spellcheck="false">[F2g2]g2 [c2g2]g2 [F2g2]g2 [c2g2]g2 |</textarea>
+        </div>
+
+        <div class="drum-selector" id="drum-selector">
+          <button type="button" class="drum-btn" data-drum="F" data-key="1" title="Бочка (Alt+1; Alt+Shift+1 — добавить в аккорд)">Bass</button>
+          <button type="button" class="drum-btn" data-drum="c" data-key="2" title="Малый барабан (Alt+2; Alt+Shift+2 — добавить в аккорд)">Snare</button>
+          <button type="button" class="drum-btn" data-drum="g" data-key="3" title="Хай-хэт закрытый (Alt+3; Alt+Shift+3 — добавить в аккорд)">HH</button>
+          <button type="button" class="drum-btn" data-drum="^f" data-key="4" title="Райд (Alt+4; Alt+Shift+4 — добавить в аккорд)">Raid</button>
+          <button type="button" class="drum-btn" data-drum="a" data-key="5" title="Крэш (Alt+5; Alt+Shift+5 — добавить в аккорд)">Crash</button>
+          <button type="button" class="drum-btn" data-drum="d" data-key="6" title="Том 1 (Alt+6; Alt+Shift+6 — добавить в аккорд)">T1</button>
+          <button type="button" class="drum-btn" data-drum="e" data-key="7" title="Том 2 (Alt+7; Alt+Shift+7 — добавить в аккорд)">T2</button>
+          <button type="button" class="drum-btn" data-drum="A" data-key="8" title="Том 3 (Alt+8; Alt+Shift+8 — добавить в аккорд)">T3</button>
+        </div>
+
+
         <div class="dynamics-toggle" id="toggle-dynamics">▶ Динамика</div>
         <div class="dynamics-section" id="dynamics-panel">
           <div style="display: flex; flex-wrap: wrap; gap: 4px; width: 100%;">
@@ -471,11 +585,13 @@
           <button id="open-library" title="Открыть из библиотеки">📚</button>
           <button id="download-pdf" title="Скачать PDF">📄</button>
           <button id="start-collab" title="Совместное редактирование">👥</button>
+          <button id="open-help" title="Справка">📖</button>
+          <button id="clear-editor" class="danger-btn" title="Очистить текущий фрагмент">🗑️</button>
         </div>
         <div class="collab-indicator" id="collab-indicator"></div>
       </div>
       <input type="file" id="file-input" accept=".json" style="display: none;">
-	  <a href="https://drumz.ru/library/" class="back-to-site">← drumz.ru</a>
+      <a href="https://drumz.ru/library/" class="back-to-site">← drumz.ru</a>
     </div>
     <div class="resizer" id="resizer"></div>
     <div class="main">
@@ -490,7 +606,7 @@
   </div>
 
   <div id="library-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
-    <div style="background:white; width:90%; max-width:600px; height:80%; max-height:600px; border-radius:8px; display:flex; flex-direction:column; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+    <div style="background:white; width:90%; max-width:600px; height:80%; max-height:600px; border-radius:8px; display:flex; flex-direction:column; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
       <div style="padding:12px 16px; background:#f8f9fa; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
         <strong>📚 Библиотека упражнений</strong>
         <button id="close-library-modal" style="background:none; border:none; font-size:18px; cursor:pointer;">×</button>
@@ -499,8 +615,68 @@
     </div>
   </div>
 
+  <div id="help-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1001; justify-content:center; align-items:center;">
+    <div style="background:white; width:90%; max-width:500px; max-height:80vh; border-radius:8px; display:flex; flex-direction:column; box-shadow: 0 4px 20px rgba(0,0,0,0.2); overflow:hidden;">
+      <div style="padding:12px 16px; background:#f8f9fa; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+        <strong>📖 Справка: карта ударных (%%percmap)</strong>
+        <button id="close-help-modal" style="background:none; border:none; font-size:18px; cursor:pointer;">×</button>
+      </div>
+      <div style="padding:16px; overflow:auto; font-size:13px; line-height:1.5;">
+        <p>В нотной строке используются следующие символы:</p>
+        <table style="width:100%; border-collapse:collapse; font-size:13px; line-height:1.4;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:6px 4px; border-bottom:2px solid #ddd;">Символ</th>
+              <th style="text-align:left; padding:6px 4px; border-bottom:2px solid #ddd;">Инструмент</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">D</td><td>Педальный хай-хэт (pedal-hi-hat)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">E</td><td>Бочка (bass-drum-1)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">F</td><td>Акустическая бочка (acoustic-bass-drum)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">G</td><td>Низкий напольный том (low-floor-tom)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">A</td><td>Высокий напольный том (high-floor-tom)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">B</td><td>Низкий том (low-tom)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">^B</td><td>Бубен / треугольник (tambourine / triangle)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">c</td><td>Акустический малый барабан (acoustic-snare)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">_c</td><td>Электронный малый (electric-snare)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">^c</td><td>Низкий деревянный блок / треугольник</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">=c</td><td>Side stick (палочка по ободу)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">d</td><td>Низко-средний том (low-mid-tom)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">^d</td><td>Высокий деревянный блок / треугольник</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">e</td><td>Высоко-средний том (hi-mid-tom)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">^e</td><td>Каубелл / треугольник (cowbell)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">f</td><td>Высокий том (high-tom)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">^f</td><td>Райд-тарелка (ride-cymbal-1)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">g</td><td>Закрытый хай-хэт (closed-hi-hat)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">^g</td><td>Открытый хай-хэт (open-hi-hat)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">a</td><td>Крэш-тарелка (crash-cymbal-1)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">^a</td><td>Открытый треугольник (open-triangle)</td></tr>
+          </tbody>
+        </table>
+
+        <p style="margin-top:16px; margin-bottom:8px;"><strong>Специальные конструкции и обозначения:</strong></p>
+        <table style="width:100%; border-collapse:collapse; font-size:13px; line-height:1.4;">
+          <tbody>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">F2>F2</td><td>Глиссандо/сдвиг (например, 8.16)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">!//!</td><td>Дробь</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">V: 3 stafflines=1 staffscale=1.4</td><td>Настройка нотоносца: 1 линия, масштаб 1.4</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">{/c}c2</td><td>Форшлаг на малый барабан</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">!open!g2</td><td>Открытый хай-хэт</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">[M: 3/4]</td><td>Метр (размер такта)</td></tr>
+            <tr><td style="font-family:monospace; padding:4px; border-bottom:1px solid #eee;">Z4</td><td>Пауза на 4 доли (можно указать иное количество)</td></tr>
+          </tbody>
+        </table>
+
+        <p style="margin-top:12px; font-size:12px; color:#666;">
+          Символы чувствительны к регистру и могут включать модификаторы: <code>^</code> (повышение), <code>_</code> (понижение), <code>=</code> (альтерация).<br>
+          Например: <code>^c</code> ≠ <code>c</code> ≠ <code>_c</code>.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // === ФУНКЦИЯ ТИХОГО УВЕДОМЛЕНИЯ ===
     function showMessage(text, isError = false) {
       let el = document.getElementById('floating-message');
       if (!el) {
@@ -518,7 +694,6 @@
       }, 3000);
     }
 
-    // === ВСТАВКА ТЕКСТА В ПОЗИЦИЮ КУРСОРА ===
     function insertAtCursor(textarea, text) {
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
@@ -530,7 +705,6 @@
       textarea.focus();
     }
 
-    // === RESIZER ===
     const resizer = document.getElementById("resizer");
     const sidebar = document.querySelector(".sidebar");
     resizer.addEventListener("mousedown", (e) => {
@@ -550,16 +724,54 @@
       document.removeEventListener("mouseup", stopResize);
     }
 
-    // === ГРУППЫ НОТ ===
     const noteGroups = {
-      basic: [{ note: "c4", label: "c4", title: "Четверть" }, { note: "c2", label: "с2", title: "Восьмая" }, { note: "c2c2", label: "c2c2", title: "Восьмушки" }, { note: "cccc", label: "cccc", title: "Шестнадцатые" }, { note: "c16 |", label: "c16", title: "Целая" }, { note: "c8", label: "c8", title: "Половинная" }],
-      pauses: [{ note: "z16 |", label: "z16", title: "Целая пауза" }, { note: "z8", label: "z8", title: "Половинная пауза" }, { note: "z4", label: "z4", title: "Четвертная пауза" }, { note: "z2", label: "z2", title: "Восьмая пауза" }],
-      syncop: [{ note: "c6", label: "c6", title: "Четверть с точкой" }, { note: "c3c", label: "c3c", title: "Восьмая с точкой + шестнадцатая" }, { note: "cc2c", label: "cc2c", title: "Шестнадцатая + восьмая + шестнадцатая" }, { note: "z2c2", label: "z2c2", title: "Восьмая пауза+нота" }],
-      triplets: [{ note: "(3c2c2c2", label: "(3c2c2c2", title: "Восьмая триоль" }, { note: "(3c2z2c2", label: "(3c2z2c2", title: "Триоль пауза триоль" }, { note: "(3z2c2z2", label: "(3z2c2z2", title: "Пауза триоль пауза" }, { note: "(3c4c4c4", label: "(3c4c4c4", title: "Четвертная триоль" }],
-      sextuplets: [{ note: "(3ccc(3ccc", label: "(3ccc(3ccc", title: "Секстоль" }, { note: "c2(3ccc", label: "c2(3ccc", title: "Восьмая + секстоль" }, { note: "(3cccc2", label: "(3cccc2", title: "Секстоль + восьмая" }],
-      sixteens: [{ note: "c2cc", label: "c2cc", title: "Галоп" }, { note: "ccc2", label: "ccc2", title: "Обратный галоп" }, { note: "zccc", label: "zccc", title: "1/16 пауза+шестнадцатые" }, { note: "z2cc", label: "z2cc", title: "Восьмая пауза+шестнадцатые" }],
-      complex: [{ note: "[F4g]", label: "[F4g]", title: "Бочка+хэт четверть" }, { note: "[c4g]", label: "[c4g]", title: "Малый+хэт четверть" }, { note: "[F2g2]g2", label: "[F2g2]g2", title: "[Бочка хэт]+хэт восьмые" }, { note: "[c2g2]g2", label: "[c2g2]g2", title: "[Малый хэт]+хэт восьмые" }, { note: "g2[F2g2]", label: "g2[F2g2]", title: "Хэт+[бочка хэт] восьмые" }],
-      separator: [{ note: "|", label: "|", title: "Тактовая черта" }]
+      basic: [
+        { note: "N16 |", label: "N16", title: "Целая", image: "pic/c16.png" },
+        { note: "N8", label: "N8", title: "Половинная", image: "pic/c8.png" },
+        { note: "N4", label: "N4", title: "Четверть", image: "pic/4n.png" },
+        { note: "N2N2", label: "N2N2", title: "Восьмушки", image: "pic/8n.png" },
+        { note: "NNNN", label: "NNNN", title: "Шестнадцатые", image: "pic/16n.png" },
+        { note: "N2", label: "N2", title: "Восьмая", image: "pic/c2n.png" } 
+      ],
+      pauses: [
+        { note: "z16 |", label: "z16", title: "Целая пауза", image: "pic/z16.png" },
+        { note: "z8", label: "z8", title: "Половинная пауза" , image: "pic/z8.png"},
+        { note: "z4", label: "z4", title: "Четвертная пауза", image: "pic/z4.png" },
+        { note: "z2", label: "z2", title: "Восьмая пауза", image: "pic/z2.png" },
+        { note: "z", label: "z", title: "Шестнадцатая пауза", image: "pic/z.png" }
+      ],
+      syncop: [
+        { note: "N6", label: "N6", title: "Четверть с точкой", image: "pic/c6.png" },
+        { note: "N3N", label: "N3N", title: "Восьмая с точкой + шестнадцатая", image: "pic/c3cn.png" },
+        { note: "NN2N", label: "NN2N", title: "Шестнадцатая + восьмая + шестнадцатая", image: "pic/cc2c.png" },
+        { note: "z2N2", label: "z2N2", title: "Восьмая пауза+нота", image: "pic/z2c2.png" }
+      ],
+      triplets: [
+        { note: "(3N2N2N2", label: "(3N2N2N2", title: "Восьмая триоль" },
+        { note: "(3N2z2N2", label: "(3N2z2N2", title: "Триоль пауза триоль" },
+        { note: "(3z2N2z2", label: "(3z2N2z2", title: "Пауза триоль пауза" },
+        { note: "(3N4N4N4", label: "(3N4N4N4", title: "Четвертная триоль" }
+      ],
+      sextuplets: [
+        { note: "(3NNN(3NNN", label: "(3NNN(3NNN", title: "Секстоль" },
+        { note: "N2(3NNN", label: "N2(3NNN", title: "Восьмая + секстоль" },
+        { note: "(3NNNN2", label: "(3NNNN2", title: "Секстоль + восьмая" }
+      ],
+      sixteens: [
+        { note: "N2NN", label: "N2NN", title: "Галоп", image: "pic/c2cc.png" },
+        { note: "NNN2", label: "NNN2", title: "Обратный галоп", image: "pic/ccc2.png" },
+        { note: "zNNN", label: "zNNN", title: "1/16 пауза+шестнадцатые", image: "pic/zccc.png" },
+        { note: "z2NN", label: "z2NN", title: "Восьмая пауза+шестнадцатые", image: "pic/z2cc.png" }
+      ],
+      complex: [
+        { note: "[N4g]", label: "[N4g]", title: "Барабан+хэт четверть" },
+        { note: "[N2g2]g2", label: "[N2g2]g2", title: "[Барабан+хэт]+хэт восьмые" },
+        { note: "g2[N2g2]", label: "g2[N2g2]", title: "Хэт+[барабан+хэт] восьмые" }
+      ],
+      separator: [
+        { note: "|", label: "|", title: "Тактовая черта" },
+        { note: "|]", label: "]", title: "Финальная черта" }
+      ]
     };
 
     const activeGroups = new Set();
@@ -579,7 +791,21 @@
             b.dataset.note = i.note;
             b.dataset.group = g;
             b.title = i.title;
-            b.textContent = i.label;
+            
+            if (i.image) {
+              const img = document.createElement("img");
+              img.src = i.image;
+              img.alt = i.title;
+              img.style.maxWidth = "100%";
+              img.style.maxHeight = "20px";
+              img.style.verticalAlign = "middle";
+              img.style.pointerEvents = "none";
+              b.textContent = "";
+              b.appendChild(img);
+            } else {
+              b.textContent = i.label;
+            }
+            
             activeNoteButtons.appendChild(b);
           });
           activeGroups.add(g);
@@ -588,7 +814,6 @@
       });
     });
 
-    // === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ===
     let synthControl = null;
     let visualObj = null;
     let abcString = document.getElementById("abc").value;
@@ -612,8 +837,9 @@
     const externalAudio = document.getElementById("external-audio");
     let currentAudio = null;
     let audioBaseUrl = null;
-    const percNotes = ['F', 'c', 'g', 'e', 'd', 'A', 'a'];
-    let fragments = [{ id: 0, title: "Вступление", abc: abcString }];
+    const percNotes = ['F', 'c', 'g', 'e', 'd', 'A', 'a', 'f', '^f'];
+    
+    let fragments = [{ id: 0, title: "Вступление", abc: abcString, startTime: 0 }];
     let currentFragmentId = 0;
     let project = {
       title: "Новая песня",
@@ -626,7 +852,15 @@
     let lastUpdateSeen = 0;
     let collabSendTimer = null;
 
-    // === ДИНАМИКА ===
+    const toggleAbcEditor = document.getElementById("toggle-abc-editor");
+    const abcEditorContainer = document.getElementById("abc-editor-container");
+    
+    toggleAbcEditor.addEventListener("click", () => {
+      const isVisible = abcEditorContainer.style.display === "flex";
+      abcEditorContainer.style.display = isVisible ? "none" : "flex";
+      toggleAbcEditor.textContent = isVisible ? "▶ Показать редактор ABC" : "▼ Скрыть редактор ABC";
+    });
+
     const toggleDynamics = document.getElementById("toggle-dynamics");
     const dynamicsPanel = document.getElementById("dynamics-panel");
     toggleDynamics.addEventListener("click", () => {
@@ -635,7 +869,56 @@
       toggleDynamics.textContent = isVisible ? "▶ Динамика" : "▼ Динамика";
     });
 
-    // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ABC ===
+    // === МУЛЬТЫВЫБОР ИНСТРУМЕНТОВ ===
+    // selectedDrums[0] — 1-й голос (синяя кнопка, подставляется вместо N)
+    // selectedDrums[1] — 2-й голос (зелёная, заменяет «g» в комплексах)
+    // selectedDrums[2+] — добавляются в аккорд
+    let selectedDrums = ['F'];
+    const drumSelector = document.getElementById("drum-selector");
+
+    function updateDrumButtons() {
+      document.querySelectorAll(".drum-btn").forEach(b => {
+        const idxSel = selectedDrums.indexOf(b.dataset.drum);
+        b.classList.toggle("active", idxSel === 0);
+        b.classList.toggle("active-multi", idxSel > 0);
+      });
+    }
+
+    function selectDrum(drum, additive) {
+      if (additive) {
+        const i = selectedDrums.indexOf(drum);
+        if (i !== -1) {
+          if (selectedDrums.length > 1) selectedDrums.splice(i, 1);
+        } else {
+          selectedDrums.push(drum);
+        }
+      } else {
+        selectedDrums = [drum];
+      }
+      updateDrumButtons();
+    }
+
+    drumSelector.addEventListener("click", e => {
+      const btn = e.target.closest(".drum-btn");
+      if (!btn) return;
+      selectDrum(btn.dataset.drum, e.ctrlKey || e.metaKey);
+    });
+    updateDrumButtons();
+    // =================================
+
+    // === ГОРЯЧИЕ КЛАВИШИ (Alt + 1...8, Alt+Shift — добавить в аккорд) ===
+    document.addEventListener('keydown', (e) => {
+      if (e.altKey && /^Digit[1-8]$/.test(e.code)) {
+        e.preventDefault(); // Предотвращаем ввод спецсимволов (например, ¡ на Mac)
+        const drumIndex = parseInt(e.code.replace('Digit', ''), 10) - 1;
+        const drumBtns = document.querySelectorAll('.drum-btn');
+        if (drumBtns[drumIndex]) {
+          selectDrum(drumBtns[drumIndex].dataset.drum, e.shiftKey);
+        }
+      }
+    });
+    // =====================================
+
     function extractNotesFromABC(fullABC) {
       return fullABC.split('\n').filter(line => {
         const t = line.trim();
@@ -653,13 +936,27 @@ K:C clef=perc
 Q:1/4=${tempo}
 V:Drums stem=up
 U:n=!style=x!
+%%percmap D  pedal-hi-hat x
+%%percmap E  bass-drum-1
 %%percmap F  acoustic-bass-drum
+%%percmap G  low-floor-tom
+%%percmap A  high-floor-tom
+%%percmap B  low-tom
+%%percmap ^B tambourine   triangle
 %%percmap c  acoustic-snare
+%%percmap _c electric-snare
+%%percmap ^c low-wood-block   triangle
+%%percmap =c side-stick x
+%%percmap d  low-mid-tom
+%%percmap ^d hi-wood-block    triangle
+%%percmap e  hi-mid-tom
+%%percmap ^e cowbell      triangle
+%%percmap f  high-tom
+%%percmap ^f ride-cymbal-1 x
 %%percmap g  closed-hi-hat x
-%%percmap e  high-tom
-%%percmap d  hi-mid-tom
-%%percmap A  low-tom
+%%percmap ^g open-hi-hat
 %%percmap a  crash-cymbal-1  x
+%%percmap ^a open-triangle     triangle
 ${notes.trim()}`;
     }
 
@@ -775,7 +1072,6 @@ ${notes.trim()}`;
       showOnlyAvailableAudioVariants(audioObj);
     }
 
-    // === ОСНОВНАЯ ФУНКЦИЯ ОТОБРАЖЕНИЯ ===
     function refreshTune() {
       stopExternalAudio();
       paperDiv.innerHTML = "";
@@ -791,7 +1087,7 @@ ${notes.trim()}`;
         const vo = ABCJS.renderAbc(paperDiv, abcString, {
           add_classes: true,
           responsive: "resize",
-          dragging: true,
+          dragging: false,
           clickListener
         });
         if (!vo || vo.length === 0) throw new Error("Render failed");
@@ -823,42 +1119,105 @@ ${notes.trim()}`;
       }
     }
 
-    // === FRAGMENTS ===
     function renderFragmentList() {
       fragmentList.innerHTML = "";
       fragments.forEach(f => {
         const div = document.createElement("div");
         div.className = "fragment-item";
         if (f.id === currentFragmentId) div.classList.add("active");
+        
+        const titleWrap = document.createElement("div");
+        titleWrap.style.display = "flex";
+        titleWrap.style.alignItems = "center";
+        titleWrap.style.flex = "1";
+        titleWrap.style.overflow = "hidden";
+        
         const title = document.createElement("span");
         title.className = "fragment-title-text";
         title.textContent = f.title;
+        
+        const timeSpan = document.createElement("span");
+        timeSpan.className = "fragment-time";
+        timeSpan.textContent = f.startTime > 0 ? `[${f.startTime}s]` : '';
+        
+        titleWrap.appendChild(title);
+        titleWrap.appendChild(timeSpan);
+        
         const edit = document.createElement("span");
         edit.className = "fragment-edit";
         edit.textContent = "✎";
-        edit.title = "Переименовать";
-        div.appendChild(title);
+        edit.title = "Переименовать / изменить время";
+        
+        div.appendChild(titleWrap);
         div.appendChild(edit);
-        div.onclick = e => { if (e.target !== edit) selectFragment(f.id); };
+        
+        div.onclick = e => {
+          if (e.target === edit || e.target.classList.contains('fragment-edit-input') || e.target.classList.contains('fragment-time-input')) {
+            return;
+          }
+          selectFragment(f.id);
+        };
+        
         edit.onclick = e => {
           e.stopPropagation();
-          const input = document.createElement("input");
-          input.className = "fragment-edit-input";
-          input.value = f.title;
-          input.select();
-          div.replaceChild(input, title);
+          
+          const titleInput = document.createElement("input");
+          titleInput.className = "fragment-edit-input";
+          titleInput.value = f.title;
+          titleInput.placeholder = "Название";
+          titleInput.addEventListener("click", ev => ev.stopPropagation());
+          titleInput.addEventListener("keydown", ev => ev.stopPropagation());
+          
+          const timeInput = document.createElement("input");
+          timeInput.className = "fragment-time-input";
+          timeInput.type = "number";
+          timeInput.min = "0";
+          timeInput.step = "0.1";
+          timeInput.value = f.startTime;
+          timeInput.placeholder = "0s";
+          timeInput.title = "Время старта в секундах";
+          timeInput.addEventListener("click", ev => ev.stopPropagation());
+          timeInput.addEventListener("keydown", ev => ev.stopPropagation());
+          
+          titleWrap.replaceChildren(titleInput, timeInput);
           div.replaceChild(document.createTextNode(""), edit);
-          input.focus();
+          
+          titleInput.focus();
+          titleInput.select();
+          
+          let isSaving = false;
           const finish = () => {
-            f.title = input.value.trim() || "Без названия";
+            if (isSaving) return;
+            isSaving = true;
+            f.title = titleInput.value.trim() || "Без названия";
+            const st = parseFloat(timeInput.value);
+            f.startTime = (!isNaN(st) && st >= 0) ? st : 0;
             renderFragmentList();
+            if (currentFragmentId === f.id && !externalAudio.paused) {
+              externalAudio.currentTime = f.startTime;
+            }
           };
-          input.addEventListener("blur", finish);
-          input.addEventListener("keydown", e => {
-            if (e.key === "Enter") finish();
-            if (e.key === "Escape") { input.blur(); renderFragmentList(); }
+          
+          titleInput.addEventListener("keydown", e => {
+            if (e.key === "Enter") { e.preventDefault(); timeInput.focus(); timeInput.select(); }
+            if (e.key === "Escape") { e.preventDefault(); renderFragmentList(); }
           });
+          timeInput.addEventListener("keydown", e => {
+            if (e.key === "Enter") { e.preventDefault(); finish(); }
+            if (e.key === "Escape") { e.preventDefault(); renderFragmentList(); }
+          });
+          
+          const handleBlur = (e) => {
+            setTimeout(() => {
+              if (!div.contains(document.activeElement)) {
+                finish();
+              }
+            }, 150);
+          };
+          titleInput.addEventListener("blur", handleBlur);
+          timeInput.addEventListener("blur", handleBlur);
         };
+        
         fragmentList.appendChild(div);
       });
     }
@@ -871,13 +1230,31 @@ ${notes.trim()}`;
         renderFragmentList();
         refreshTune();
         abcTextarea.focus();
+        
+        if (!externalAudio.paused && externalAudio.src) {
+          if (externalAudio.readyState >= 1) {
+            externalAudio.currentTime = f.startTime;
+          } else {
+            const onLoaded = () => {
+              externalAudio.currentTime = f.startTime;
+              externalAudio.removeEventListener('loadedmetadata', onLoaded);
+            };
+            externalAudio.addEventListener('loadedmetadata', onLoaded);
+          }
+        }
+        
         if (currentSession) sendStateToServer();
       }
     }
 
     function addFragment() {
       const newId = fragments.length ? Math.max(...fragments.map(f => f.id)) + 1 : 0;
-      fragments.push({ id: newId, title: `Фрагмент ${fragments.length + 1}`, abc: "z16 | z16 | z16 | z16 |" });
+      fragments.push({ 
+        id: newId, 
+        title: `Фрагмент ${fragments.length + 1}`, 
+        abc: "z16 | z16 | z16 | z16 |",
+        startTime: 0
+      });
       selectFragment(newId);
     }
 
@@ -895,7 +1272,7 @@ ${notes.trim()}`;
       }
       projectTitle.value = "Новая песня";
       projectTempo.value = 120;
-      fragments = [{ id: 0, title: "Вступление", abc: "z16 |" }];
+      fragments = [{ id: 0, title: "Вступление", abc: "z16 |", startTime: 0 }];
       currentFragmentId = 0;
       project = { title: "Новая песня", tempo: 120, fragments, audio: null };
       hideAudioPanel();
@@ -913,8 +1290,24 @@ ${notes.trim()}`;
         stopAbcPlayback();
         audioVariants.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
+        
+        const f = fragments.find(fr => fr.id === currentFragmentId);
+        const targetTime = f ? f.startTime : 0;
+        
         externalAudio.src = audioBaseUrl + project.audio[type];
         audioPlayerContainer.style.display = "block";
+        
+        const setStartTime = () => {
+          externalAudio.currentTime = targetTime;
+          externalAudio.removeEventListener('loadedmetadata', setStartTime);
+        };
+        
+        if (externalAudio.readyState >= 1) {
+          externalAudio.currentTime = targetTime;
+        } else {
+          externalAudio.addEventListener('loadedmetadata', setStartTime);
+        }
+        
         externalAudio.play().catch(e => {
           console.error("Audio play failed:", e);
           showMessage('Ошибка воспроизведения', true);
@@ -923,9 +1316,7 @@ ${notes.trim()}`;
     });
     externalAudio.addEventListener("play", stopAbcPlayback);
 
-    // === SAVE / LOAD ===
     function saveProject() {
-
       const f = fragments.find(f => f.id === currentFragmentId);
       if (f) f.abc = abcTextarea.value;
       const data = JSON.stringify({
@@ -982,7 +1373,10 @@ ${notes.trim()}`;
       if (currentSession) return;
       project.title = data.title || "Новая песня";
       project.tempo = data.tempo || 120;
-      project.fragments = data.fragments || [{ id: 0, title: "Фрагмент", abc: "z16 |" }];
+      
+      project.fragments = (data.fragments || [{ id: 0, title: "Фрагмент", abc: "z16 |" }])
+        .map(f => ({ ...f, startTime: typeof f.startTime === 'number' ? f.startTime : 0 }));
+      
       project.audio = data.audio || null;
       projectTitle.value = project.title;
       projectTempo.value = project.tempo;
@@ -995,7 +1389,6 @@ ${notes.trim()}`;
       if (fragments.length) selectFragment(fragments[0].id);
     }
 
-    // === LIBRARY MODAL ===
     const modal = document.getElementById('library-modal');
     const closeLib = document.getElementById('close-library-modal');
     const openLib = document.getElementById('open-library');
@@ -1056,10 +1449,9 @@ ${notes.trim()}`;
       }
     }
     openLib.addEventListener('click', () => { modal.style.display = 'flex'; if (!libCache) loadLibTree(); });
-    closeLib.addEventListener('click', () => modal.style.display = 'none');
+    closeLib.addEventListener('click', () => { modal.style.display = 'none'; });
     modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
 
-    // === PDF ===
     function downloadAsPDF() {
       const p = document.getElementById("paper");
       if (!p || !p.hasChildNodes()) {
@@ -1091,19 +1483,40 @@ ${notes.trim()}`;
       });
     }
 
-    // === ВВОД НОТ ===
     activeNoteButtons.addEventListener("click", e => {
-      if (e.target.classList.contains("note-btn")) {
-        insertAtCursor(abcTextarea, e.target.dataset.note + " ");
+      const btn = e.target.closest(".note-btn");
+      if (btn) {
+        let noteTemplate = btn.dataset.note;
+        let noteToInsert;
+
+        if (noteTemplate.includes('[') && selectedDrums.length > 1) {
+          // Комплексная нота (аккорд): 1-й инструмент вместо N,
+          // 2-й инструмент вместо «g» (голос сопровождения)
+          noteToInsert = noteTemplate.replace(/[Ng]/g, ch =>
+            ch === 'N' ? selectedDrums[0] : selectedDrums[1]
+          );
+          // 3-й и следующие инструменты добавляются в аккорд
+          if (selectedDrums.length > 2) {
+            const extra = selectedDrums.slice(2).join('');
+            noteToInsert = noteToInsert.replace(']', extra + ']');
+          }
+        } else {
+          // Обычная нота: только 1-й инструмент
+          noteToInsert = noteTemplate.replace(/N/g, selectedDrums[0]);
+        }
+
+        insertAtCursor(abcTextarea, noteToInsert + " ");
         const f = fragments.find(f => f.id === currentFragmentId);
         if (f) f.abc = abcTextarea.value;
         refreshTune();
         if (currentSession) sendStateToServer();
       }
     });
+    
     dynamicsPanel.addEventListener("click", e => {
-      if (e.target.classList.contains("note-btn")) {
-        insertAtCursor(abcTextarea, e.target.dataset.note + " ");
+      const btn = e.target.closest(".note-btn");
+      if (btn) {
+        insertAtCursor(abcTextarea, btn.dataset.note + " ");
         const f = fragments.find(f => f.id === currentFragmentId);
         if (f) f.abc = abcTextarea.value;
         refreshTune();
@@ -1111,7 +1524,18 @@ ${notes.trim()}`;
       }
     });
 
-    // === СОВМЕСТНЫЙ РЕЖИМ ===
+    // === ОЧИСТКА РЕДАКТОРА ===
+    document.getElementById('clear-editor').addEventListener('click', () => {
+      
+        abcTextarea.value = '';
+        const f = fragments.find(f => f.id === currentFragmentId);
+        if (f) f.abc = '';
+        refreshTune();
+        if (currentSession) sendStateToServer();
+      
+    });
+    // =========================
+
     async function sendStateToServer() {
       if (!currentSession) return;
       const f = fragments.find(fr => fr.id === currentFragmentId);
@@ -1152,7 +1576,8 @@ ${notes.trim()}`;
     function applyRemoteState(data) {
       projectTitle.value = data.title || "Без названия";
       projectTempo.value = data.tempo || 120;
-      fragments = data.fragments || [{ id: 0, title: "Фрагмент", abc: "z16 |" }];
+      fragments = (data.fragments || [{ id: 0, title: "Фрагмент", abc: "z16 |" }])
+        .map(f => ({ ...f, startTime: typeof f.startTime === 'number' ? f.startTime : 0 }));
       currentFragmentId = data.currentFragmentId || 0;
       renderFragmentList();
       const f = fragments.find(fr => fr.id === currentFragmentId);
@@ -1211,7 +1636,18 @@ ${notes.trim()}`;
       });
     });
 
-    // === INIT ===
+    document.getElementById('open-help')?.addEventListener('click', () => {
+      document.getElementById('help-modal').style.display = 'flex';
+    });
+    document.getElementById('close-help-modal')?.addEventListener('click', () => {
+      document.getElementById('help-modal').style.display = 'none';
+    });
+    document.getElementById('help-modal')?.addEventListener('click', e => {
+      if (e.target.id === 'help-modal') {
+        document.getElementById('help-modal').style.display = 'none';
+      }
+    });
+    
     document.addEventListener("DOMContentLoaded", () => {
       initCollabMode();
       renderFragmentList();

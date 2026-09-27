@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сет-лист</title>
+  <!-- === FAVICONS (универсально для всех страниц) === -->
+<link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+<link rel="manifest" href="/favicon/site.webmanifest">
+<meta name="theme-color" content="#121212">
+  <style>
+   * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  background: #1a1a1a;
+  color: #fff;
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  margin: 16px 0 24px;
+  font-size: 24px;
+  color: #666;
+}
+
+.song {
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.song-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.song-title {
+  font-size: 18px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.song-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  color: #aaa;
+  min-width: max-content;
+}
+
+.song-bpm, .song-key {
+  text-align: right;
+}
+
+.toggle-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: transform 0.3s;
+}
+
+.toggle-icon.open {
+  transform: rotate(90deg);
+  color: #fff;
+}
+
+.song-details {
+  display: none;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #3a3a3a;
+}
+
+.song-details.open {
+  display: block;
+}
+
+.structure {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.structure-block {
+  flex: 1;
+  min-width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+  position: relative;
+}
+
+.structure-block:hover {
+  opacity: 0.8;
+  transform: translateY(-2px);
+}
+
+.structure-block::after {
+  content: attr(data-time);
+  position: absolute;
+  bottom: -18px;
+  font-size: 9px;
+  color: #888;
+}
+
+/* Цвета блоков */
+.intro    { background: #FF6B6B; color: #fff; }    /* Красный */
+.verse    { background: #4ECDC4; color: #1a1a1a; } /* Бирюзовый */
+.chorus   { background: #45B7D1; color: #fff; }    /* Синий */
+.bridge   { background: #FFA500; color: #fff; }    /* Оранжевый */
+.solo     { background: #FFD700; color: #1a1a1a; } /* Жёлтый */
+.outro    { background: #888; color: #fff; }       /* Серый */
+.prechorus{ background: #98D8C8; color: #1a1a1a; } /* Светло-бирюзовый */
+.mod      { background: #FF6B6B; color: #fff; }    /* Красный */
+
+.player {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.legend {
+  background: #252525;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: #888;
+}
+
+.legend-item {
+  display: inline-block;
+  margin-right: 12px;
+  margin-bottom: 4px;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.order-number {
+  color: #FF6B6B;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+/* Стили для схемы вступления */
+.intro-scheme {
+  margin-top: 10px;
+  padding: 15px;
+  background: rgba(51, 51, 51, 0.8);
+  border-radius: 8px;
+  border: 1px solid #555;
+}
+
+.measures-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 3px;
+  margin-bottom: 10px;
+}
+
+.measure-cell {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: 4px;
+  color: #fff;
+  min-width: 0;
+  padding: 0 2px;
+  text-align: center;
+  border: 2px solid #fff;
+  background: transparent;
+  backdrop-filter: blur(10px);
+  transition: background 0.2s ease; /* Плавный переход */
+}
+
+/* Активные ссылки будут светлее при hover */
+.measure-cell[href]:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.measure-cell.empty {
+  border: 2px solid transparent;
+  background: transparent;
+  visibility: hidden;
+}
+
+
+.measure-cell:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.instrument-label {
+  font-size: 9px;
+  color: #aaa;
+  margin-top: 15px;
+}
+
+  </style>
+</head>
+<body>
+  <h1>Короткое замыкание</h1>
+
+  <div id="songs-list"></div>
+
+  <script>
+    // Данные песен (в порядке исполнения)
+    const songs = [
+      {
+        order: 1,
+        title: "Гуляй мужик",
+        bpm: 127,
+        key: "Am",
+        audio: "audio/1_Gulyajj_muzhik_127.mp3",
+        introScheme: [
+          [
+            { instrument: "keys", duration: 2 },
+            { instrument: "drums", duration: 2 }
+          ],
+          [
+            { instrument: "guitar", duration: 4 },
+            { instrument: "all", duration: 4 }
+          ]
+        ],
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" },
+          { type: "bridge",   time: 23,  label: "🎵" },
+          { type: "verse",    time: 38,   label: "Куплет" },
+          { type: "chorus",   time: 55,  label: "Припев" },
+          { type: "bridge",   time: 70,  label: "🎵" },
+          { type: "verse",    time: 85,   label: "Куплет" },
+          { type: "chorus",   time: 102,  label: "Припев" },
+          { type: "solo",   time: 118,  label: "🎸" },
+          { type: "verse",    time: 133,   label: "Куплет" },
+          { type: "chorus",   time: 150,  label: "Припев" },
+          { type: "bridge",   time: 165,  label: "🎵" }
+        ]
+      },
+      {
+        order: 2,
+        title: "Сельский кайф*",
+        bpm: 121,
+        key: "Am",
+        audio: "audio/2_Selskijj_kajjf_121.mp3",
+		introScheme: [
+          [
+            { instrument: "drums", duration: 1, editorUrl: "https://drumz.ru/song-editor/?load=%2Flibrary%2FIntro%2FСГ%2FСельский+кайф.json" }
+          ]
+        ],
+        structure: [
+		  { type: "intro",    time: 0,   label: "Intro" },
+          { type: "bridge",   time: 0,  label: "🎵" },
+          { type: "verse",    time: 8,   label: "Куплет" },
+          { type: "chorus",   time: 33,  label: "Припев" },
+          { type: "verse",    time: 48,   label: "Куплет" },
+          { type: "chorus",   time: 72,  label: "Припев" },
+          { type: "bridge",   time: 88,  label: "🎵" },
+          { type: "verse",    time: 103,   label: "Куплет" },
+          { type: "chorus",   time: 127,  label: "Припев" },
+          { type: "bridge",   time: 143,  label: "🎵" },
+          { type: "outro",   time: 158,  label: "Концовка" }
+        ]
+      },
+      {
+        order: 3,
+        title: "Страх",
+        bpm: 122,
+        key: "Gm",
+        audio: "audio/3_Strakh_122.mp3",
+        introScheme: [
+          [
+            { instrument: "keys", duration: 4 },
+            { instrument: "all", duration: 4 }
+          ]
+        ],
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" },
+          { type: "bridge",   time: 16,  label: "🎵" },
+          { type: "verse",    time: 31,   label: "Куплет" },
+          { type: "chorus",   time: 47,  label: "Припев" },
+          { type: "bridge",   time: 61,  label: "🎵" },
+          { type: "verse",    time: 76,   label: "Куплет" },
+          { type: "chorus",   time: 92,  label: "Припев" },
+          { type: "bridge",   time: 107,  label: "🎵" },
+          { type: "solo",   time: 122,  label: "🎸" },
+          { type: "verse",    time: 138,   label: "Куплет" },
+          { type: "chorus",   time: 154,  label: "Припев" },
+          { type: "bridge",   time: 168,  label: "🎵" }
+        ]
+      },
+      {
+        order: 4,
+        title: "Вечером на лавочке",
+        bpm: 133,
+        key: "G",
+        audio: "audio/4_Vecherom_na_lavochke_133.mp3",
+        introScheme: [
+          [
+            { instrument: "guitar", duration: 2 }
+          ],
+          [
+            { instrument: "vocals", duration: 4 },
+			{ instrument: "vocals", duration: 4 }
+          ]
+        ],
+        structure: [
+          { type: "intro",    time: 2,   label: "Intro" },
+          { type: "bridge",   time: 23,  label: "🎵" },
+          { type: "verse",    time: 41,   label: "Куплет" },
+          { type: "chorus",   time: 70,  label: "Припев" },
+          { type: "verse",    time: 88,   label: "Куплет" },
+          { type: "chorus",   time: 117,  label: "Припев" },
+          { type: "solo",   time: 135,  label: "🎸" },
+          { type: "bridge",   time: 164,  label: "🎵" },
+          { type: "verse",    time: 181,   label: "Куплет" },
+          { type: "chorus",   time: 211,  label: "Припев" },
+          { type: "bridge",   time: 226,  label: "🎵" }
+        ]
+      },
+      {
+        order: 5,
+        title: "Ядрёна вошь*",
+        bpm: 132,
+        key: "G",
+        audio: "audio/5_YAdrjona_vosh_132.mp3",
+        introScheme: [
+          [
+            { instrument: "combo", duration: 4, label: "🎸🥁", editorUrl: "https://drumz.ru/song-editor/?load=%2Flibrary%2FIntro%2FСГ%2FЯдрёна+вошь.json" }
+          ]
+        ],
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" },
+          { type: "verse",    time: 8,   label: "Куплет" },
+          { type: "chorus",   time: 38,  label: "Припев" },
+          { type: "bridge",   time: 68,  label: "🎵" },
+          { type: "verse",    time: 74,   label: "Куплет" },
+          { type: "chorus",   time: 104,  label: "Припев" },
+          { type: "solo",   time: 133,  label: "🎸" },
+          { type: "verse",    time: 162,   label: "Куплет" },
+          { type: "chorus",   time: 191,  label: "Припев" }
+        ]
+      },
+	       {
+        order: 6,
+        title: "Колхозный панк",
+        bpm: 216,
+        key: "Am",
+        audio: "audio/6_Kolkhoznyjj_pank_216.mp3",
+        introScheme: [
+          [
+            { instrument: "guitar", duration: 4 },
+          ]
+        ],		
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" },
+		  { type: "bridge",   time: 5,  label: "🎵" },
+          { type: "verse",    time: 22,   label: "Куплет" },
+          { type: "chorus",   time: 40,  label: "Припев" },
+		  { type: "bridge",   time: 55,  label: "🎵" },
+          { type: "verse",    time: 73,   label: "Куплет" },
+          { type: "chorus",   time: 90,  label: "Припев" },
+		  { type: "solo",   time: 106,  label: "🎸" },
+		  { type: "bridge",   time: 141,  label: "🎵" },
+          { type: "verse",    time: 159,   label: "Куплет" },
+          { type: "chorus",   time: 177,  label: "Припев" },
+		  { type: "bridge",   time: 192,  label: "🎵" }
+		  
+        ]
+      },
+      {
+        order: 7,
+        title: "Ява",
+        bpm: 120,
+        key: "Am",
+        audio: "audio/7_YAva_113.mp3",
+        introScheme: [
+          [
+            { instrument: "vocals", duration: 8 }
+          ]
+
+        ],		
+        structure: [
+          { type: "intro",    time: 0,   label: "I" },
+		  { type: "bridge",   time: 8,  label: "🎵" },
+          { type: "verse",    time: 16,   label: "К" },
+          { type: "chorus",   time: 51,  label: "П" },
+		  { type: "bridge",   time: 68,  label: "🎵" },
+		  { type: "verse",    time: 76,   label: "К" },
+          { type: "chorus",   time: 110,  label: "П" },
+		  { type: "bridge",   time: 128,  label: "🎵" },
+		  { type: "verse",    time: 135,   label: "К" },
+          { type: "chorus",   time: 170,  label: "П" },
+		  { type: "bridge",   time: 187,  label: "🎵" },
+		  { type: "solo",   time: 196,  label: "🎸" },
+		  { type: "verse",    time: 212,   label: "К" },
+          { type: "chorus",   time: 247,  label: "П" },
+		  { type: "bridge",   time: 264,  label: "🎵" }
+		  
+		  
+		  
+        ]
+      },
+      {
+        order: 8,
+        title: "Бомж*",
+        bpm: 133,
+        key: "Am",
+        audio: "audio/8_Bomzh_133.mp3",
+		introScheme: [
+          [
+            { instrument: "drums", duration: 1, editorUrl: "https://drumz.ru/song-editor/?load=%2Flibrary%2FIntro%2FСГ%2FБомж.json" }
+          ]
+        ],
+        structure: [
+		  { type: "intro",    time: 9,   label: "Intro" },
+		  { type: "bridge",   time: 10,  label: "🎵" },
+          { type: "verse",    time: 17,   label: "Куплет" },
+          { type: "chorus",   time: 46,  label: "Припев" },
+		  { type: "bridge",   time: 73,  label: "🎵" },
+		  { type: "verse",    time: 80,   label: "Куплет" },
+          { type: "chorus",   time: 108,  label: "Припев" },
+		  { type: "bridge",   time: 137,  label: "🎵" },
+		  { type: "verse",    time: 147,   label: "Куплет" },
+          { type: "chorus",   time: 175,  label: "Припев" },
+		  { type: "chorus",   time: 190,  label: "Припев" },
+		  { type: "bridge",   time: 204,  label: "🎵" }
+        ]
+      },
+      {
+        order: 9,
+        title: "Опять сегодня*",
+        bpm: 160,
+        key: "Am",
+        audio: "audio/9_Opyat_segodnya_160.mp3",
+		introScheme: [
+          [
+            { instrument: "drums", duration: 1, editorUrl: "https://drumz.ru/song-editor/?load=%2Flibrary%2FIntro%2FСГ%2FОпять+сегодня.json" }
+          ]
+        ],
+        structure: [
+		  { type: "intro",    time: 0,   label: "Intro" },
+		  { type: "solo",   time: 1,  label: "🎸" },
+		  { type: "bridge",   time: 13,  label: "🎵" },
+          { type: "verse",    time: 18,   label: "Куплет" },
+          { type: "chorus",   time: 30,  label: "Припев" },
+		  { type: "bridge",   time: 43,  label: "🎵" },
+          { type: "verse",    time: 48,   label: "Куплет" },
+          { type: "chorus",   time: 60,  label: "Припев" },
+		  { type: "solo",   time: 73,  label: "🎸" },
+		  { type: "verse",    time: 85,   label: "Куплет" },
+          { type: "chorus",   time: 96,  label: "Припев" },
+		  { type: "solo",   time: 121,  label: "🎸" }
+		  
+        ]
+      },
+      {
+        order: 10,
+        title: "Белая горячка",
+        bpm: 93,
+        key: "E",
+        audio: "audio/10_Belaya_goryachka_93.mp3",
+        structure: [
+		  { type: "bridge",   time: 5,  label: "🎵" },
+          { type: "verse",    time: 26,   label: "Куплет" },
+          { type: "chorus",   time: 46,  label: "Припев" },
+		  { type: "bridge",   time: 67,  label: "🎵" },
+		  { type: "verse",    time: 76,   label: "Куплет" },
+          { type: "chorus",   time: 97,  label: "Припев" },
+		  { type: "solo",   time: 117,  label: "🎸" },
+		  { type: "verse",    time: 137,   label: "Куплет" },
+          { type: "chorus",   time: 158,  label: "Припев" },
+		  { type: "bridge",   time: 177,  label: "🎵" }
+        ]
+      },
+      {
+        order: 11,
+        title: "Лирика",
+        bpm: 74,
+        key: "Am",
+        audio: "audio/11_Lirika_74.mp3",
+        introScheme: [
+          [
+            { instrument: "combo", duration: 8, label: "🎸🎹" }
+          ]
+        ],
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" },
+          { type: "verse",    time: 25,   label: "Куплет" },
+          { type: "chorus",   time: 52,  label: "Припев" },
+		  { type: "verse",    time: 77,   label: "Куплет" },
+          { type: "chorus",   time: 103,  label: "Припев" },
+		  { type: "solo",   time: 128,  label: "🎸" },
+		  { type: "verse",    time: 153,   label: "Куплет" },
+          { type: "chorus",   time: 180,  label: "Припев" },
+		  { type: "chorus",   time: 206,  label: "Припев" },
+		  { type: "outro",   time: 243,  label: "Концовка" }
+		  
+        ]
+      },
+      {
+        order: 12,
+        title: "Здравствуйте, детки",
+        bpm: 135,
+        key: "Dm",
+        audio: "audio/12_Zdravstvujjte_detishki_135.mp3",
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" }
+
+        ]
+      },
+      {
+        order: 13,
+        title: "Снегурочка*",
+        bpm: 188,
+        key: "Am",
+        audio: "audio/13_Snegurochka_188.mp3",
+		introScheme: [
+          [
+            { instrument: "drums", duration: 4, editorUrl: "https://drumz.ru/song-editor/?load=%2Flibrary%2FIntro%2FСГ%2FСнегурочка.json" }
+          ]
+        ],
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" },
+		  { type: "bridge",   time: 5,  label: "🎵" },
+          { type: "verse",    time: 25,   label: "Куплет" },
+          { type: "chorus",   time: 46,  label: "Припев" },
+		  { type: "bridge",   time: 67,  label: "🎵" },
+          { type: "verse",    time: 87,   label: "Куплет" },
+          { type: "chorus",   time: 108,  label: "Припев" },
+		  { type: "solo",   time: 129,  label: "🎸" },
+          { type: "verse",    time: 149,   label: "Куплет" },
+          { type: "chorus",   time: 170,  label: "Припев" },
+		  { type: "bridge",   time: 191,  label: "🎵" },
+		  { type: "bridge",   time: 201,  label: "🎵" }
+        ]
+      },
+      {
+        order: 14,
+        title: "Ночь перед Рождеством",
+        bpm: 148,
+        key: "F#m",
+        audio: "audio/14_Noch_pered_Rozhdestvom_148.mp3",
+        introScheme: [
+          [
+            { instrument: "all", duration: 8 }
+          ]
+        ],
+        structure: [
+          { type: "intro",    time: 24,   label: "Intro" },
+		  { type: "bridge",   time: 37,  label: "🎵" },
+          { type: "verse",    time: 43,   label: "Куплет" },
+		  { type: "bridge",   time: 82,  label: "🎵" },
+          { type: "verse",    time: 88,   label: "Куплет" },
+          { type: "chorus",   time: 114,  label: "Припев" },
+		  { type: "bridge",   time: 127,  label: "🎵" },
+          { type: "verse",    time: 133,   label: "Куплет" },
+          { type: "chorus",   time: 159,  label: "Припев" },
+		  { type: "bridge",   time: 172,  label: "🎵" },
+		  { type: "solo",   time: 178,  label: "🎸" },
+		  { type: "verse",    time: 204,   label: "Куплет" },
+          { type: "chorus",   time: 230,  label: "Припев" },
+		  { type: "outro",   time: 243,  label: "coda" }
+        ]
+      },
+      {
+        order: 15,
+        title: "Казачья",
+        bpm: 129,
+        key: "Am",
+        audio: "audio/15_Kazachya_129.mp3",
+        introScheme: [
+          [
+            { instrument: "drums", duration: 2 },
+			{ instrument: "combo", duration: 2, label: "🎸🥁" }
+          ]
+        ],
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" },
+		  { type: "bridge",   time: 7,  label: "🎵" },
+          { type: "verse",    time: 25,   label: "Куплет" },
+          { type: "chorus",   time: 40,  label: "Припев" },
+		  { type: "bridge",   time: 55,  label: "🎵" },
+		  { type: "verse",    time: 72,   label: "Куплет" },
+          { type: "chorus",   time: 95,  label: "Припев" },
+		  { type: "solo",   time: 102,  label: "🎸" },
+		  { type: "verse",    time: 117,   label: "Куплет" },
+          { type: "chorus",   time: 132,  label: "Припев" },
+		  { type: "bridge",   time: 147,  label: "🎵" }
+        ]
+      },
+      {
+        order: 16,
+        title: "Тёща*",
+        bpm: 133,
+        key: "Em",
+        audio: "audio/16_Tjoshha_133.mp3",
+		introScheme: [
+          [
+            { instrument: "drums", duration: 1, editorUrl: "https://drumz.ru/song-editor/?load=%2Flibrary%2FIntro%2FСГ%2FТеща.json" }
+          ]
+        ],
+        structure: [
+		  { type: "intro",    time: 0,   label: "Intro" },
+		  { type: "bridge",   time: 1,  label: "🎵" },
+          { type: "verse",    time: 18,   label: "Куплет" },
+          { type: "chorus",   time: 47,  label: "Припев" },
+		  { type: "bridge",   time: 61,  label: "🎵" },
+		  { type: "verse",    time: 78,   label: "Куплет" },
+          { type: "chorus",   time: 107,  label: "Припев" },
+		  { type: "solo",   time: 121,  label: "🎸" },
+		  { type: "verse",    time: 149,   label: "Куплет" },
+          { type: "chorus",   time: 178,  label: "Припев" },
+		  { type: "chorus",   time: 193,  label: "Припев" },
+		  { type: "bridge",   time: 207,  label: "🎵" }
+        ]
+      },
+      {
+        order: 17,
+        title: "Демобилизация",
+        bpm: 204,
+        key: "Am",
+        audio: "audio/17_Demobilizaciya_204.mp3",
+        structure: [
+          { type: "bridge",   time: 18,  label: "🎵" },
+          { type: "verse",    time: 30,   label: "Куплет" },
+          { type: "chorus",   time: 39,  label: "Припев" },
+		  { type: "verse",    time: 58,   label: "Куплет" },
+          { type: "chorus",   time: 68,  label: "Припев" },
+		  { type: "verse",    time: 86,   label: "Куплет" },
+          { type: "chorus",   time: 96,  label: "Припев" },
+		  { type: "mod",   time: 115,  label: "Bbm" },
+		  { type: "verse",    time: 119,   label: "Куплет" },
+          { type: "chorus",   time: 129,  label: "Припев" },
+		  { type: "solo",   time: 148,  label: "🎸" },
+		  { type: "mod",   time: 176,  label: "Cm" },
+		  { type: "verse",    time: 180,   label: "Куплет" },
+		  { type: "chorus",   time: 190,  label: "Припев" },
+		  { type: "bridge",   time: 209,  label: "🎵" },
+		  { type: "outro",   time: 226,  label: "coda" }
+        ]
+      },
+      {
+        order: 18,
+        title: "30 лет*",
+        bpm: 152,
+        key: "Am",
+        audio: "audio/18_30_let_152.mp3",
+        introScheme: [
+          [
+            { instrument: "drums", duration: 4, editorUrl: "https://drumz.ru/song-editor/?load=%2Flibrary%2FIntro%2FСГ%2F30+лет.json" }
+          ]
+        ],
+        structure: [
+          { type: "intro",    time: 3,   label: "Intro" },
+		  { type: "bridge",   time: 11,  label: "🎵" },
+          { type: "verse",    time: 38,   label: "Куплет" },
+          { type: "chorus",   time: 64,  label: "Припев" },
+		  { type: "verse",    time: 92,   label: "Куплет" },
+          { type: "chorus",   time: 117,  label: "Припев" },
+		  { type: "solo",   time: 143,  label: "🎸" },
+		  { type: "verse",    time: 168,   label: "Куплет" },
+          { type: "chorus",   time: 194,  label: "Припев" },
+		  { type: "chorus",   time: 219,  label: "Припев" }
+        ]
+      },
+      {
+        order: 19,
+        title: "Кума",
+        bpm: 134,
+        key: "Am",
+        audio: "audio/19_Kuma_134.mp3",
+        structure: [
+          { type: "bridge",   time: 9,  label: "🎵" },
+          { type: "verse",    time: 26,   label: "Куплет" },
+          { type: "chorus",   time: 41,  label: "Припев" },
+		  { type: "bridge",   time: 56,  label: "🎵" },
+          { type: "verse",    time: 70,   label: "Куплет" },
+          { type: "chorus",   time: 85,  label: "Припев" },
+		  { type: "solo",   time: 99,  label: "🎸" },
+		  { type: "verse",    time: 114,   label: "Куплет" },
+          { type: "chorus",   time: 129,  label: "Припев" },
+		  { type: "bridge",   time: 145,  label: "🎵" }
+        ]
+      },
+      {
+        order: 20,
+        title: "Дурак*",
+        bpm: 194,
+        key: "Am",
+        audio: "audio/20_Durak_194.mp3",
+		introScheme: [
+          [
+            { instrument: "drums", duration: 1, editorUrl: "https://drumz.ru/song-editor/?load=%2Flibrary%2FIntro%2FСГ%2FДурак.json" }
+          ]
+        ],
+        structure: [
+		  { type: "intro",    time: 0,   label: "Intro" },
+          { type: "bridge",    time: 1,   label: "🎵" },
+          { type: "verse",    time: 25,   label: "Куплет" },
+          { type: "chorus",   time: 45,  label: "Припев" },
+		  { type: "bridge",    time: 64,   label: "🎵" },
+          { type: "verse",    time: 73,   label: "Куплет" },
+          { type: "chorus",   time: 94,  label: "Припев" },
+		  { type: "solo",    time: 113,   label: "🎸" },
+          { type: "verse",    time: 133,   label: "Куплет" },
+          { type: "chorus",   time: 153,  label: "Припев" },
+		  { type: "bridge",    time: 173,   label: "🎵🎸" },
+        ]
+      },
+      {
+        order: 21,
+        title: "Туман*",
+        bpm: 160,
+        key: "Cm",
+        audio: "audio/21_Tuman_160.mp3",
+		introScheme: [
+          [
+            { instrument: "drums", duration: 1, editorUrl: "https://drumz.ru/song-editor/?load=%2Flibrary%2FIntro%2FСГ%2FТуман.json" }
+          ],
+		  [
+            { instrument: "all", duration: 8 }
+          ]
+        ],
+        structure: [
+          { type: "intro",    time: 5,   label: "Intro" },
+          { type: "verse",    time: 19,   label: "Куплет" },
+          { type: "chorus",   time: 42,  label: "Припев" },
+		  { type: "verse",    time: 67,   label: "Куплет" },
+          { type: "chorus",   time: 90,  label: "Припев" },
+		  { type: "solo",    time: 112,   label: "🎸" },
+		  { type: "verse",    time: 139,   label: "Куплет" },
+          { type: "chorus",   time: 162,  label: "Припев" },
+		  { type: "chorus",   time: 186,  label: "Припев" },
+		  { type: "outro",   time: 210,  label: "coda" }
+		  
+        ]
+      },
+      {
+        order: 22,
+        title: "Пора домой*",
+        bpm: 160,
+        key: "Am",
+        audio: "audio/22_Pora_domojj_160.mp3",
+        introScheme: [
+          [
+            { instrument: "drums", duration: 1, editorUrl: "https://drumz.ru/song-editor/?load=%2Flibrary%2FIntro%2FСГ%2FПора+домой.json" }
+          ],
+        
+          [
+            { instrument: "all", duration: 8 },
+            { instrument: "all", duration: 2 }
+          ]
+        ],
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" },
+          { type: "verse",    time: 16,   label: "Куплет" },
+          { type: "chorus",   time: 29,  label: "Припев" },
+		  { type: "verse",    time: 53,   label: "Куплет" },
+		  { type: "chorus",   time: 64,  label: "Припев" },
+		  { type: "mod",    time: 85,   label: "Bm" },
+		  { type: "verse",    time: 91,   label: "Куплет" },
+		  { type: "chorus",   time: 103,  label: "Припев" },
+		  { type: "solo",    time: 127,   label: "🎸" },
+		  { type: "mod",    time: 163,   label: "Cm" },
+		  { type: "verse",    time: 169,   label: "Куплет" },
+		  { type: "chorus",   time: 182,  label: "Припев" },
+		  { type: "outro",   time: 203,  label: "coda" }
+		  
+		  
+        ]
+      },
+	  {
+        order: 23,
+        title: "Всё з",
+        bpm: 99,
+        key: "F",
+        audio: "audio/23_Vsjo_Zaeblo_120.mp3",
+        introScheme: [
+          [
+            { instrument: "keys", duration: 2 }
+          ]
+        
+        ],
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" },
+          { type: "chorus",    time: 5,   label: "Припев" },
+		  { type: "verse",    time: 24,   label: "Куплет" },
+		  { type: "prechorus",   time: 43,  label: "Pre" },
+		  { type: "chorus",    time: 53,   label: "Припев" },
+		  { type: "verse",    time: 72,   label: "Куплет" },
+		  { type: "prechorus",   time: 101,  label: "Pre" },
+		  { type: "chorus",   time: 111,  label: "Припев" },
+		  { type: "verse",    time: 130,   label: "Куплет" },
+		  { type: "prechorus",   time: 150,  label: "Pre" },
+		  { type: "chorus",   time: 160,  label: "Припев" },
+		  { type: "solo",    time: 179,   label: "🎸" },
+		  { type: "verse",    time: 199,   label: "Куплет" },
+		  { type: "chorus",   time: 208,  label: "Припев" },
+		  { type: "outro",   time: 227,  label: "coda" }
+		  
+		  
+        ]
+      },
+	  {
+        order: 24,
+        title: "Возле дома твоего",
+        bpm: 108,
+        key: "G",
+        audio: "audio/24_Vozle_doma_tvoego.mp3",
+        introScheme: [
+          [
+            { instrument: "keys", duration: 2 }
+          ]
+        
+        ],
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" }
+
+        ]
+      },
+	  
+	  	  {
+        order: 25,
+        title: "Носки",
+        bpm: 133,
+        key: "Am",
+        audio: "audio/25_Noski.mp3",
+        introScheme: [
+          [
+            { instrument: "keys", duration: 2 }
+          ]
+        
+        ],
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" }
+
+        ]
+      },
+	  
+	  	  {
+        order: 26,
+        title: "Колхозная",
+        bpm: 115,
+        key: "G",
+        audio: "audio/26_Kolkhoznaya.mp3",
+        introScheme: [
+          [
+            { instrument: "keys", duration: 2 }
+          ]
+        
+        ],
+        structure: [
+          { type: "intro",    time: 0,   label: "Intro" }
+
+        ]
+      },
+	  
+    ];
+
+
+    // Рендер списка песен
+    const songsList = document.getElementById('songs-list');
+
+    songs.forEach((song, index) => {
+      const songEl = document.createElement('div');
+      songEl.className = 'song';
+      songEl.innerHTML = `
+        <div class="song-header" onclick="toggleSong(${index})">
+          <div class="song-title">
+            <span class="order-number">${song.order}.</span>${song.title}
+          </div>
+          <div class="song-meta">
+            <div class="song-bpm">${song.bpm}</div>
+            <div class="song-key">${song.key}</div>
+            <div class="toggle-icon" id="icon-${index}">▶</div>
+          </div>
+        </div>
+        <div class="song-details" id="details-${index}">
+          <div class="structure" id="structure-${index}"></div>
+          <audio class="player" controls src="${song.audio}" id="player-${index}"></audio>
+        </div>
+      `;
+      songsList.appendChild(songEl);
+
+      // Рендер структуры
+      const structureEl = document.getElementById(`structure-${index}`);
+      song.structure.forEach((block, i) => {
+        const blockEl = document.createElement('div');
+        blockEl.className = `structure-block ${block.type}`;
+        blockEl.textContent = block.label;
+        
+        if (block.type === 'intro' && song.introScheme) {
+          blockEl.onclick = () => {
+            seekTo(index, block.time);
+            showIntroScheme(index);
+          };
+        } else {
+          blockEl.onclick = () => seekTo(index, block.time);
+        }
+        
+        structureEl.appendChild(blockEl);
+      });
+    });
+
+    // Переключение деталей
+    window.toggleSong = function(index) {
+      const details = document.getElementById(`details-${index}`);
+      const icon = document.getElementById(`icon-${index}`);
+      
+      if (details.classList.contains('open')) {
+        details.classList.remove('open');
+        icon.classList.remove('open');
+      } else {
+        // Закрываем все остальные
+        document.querySelectorAll('.song-details').forEach(el => el.classList.remove('open'));
+        document.querySelectorAll('.toggle-icon').forEach(el => el.classList.remove('open'));
+        
+        // Открываем текущий
+        details.classList.add('open');
+        icon.classList.add('open');
+      }
+    };
+
+    // Перемотка аудио
+    window.seekTo = function(songIndex, time) {
+      const player = document.getElementById(`player-${songIndex}`);
+      if (player) {
+        player.currentTime = time;
+        if (player.paused) player.play();
+      }
+    };
+
+// Показ схемы вступления с 8-колоночной сеткой
+window.showIntroScheme = function(songIndex) {
+  const song = songs[songIndex];
+  if (!song || !song.introScheme) return;
+
+  // Удаляем предыдущую схему, если была
+  let existingScheme = document.querySelector(`#scheme-${songIndex}`);
+  if (existingScheme) existingScheme.remove();
+
+  const container = document.createElement('div');
+  container.id = `scheme-${songIndex}`;
+  container.className = 'intro-scheme';
+  container.innerHTML = '<h4 style="margin-bottom: 8px; color: #FF6B6B;">Схема вступления:</h4>';
+
+  // Создаем сетку для каждой строки
+  song.introScheme.forEach((line, lineIndex) => {
+    const grid = document.createElement('div');
+    grid.className = 'measures-grid';
+    
+    let currentPosition = 0;
+    
+    // Добавляем ячейки для каждого элемента в строке
+    line.forEach(item => {
+      // Создаем ССЫЛКУ вместо div
+      const cell = document.createElement('a');
+      cell.className = 'measure-cell';
+      cell.textContent = getInstrumentShortName(item);
+      cell.style.gridColumn = `span ${item.duration}`;
+      
+      // Стили для ссылки
+      cell.style.textDecoration = 'none';
+      cell.style.display = 'flex';
+      cell.style.alignItems = 'center';
+      cell.style.justifyContent = 'center';
+      cell.style.cursor = 'pointer';
+      
+      // Делаем ссылку на редактор нот (если указан URL)
+      if (item.editorUrl) {
+        cell.href = item.editorUrl;
+        cell.target = '_blank'; // Открываем в новой вкладке
+      } else {
+        cell.href = 'javascript:void(0)'; // Пустая ссылка
+        cell.style.cursor = 'default'; // Обычный курсор для неактивных
+      }
+
+      // Hover-эффект для активных ссылок
+      if (item.editorUrl) {
+        cell.addEventListener('mouseenter', () => {
+          cell.style.background = 'rgba(255, 255, 255, 0.2)';
+        });
+
+        cell.addEventListener('mouseleave', () => {
+          cell.style.background = 'transparent';
+        });
+      }
+      
+      grid.appendChild(cell);
+      currentPosition += item.duration;
+    });
+    
+    // Добавляем пустые ячейки если нужно до 8
+    while (currentPosition < 8) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = 'measure-cell empty';
+      grid.appendChild(emptyCell);
+      currentPosition++;
+    }
+    
+    container.appendChild(grid);
+  });
+
+  // Вставляем после плеера
+  const playerContainer = document.getElementById(`details-${songIndex}`);
+  playerContainer.appendChild(container);
+};
+
+
+function getInstrumentShortName(item) {
+  if (item.label) {
+    return item.label;  // Используем готовую метку
+  }
+  
+  // Для обратной совместимости с одиночными инструментами
+  switch(item.instrument) {
+    case 'drums': return '🥁';
+    case 'bass': return '🎸';
+    case 'keys': return '🎹';
+    case 'guitar': return '🎸';
+    case 'vocals': return '🎤';
+    case 'all': return '🎶';
+    default: return '🎵';
+  }
+}
+
+  </script>
+</body>
+</html>

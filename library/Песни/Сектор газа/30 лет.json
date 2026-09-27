@@ -1,0 +1,16 @@
+{
+  "title": "30 лет",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 152,
+  "version": "1.0",
+  "created": "2026-02-17",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "F4 c2F2 z2 F2 c4| F4 c2F2 z2 F2 c4| F4 c2F2 z2 F2 c4| F4 c2F2 z2 [F2e] [c2e]e2| "
+    }
+  ]
+}

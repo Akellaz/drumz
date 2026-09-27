@@ -1,0 +1,19 @@
+{
+  "title": "Ява",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 113,
+  "version": "1.0",
+  "created": "2026-01-26",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Припев",
+      "abc": "[F2g2][F2g2] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2][F2g2] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2]gF [a2c][a2F] z2Lc2 eedd | [F2g2]gF [a2c][a2F] z2Lc2 eedd | \n[F2g2][F2g2] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2][F2g2] [c2g2]g2 [F2g2][F2g2] [c2g2]g2 | [F2g2]gF [a2c][a2F] z2Lc2 eedd | [g2F]g2 [g2F]gF [a3c]F zddz | "
+    }
+  ],
+  "audio": {
+    "plus": "Jawa_plus.mp3"
+  }
+}

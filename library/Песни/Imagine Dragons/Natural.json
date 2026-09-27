@@ -1,0 +1,20 @@
+{
+  "title": "Natural",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "2",
+  "description": "",
+  "tempo": 98,
+  "version": "1.0",
+  "created": "2026-08-13",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Imagine Dragons",
+      "abc": "g4 g4 g4 g4 | g4 g4 g4 ^f4 | g4 g4 g4 g4 | g4 g4 g4 ^f4 | \ng4 g4 g4 g4 | g4 g4 g4 ^f4 | g4 g4 g4 g4 | g4z4 z4 z4 | \n[F4a] c2F2 z4 c4 | F4  c2F2 z4 c4 | [F4a] c2F2 z4 c4 | F4  c2F2 z4 c4 | \n[F4a] c2F2 z4 c4 | F4  c2F2 z4 c4 | [F4a] c2F2 z4 c4 | F4  c2F2 z2 A2A4 | \nF4 c4 z4 c4 | F4 c4 z4 c4 | F4 c4 z4 c4 | F4 c4 z4 c4 | \n[F4a] c4 z4 c4 | F4 c4 z4 c4 | F4 c4 z4 c4 | F4 c4 c2c2  A4 | \n[F4a] c4 z4 c4 | F4 c4 z4 c4 | F4 c4 z4 c4 | F4 c2c2 z4 c2c2 | \n[F4a] c4 z4 c4 | F4 c4 z4 c4 | F4 c4 z4 c4 | F4 z4 z4 z4 | \n[F4a] c2F2 z4 c4 | F4  c2F2 z4 c4 | [F4a] c2F2 z4 c4 | F4  c4 c2c2 c2c2  | \n[F4a] c2F2 z4 c4 | F4  c2F2 z4 c4 | [F4a] c2F2 z4 c4 | c4 e4  d4 A4  | \nz4 \n\n",
+      "startTime": 0
+    }
+  ],
+  "audio": {
+    "plus": "Natural.mp3"
+  }
+}

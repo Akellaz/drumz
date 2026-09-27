@@ -1,0 +1,56 @@
+{
+  "title": "TNT",
+  "category": ["четверти", "восьмые"],
+  "difficulty": "4",
+  "description": "",
+  "tempo": 126,
+  "version": "1.0",
+  "created": "2026-04-26",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "[F4a] z4 z4 z4 | c2c2 c2c2 c2c2 c2c2 | c2c2 c2c2 c2c2 c2c2 | c2c2 c2c2 c2c2 {/c}c4 | \n|:F4F4F4F4 | F4F4F4F4 | F4F4F4F4 | F4F4F4F4 :| \n",
+      "startTime": 0
+    },
+    {
+      "id": 1,
+      "title": "Куплет 1",
+      "abc": "\"verse\"|:F4F4F4F4 | F4F4F4F4 | F4F4F4F4 | F4F4F4F4 :| \nF4[F4c]F4F4 | F4F4F4F4 | F4[F4c]F4F4 | F4F4F4F4 | \nF4[F4c]F4F4 | F4F4F4F4 | F4[F4c]F4c2[F2a] | z16 | z16  \n",
+      "startTime": 24.7
+    },
+    {
+      "id": 2,
+      "title": "Припев 1",
+      "abc": "|[M: 6/4] \"Chorus\" [a4F][a4Fc] [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [M: 4/4] [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] |\n [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] | [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] |\n [a4F][a4Fc] c2e2 A2[F2a] | z4 z4 [A4F][A4F]|[A4F][A4F][A4F]{/A}[A4F] | \nF4F4F4F4 | F4F4F4F4 | F4F4F4F4 | F4F4F4F4 | ",
+      "startTime": 57.1
+    },
+    {
+      "id": 3,
+      "title": "Куплет 2",
+      "abc": "|: F4[F4c]F4[F4c] | F4[F4c]F4[F4c] | F4[F4c]F4[F4c] | F4[F4c]F4[F4c] :| \n F4[F4c]F4[F4c] | F4[F4c]F4[F4c] | F4[F4c]F4[F4c] | F4[F4c]F4[F4c] | \n F4[F4c]F4[F4c] | F4[F4c]F4[F4c] | F4[F4c]F4c2[F2a] | z16 | z16 | ",
+      "startTime": 82.8
+    },
+    {
+      "id": 4,
+      "title": "Припев 2",
+      "abc": "|[M: 6/4] \"Chorus\" [a4F][a4Fc] [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [M: 4/4] [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] |\n [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] | [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] |\n [F2a]g2 [g2c]g2 c2e2 A2[F2a] | z16| z4z4 [e2A][e2A] [e4A] | ",
+      "startTime": 115.2
+    },
+    {
+      "id": 5,
+      "title": "Solo",
+      "abc": "[F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 |  [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 |\n[F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 |  [F2g2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | \n[F2a2]g2 [c2g2F]g2 [F2g]F2 c2[F2a] | z4 c4 e4 z2c2 | z2c2 z4 {//cc}c2F2 {/c}c4 |\n|[M: 6/4] \"Проигрыш\" [a4F][a4Fc] [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [M: 4/4] [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] |\n [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] | [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] |\n [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] |  [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] |\n [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] | [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2g2]g2 [c2g2F]g2 [a4F][a4Fc] | \n[F4a] [g2c]F2 c2e2 A2[F2a] | z16 |\nc",
+      "startTime": 133.3
+    },
+    {
+      "id": 6,
+      "title": "Окончание",
+      "abc": "[F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 | [F2a2]g2 [c2g2F]g2 [F2g2]g2 [c2g2F]g2 |\n[F4a] [c4Fg] [F4a] [c4Fg] | [F4a] [c4Fg] [F4a] [c4Fg] | [F4a] [c4Fa] [c4Fa] [c4Fa]| [c4Fa][c4Fa][c4Fa][c4Fa]| [F4a]z4z4z4|] ",
+      "startTime": 181.9
+    }
+  ],
+  "audio": {
+    "plus": "TNT.mp3"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "title": "Туман",
+  "category": "books",
+  "difficulty": "beginner",
+  "description": "",
+  "tempo": 160,
+  "version": "1.0",
+  "created": "2026-02-17",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Вступление",
+      "abc": "g4g4g4g4|z4z4z4c4"
+    }
+  ]
+}

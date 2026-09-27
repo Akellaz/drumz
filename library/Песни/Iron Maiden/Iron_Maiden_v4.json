@@ -1,0 +1,19 @@
+{
+  "title": "Iron Maiden v.4",
+  "category": "books",
+  "difficulty": "5",
+  "description": "",
+  "tempo": 109,
+  "version": "1.0",
+  "created": "2025-12-16",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Hallowed Be Thy Name",
+      "abc": "[F4a] z4 z4 z4 | z2 e2 z d3 A3A A2[F2a] |\n [F4a] z4 z4 z4 | (3e2e2ee (3d2d2dd (3A2A2AA A2[F2a]| \n[F4a] z4 z4 z4 | (3{/e}e2e2e2 (3{/d}d2d2d2 (3{/A}A2A2A2 {/A}A2[F2a]|\n[F4a] z4 z4 z4 | z2c2 ze3 d3c c2c2|\nccee dddd AAAA [F2a][F2a] | [F2a]cc eedd AAAA [F2a][F2a] |\n[F2a]cc eedd AAAA [F2a][F2a] |[F2a]cc eedd AAAA [F2a][F2a]|"
+    }
+  ],
+  "audio": {
+    "plus": "Iron_Maiden4_plus.mp3"
+  }
+}

@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Реалистичная Орбита Земли 3D с Луной и затмениями</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      color: #e0e0ff;
+      font-family: -apple-system, system-ui, sans-serif;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .controls {
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      background: rgba(10, 14, 23, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 10px 15px;
+      border-radius: 12px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .date-nav-btn {
+      background: rgba(28, 42, 71, 0.85);
+      border: 1px solid #2a3a55;
+      color: #8ac9ff;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all 0.2s ease;
+      user-select: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    .date-nav-btn:hover {
+      background: rgba(38, 58, 91, 0.95);
+      transform: scale(1.05);
+      color: #4fc3f7;
+    }
+    .date-nav-btn:active {
+      transform: scale(0.95);
+    }
+    input[type="date"] {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #2a3a55;
+      background: #0f1423;
+      color: white;
+      font-size: 14px;
+      appearance: none;
+      min-width: 140px;
+    }
+    .info {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      text-align: right;
+      font-size: 12px;
+      color: rgba(138, 199, 255, 0.9);
+      background: rgba(10, 14, 23, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 10px 15px;
+      border-radius: 12px;
+      z-index: 100;
+      line-height: 1.6;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="controls">
+    <button class="date-nav-btn" id="prevDayBtn">←</button>
+    <input type="date" id="datePicker">
+    <button class="date-nav-btn" id="nextDayBtn">→</button>
+  </div>
+  
+  <div class="info">
+    <div id="currentDate">Загрузка...</div>
+    <div id="currentSeason">Сезон: ...</div>
+    <div id="earthTime" style="margin-top: 6px; color: rgba(100, 181, 246, 0.7);">Время: ...</div>
+    <div id="moonPhase" style="margin-top: 6px; color: rgba(255, 255, 200, 0.9);">Фаза Луны: ...</div>
+    <div style="margin-top: 6px; color: rgba(255, 215, 0, 0.9);">Наклон оси: 23.5°</div>
+  </div>
+
+  <script>
+    // ========== НАСТРОЙКИ ==========
+    const config = {
+      sunRadius: 8,
+      earthRadius: 2.5,
+      moonRadius: 0.8,
+      orbitRadius: 50,
+      moonOrbitRadius: 8,
+      orbitSegments: 128,
+      monthLabelDistance: 62,
+      seasonLabelDistance: 70,
+      cameraDistance: 120,
+      backgroundColor: 0x000000,
+      orbitColor: 0x3a5577,
+      starsCount: 2000,
+      earthRotationSpeed: 0.01,
+      cameraTransitionSpeed: 0.05
+    };
+
+    // ========== СЕЗОНЫ ==========
+    const seasons = [
+      { name: "ЗИМА", startDay: 355, endDay: 79, color: 0x4fc3f7, angleStart: null, angleEnd: null },
+      { name: "ВЕСНА", startDay: 80, endDay: 172, color: 0x81c784, angleStart: null, angleEnd: null },
+      { name: "ЛЕТО", startDay: 173, endDay: 265, color: 0xff8a65, angleStart: null, angleEnd: null },
+      { name: "ОСЕНЬ", startDay: 266, endDay: 354, color: 0xa5d6a7, angleStart: null, angleEnd: null }
+    ];
+
+    seasons.forEach(season => {
+      season.angleStart = ((season.startDay + 10) % 365 / 365) * Math.PI * 2 - Math.PI/2;
+      season.angleEnd = ((season.endDay + 10) % 365 / 365) * Math.PI * 2 - Math.PI/2;
+      if (season.angleEnd < season.angleStart) season.angleEnd += Math.PI * 2;
+    });
+
+    // ========== ИНИЦИАЛИЗАЦИЯ THREE.JS ==========
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(config.backgroundColor);
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 30, config.cameraDistance);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    document.body.appendChild(renderer.domElement);
+
+    // Основное освещение
+    const ambientLight = new THREE.AmbientLight(0x333333);
+    scene.add(ambientLight);
+
+    // ========== ЗВЁЗДНОЕ НЕБО ==========
+    function createStars() {
+      const starsGeometry = new THREE.BufferGeometry();
+      const starsMaterial = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.8,
+        sizeAttenuation: true,
+        transparent: true,
+        opacity: 0.9
+      });
+
+      const starsVertices = new Float32Array(config.starsCount * 3);
+      const starsSizes = new Float32Array(config.starsCount);
+
+      for (let i = 0; i < config.starsCount; i++) {
+        const radius = 300 + Math.random() * 200;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        
+        starsVertices[i * 3] = Math.sin(phi) * Math.cos(theta) * radius;
+        starsVertices[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * radius;
+        starsVertices[i * 3 + 2] = Math.cos(phi) * radius;
+        
+        starsSizes[i] = 0.3 + Math.random() * 1.5;
+      }
+
+      starsGeometry.setAttribute('position', new THREE.BufferAttribute(starsVertices, 3));
+      starsGeometry.setAttribute('size', new THREE.BufferAttribute(starsSizes, 1));
+
+      const stars = new THREE.Points(starsGeometry, starsMaterial);
+      scene.add(stars);
+    }
+
+    createStars();
+
+    // ========== СОЛНЦЕ ==========
+    const sunGroup = new THREE.Group();
+    sunGroup.name = "sun";
+    scene.add(sunGroup);
+
+    // Визуальная модель Солнца (неподвижна в центре)
+    const sunGeometry = new THREE.SphereGeometry(config.sunRadius, 64, 64);
+    const sunMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffd700,
+      emissive: 0xffa500,
+      emissiveIntensity: 1
+    });
+    const sunVisual = new THREE.Mesh(sunGeometry, sunMaterial);
+    sunGroup.add(sunVisual);
+
+    // Свет от Солнца
+    const sunLight = new THREE.PointLight(0xffffff, 2, 500);
+    sunGroup.add(sunLight);
+
+    // Солнце в центре системы (фиксировано)
+    sunGroup.position.set(0, 0, 0);
+
+    // ========== ЦВЕТНЫЕ СЕГМЕНТЫ ОРБИТЫ ==========
+    seasons.forEach(season => {
+      const segments = Math.ceil((season.angleEnd - season.angleStart) / (Math.PI * 2) * config.orbitSegments);
+      const geometry = new THREE.BufferGeometry();
+      const vertices = [];
+      
+      for (let i = 0; i <= segments; i++) {
+        const angle = season.angleStart + (i / segments) * (season.angleEnd - season.angleStart);
+        vertices.push(
+          Math.cos(angle) * config.orbitRadius,
+          0,
+          -Math.sin(angle) * config.orbitRadius
+        );
+      }
+      
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      
+      const material = new THREE.LineBasicMaterial({ 
+        color: season.color,
+        linewidth: 8,
+        transparent: true,
+        opacity: 0.6
+      });
+      
+      const segment = new THREE.Line(geometry, material);
+      scene.add(segment);
+    });
+
+    // ========== ОРБИТА (тонкая линия) ==========
+    const orbitGeometry = new THREE.BufferGeometry();
+    const orbitVertices = [];
+    
+    for (let i = 0; i <= config.orbitSegments; i++) {
+      const angle = (i / config.orbitSegments) * Math.PI * 2;
+      orbitVertices.push(
+        Math.cos(angle) * config.orbitRadius,
+        0,
+        -Math.sin(angle) * config.orbitRadius
+      );
+    }
+    
+    orbitGeometry.setAttribute('position', new THREE.Float32BufferAttribute(orbitVertices, 3));
+    
+    const orbitMaterial = new THREE.LineBasicMaterial({ 
+      color: config.orbitColor,
+      transparent: true,
+      opacity: 0.3
+    });
+    
+    const orbit = new THREE.Line(orbitGeometry, orbitMaterial);
+    scene.add(orbit);
+
+    // ========== МЕТКИ СЕЗОНОВ ==========
+    function createSeasonLabel(text) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 256;
+      canvas.height = 64;
+      
+      const gradient = ctx.createLinearGradient(0, 0, 256, 64);
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.7)');
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 256, 64);
+      
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 40px -apple-system, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 128, 32);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      
+      const material = new THREE.SpriteMaterial({ 
+        map: texture, 
+        transparent: true,
+        opacity: 0.85
+      });
+      
+      const sprite = new THREE.Sprite(material);
+      sprite.scale.set(30, 8, 1);
+      
+      return sprite;
+    }
+
+    seasons.forEach(season => {
+      const midAngle = (season.angleStart + season.angleEnd) / 2;
+      const label = createSeasonLabel(season.name);
+      label.position.set(
+        Math.cos(midAngle) * config.seasonLabelDistance,
+        0,
+        -Math.sin(midAngle) * config.seasonLabelDistance
+      );
+      scene.add(label);
+    });
+
+    // ========== МЕТКИ РАВНОДЕНСТВИЙ ==========
+    const equinoxes = [
+      { name: "21 ДЕК", day: 355, color: 0xffffff },
+      { name: "20 МАР", day: 79, color: 0xffffff },
+      { name: "21 ИЮН", day: 172, color: 0xffffff },
+      { name: "23 СЕН", day: 265, color: 0xffffff }
+    ];
+
+    function createEquinoxLabel(text) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 128;
+      canvas.height = 40;
+      
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.font = 'bold 24px -apple-system, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 64, 20);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      
+      const material = new THREE.SpriteMaterial({ 
+        map: texture, 
+        transparent: true,
+        opacity: 0.7
+      });
+      
+      const sprite = new THREE.Sprite(material);
+      sprite.scale.set(18, 6, 1);
+      
+      return sprite;
+    }
+
+    equinoxes.forEach(point => {
+      const angle = ((point.day + 10) % 365 / 365) * Math.PI * 2 - Math.PI/2;
+      const label = createEquinoxLabel(point.name);
+      label.position.set(
+        Math.cos(angle) * (config.orbitRadius + 8),
+        0,
+        -Math.sin(angle) * (config.orbitRadius + 8)
+      );
+      scene.add(label);
+      
+      const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(
+          Math.cos(angle) * config.orbitRadius,
+          0,
+          -Math.sin(angle) * config.orbitRadius
+        )
+      ]);
+      const lineMaterial = new THREE.LineDashedMaterial({ 
+        color: point.color,
+        transparent: true,
+        opacity: 0.2,
+        dashSize: 2,
+        gapSize: 1
+      });
+      const line = new THREE.Line(lineGeometry, lineMaterial);
+      line.computeLineDistances();
+      scene.add(line);
+    });
+
+    // ========== МЕТКИ МЕСЯЦЕВ ==========
+    const monthNames = ['ЯНВ', 'ФЕВ', 'МАР', 'АПР', 'МАЙ', 'ИЮН', 'ИЮЛ', 'АВГ', 'СЕН', 'ОКТ', 'НОЯ', 'ДЕК'];
+    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    function createMonthLabel(text) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 128;
+      canvas.height = 64;
+      
+      ctx.clearRect(0, 0, 128, 64);
+      ctx.fillStyle = '#8ac9ff';
+      ctx.font = 'bold 36px -apple-system, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 64, 32);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      
+      const material = new THREE.SpriteMaterial({ 
+        map: texture, 
+        transparent: true,
+        opacity: 0.9
+      });
+      
+      const sprite = new THREE.Sprite(material);
+      sprite.scale.set(14, 7, 1);
+      
+      return sprite;
+    }
+
+    let dayOffset = 0;
+    monthNames.forEach((name, i) => {
+      const midDay = dayOffset + daysInMonth[i] / 2;
+      const angle = (midDay / 365) * Math.PI * 2 - Math.PI/2;
+      
+      const label = createMonthLabel(name);
+      label.position.set(
+        Math.cos(angle) * config.monthLabelDistance,
+        0,
+        -Math.sin(angle) * config.monthLabelDistance
+      );
+      
+      scene.add(label);
+      dayOffset += daysInMonth[i];
+    });
+
+    // ========== ПОЛЯРНАЯ ЗВЕЗДА ==========
+    const axialTiltRad = THREE.MathUtils.degToRad(23.5);
+    const poleStarDistance = 1000;
+
+    const poleStarGeometry = new THREE.SphereGeometry(2.5, 16, 16);
+    const poleStarMaterial = new THREE.MeshBasicMaterial({ 
+      color: 0xf0f8ff,
+      emissive: 0xa0d0ff,
+      emissiveIntensity: 0.85
+    });
+    const poleStar = new THREE.Mesh(poleStarGeometry, poleStarMaterial);
+    poleStar.position.set(0, Math.cos(axialTiltRad) * poleStarDistance, Math.sin(axialTiltRad) * poleStarDistance);
+    scene.add(poleStar);
+
+    function animatePoleStar() {
+      const intensity = 0.75 + Math.sin(Date.now() * 0.003) * 0.15;
+      poleStarMaterial.emissiveIntensity = intensity;
+      requestAnimationFrame(animatePoleStar);
+    }
+    animatePoleStar();
+
+    // ========== РЕАЛИСТИЧНАЯ ЗЕМЛЯ ==========
+    let earthMesh;
+    
+    const earthGroup = new THREE.Group();
+    scene.add(earthGroup);
+    
+    earthGroup.rotation.x = THREE.MathUtils.degToRad(23.5);
+    
+    const textureLoader = new THREE.TextureLoader();
+    
+    const earthMaterial = new THREE.MeshPhongMaterial({
+      specular: 0x333333,
+      shininess: 5
+    });
+    
+    const earthGeometry = new THREE.SphereGeometry(config.earthRadius, 32, 32);
+    
+    earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
+    earthMesh.name = "earth";
+    earthGroup.add(earthMesh);
+
+    // ========== ВИЗУАЛИЗАЦИЯ ОСИ ВРАЩЕНИЯ ЗЕМЛИ ==========
+    const axisLength = config.earthRadius * 3;
+
+    const axisGeometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, -axisLength, 0),
+      new THREE.Vector3(0, axisLength, 0)
+    ]);
+
+    const axisMaterial = new THREE.LineBasicMaterial({ 
+      color: 0xff4081,
+      transparent: true,
+      opacity: 0.8
+    });
+
+    const earthAxis = new THREE.Line(axisGeometry, axisMaterial);
+    earthMesh.add(earthAxis);
+
+    // Загружаем текстуры
+    textureLoader.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg', 
+      function(texture) {
+        earthMaterial.map = texture;
+        earthMaterial.needsUpdate = true;
+      });
+    
+    textureLoader.load('https://threejs.org/examples/textures/planets/earth_normal_2048.jpg', 
+      function(texture) {
+        earthMaterial.normalMap = texture;
+        earthMaterial.needsUpdate = true;
+      });
+    
+    textureLoader.load('https://threejs.org/examples/textures/planets/earth_specular_2048.jpg', 
+      function(texture) {
+        earthMaterial.specularMap = texture;
+        earthMaterial.needsUpdate = true;
+      });
+
+    // ========== ЛУНА С РЕАЛИСТИЧНЫМИ ФАЗАМИ ==========
+    let moonMesh;
+    let moonLight;
+    let moonShadow;
+
+    // Функция для расчета фазы Луны по дате
+    function calculateMoonPhase(date) {
+      // Преобразуем дату в юлианский день
+      const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      const J1970 = 2440587.5;
+      const julianDate = J1970 + utcDate.getTime() / 86400000;
+      
+      // Юлианская дата нового луния 2000 года
+      const newMoonJDE = 2451549.5;
+      
+      // Синодический месяц в днях
+      const synodicMonth = 29.530588853;
+      
+      // Количество дней с нового луния
+      const daysSinceNew = julianDate - newMoonJDE;
+      
+      // Нормализуем к диапазону одного месяца
+      const normalizedDays = ((daysSinceNew % synodicMonth) + synodicMonth) % synodicMonth;
+      
+      // Процент цикла (0-1)
+      const cyclePercentage = normalizedDays / synodicMonth;
+      
+      // Определяем фазу
+      let phaseName;
+      let phaseIndex;
+      
+      if (cyclePercentage < 0.03 || cyclePercentage > 0.97) {
+        phaseName = "Новолуние";
+        phaseIndex = 0;
+      } else if (cyclePercentage < 0.22) {
+        phaseName = "Молодая Луна";
+        phaseIndex = 1;
+      } else if (cyclePercentage < 0.28) {
+        phaseName = "Первая четверть";
+        phaseIndex = 2;
+      } else if (cyclePercentage < 0.47) {
+        phaseName = "Прибывающая Луна";
+        phaseIndex = 3;
+      } else if (cyclePercentage < 0.53) {
+        phaseName = "Полнолуние";
+        phaseIndex = 4;
+      } else if (cyclePercentage < 0.72) {
+        phaseName = "Убывающая Луна";
+        phaseIndex = 5;
+      } else if (cyclePercentage < 0.78) {
+        phaseName = "Последняя четверть";
+        phaseIndex = 6;
+      } else {
+        phaseName = "Старая Луна";
+        phaseIndex = 7;
+      }
+      
+      return {
+        name: phaseName,
+        index: phaseIndex,
+        percentage: cyclePercentage,
+        illumination: Math.abs(Math.cos(cyclePercentage * Math.PI * 2))
+      };
+    }
+
+    // Создание Луны с возможностью отображения фаз
+    function createMoon() {
+      const moonGroup = new THREE.Group();
+      scene.add(moonGroup);
+      
+      // Создаем геометрию Луны
+      const moonGeometry = new THREE.SphereGeometry(config.moonRadius, 32, 32);
+      
+      // Материал для затемненной части Луны
+      const darkMaterial = new THREE.MeshBasicMaterial({
+        color: 0x333333,
+        side: THREE.BackSide
+      });
+      
+      // Материал для освещенной части Луны
+      const lightMaterial = new THREE.MeshPhongMaterial({
+        color: 0xdddddd,
+        emissive: 0xaaaaaa,
+        emissiveIntensity: 0.2,
+        specular: 0x333333,
+        shininess: 5
+      });
+      
+      // Создаем две половины Луны - темную и светлую
+      const darkHalf = new THREE.Mesh(moonGeometry, darkMaterial);
+      const lightHalf = new THREE.Mesh(moonGeometry, lightMaterial);
+      
+      // Создаем группу для визуализации фаз
+      moonGroup.add(darkHalf);
+      moonGroup.add(lightHalf);
+      
+      // Сохраняем ссылки на компоненты
+      moonMesh = {
+        group: moonGroup,
+        dark: darkHalf,
+        light: lightHalf,
+        materials: {
+          dark: darkMaterial,
+          light: lightMaterial
+        }
+      };
+      
+      // Свет для освещения Луны
+      moonLight = new THREE.DirectionalLight(0xffffff, 0.3);
+      moonGroup.add(moonLight);
+      
+      // Тень от Луны (для солнечных затмений)
+      const moonShadowGeometry = new THREE.SphereGeometry(config.moonRadius * 1.2, 16, 16);
+      const moonShadowMaterial = new THREE.MeshBasicMaterial({ 
+        color: 0x000000,
+        transparent: true,
+        opacity: 0.7,
+        side: THREE.BackSide
+      });
+      moonShadow = new THREE.Mesh(moonShadowGeometry, moonShadowMaterial);
+      moonShadow.visible = false; // По умолчанию скрыта
+      moonGroup.add(moonShadow);
+      
+      return moonGroup;
+    }
+
+    const moonGroup = createMoon();
+
+    // Обновление визуализации фазы Луны
+    function updateMoonPhaseVisualization(phaseInfo) {
+      if (!moonMesh) return;
+      
+      // Поворачиваем Луну так, чтобы освещенная часть была направлена к Солнцу
+      // В зависимости от фазы меняем ориентацию
+      const rotation = phaseInfo.percentage * Math.PI * 2;
+      moonMesh.group.rotation.y = rotation;
+    }
+
+    // ========== ТЕНЬ ЗЕМЛИ ==========
+    const shadowGeometry = new THREE.CircleGeometry(config.earthRadius * 2.5, 32);
+    const shadowMaterial = new THREE.MeshBasicMaterial({ 
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.3,
+      side: THREE.DoubleSide
+    });
+    const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial);
+    
+    shadow.rotation.x = Math.PI / 2;
+    shadow.position.y = -0.1;
+    
+    // earthGroup.add(shadow);
+
+    // След Земли
+    const trailGeometry = new THREE.BufferGeometry();
+    const trailVertices = new Float32Array(300 * 3);
+    trailGeometry.setAttribute('position', new THREE.BufferAttribute(trailVertices, 3));
+    
+    const trailMaterial = new THREE.LineBasicMaterial({ 
+      color: 0x1e88e5,
+      transparent: true,
+      opacity: 0.3
+    });
+    
+    const earthTrail = new THREE.Line(trailGeometry, trailMaterial);
+    scene.add(earthTrail);
+
+    // ========== УПРАВЛЕНИЕ КАМЕРОЙ ==========
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    let rotationX = 0;
+    let rotationY = -0.3;
+    const minPolarAngle = 0.1;
+    const maxPolarAngle = Math.PI - 0.1;
+    const rotationSpeed = 0.003;
+    
+    let cameraTarget = new THREE.Vector3(0, 0, 0);
+    let isFocusedOnEarth = false;
+    let cameraDistance = config.cameraDistance;
+
+    renderer.domElement.addEventListener('mousedown', onMouseDown);
+    renderer.domElement.addEventListener('mousemove', onMouseMove);
+    renderer.domElement.addEventListener('mouseup', onMouseUp);
+    renderer.domElement.addEventListener('mouseleave', onMouseUp);
+    renderer.domElement.addEventListener('wheel', onWheel);
+    renderer.domElement.addEventListener('touchstart', onTouchStart);
+    renderer.domElement.addEventListener('touchmove', onTouchMove);
+    renderer.domElement.addEventListener('touchend', onTouchEnd);
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    renderer.domElement.addEventListener('click', onClick);
+
+    function onClick(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+      
+      raycaster.setFromCamera(mouse, camera);
+      
+      const intersects = raycaster.intersectObjects([earthMesh, sunVisual, moonMesh.light]);
+      
+      if (intersects.length > 0) {
+        const object = intersects[0].object;
+        if (object.name === "earth") {
+          isFocusedOnEarth = true;
+          cameraTarget.copy(earthGroup.position);
+          cameraDistance = 20;
+        } else if (object.parent && object.parent.name === "sun") {
+          isFocusedOnEarth = false;
+          cameraTarget.set(0, 0, 0);
+          cameraDistance = config.cameraDistance;
+        } else if (object === moonMesh.light) {
+          // Клик по Луне
+          isFocusedOnEarth = true;
+          cameraTarget.copy(moonGroup.position);
+          cameraDistance = 15;
+        }
+      }
+    }
+
+    function onMouseDown(e) {
+      isDragging = true;
+      previousMousePosition = { x: e.clientX, y: e.clientY };
+    }
+
+    function onMouseMove(e) {
+      if (isDragging) {
+        const dx = e.clientX - previousMousePosition.x;
+        const dy = e.clientY - previousMousePosition.y;
+        
+        rotationY -= dx * rotationSpeed;
+        rotationX = Math.max(minPolarAngle, Math.min(maxPolarAngle, rotationX - dy * rotationSpeed));
+        
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+      }
+    }
+
+    function onMouseUp() {
+      isDragging = false;
+    }
+
+    function onWheel(e) {
+      e.preventDefault();
+      cameraDistance = Math.max(15, Math.min(300, cameraDistance - e.deltaY * 0.1));
+    }
+
+    function onTouchStart(e) {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        e.preventDefault();
+      }
+    }
+
+    function onTouchMove(e) {
+      if (isDragging && e.touches.length === 1) {
+        const dx = e.touches[0].clientX - previousMousePosition.x;
+        const dy = e.touches[0].clientY - previousMousePosition.y;
+        
+        rotationY -= dx * rotationSpeed * 2;
+        rotationX = Math.max(minPolarAngle, Math.min(maxPolarAngle, rotationX - dy * rotationSpeed * 2));
+        
+        previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        e.preventDefault();
+      }
+    }
+
+    function onTouchEnd() {
+      isDragging = false;
+    }
+
+    // ========== ОПРЕДЕЛЕНИЕ СЕЗОНА ==========
+    function getSeason(dayOfYear) {
+      for (const season of seasons) {
+        if (season.startDay <= season.endDay) {
+          if (dayOfYear >= season.startDay && dayOfYear <= season.endDay) {
+            return season.name;
+          }
+        } else {
+          if (dayOfYear >= season.startDay || dayOfYear <= season.endDay) {
+            return season.name;
+          }
+        }
+      }
+      return "НЕИЗВЕСТНО";
+    }
+
+    // ========== РЕАЛИСТИЧНОЕ ВРАЩЕНИЕ ЗЕМЛИ ==========
+    function updateEarthRotation(date) {
+      const hours = date.getUTCHours();
+      const minutes = date.getUTCMinutes();
+      const seconds = date.getUTCSeconds();
+      
+      const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+      const rotationAngle = (totalSeconds / 86400) * Math.PI * 2;
+      
+      if (earthMesh) {
+        earthMesh.rotation.y = rotationAngle;
+      }
+      
+      const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} UTC`;
+      document.getElementById('earthTime').textContent = `Время: ${timeString}`;
+    }
+
+    // ========== АСТРОНОМИЧЕСКИЕ ФУНКЦИИ ДЛЯ ЛУНЫ ==========
+    function calculateJulianDate(date) {
+      const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 
+                                      date.getHours(), date.getMinutes(), date.getSeconds()));
+      const J1970 = 2440587.5;
+      return J1970 + utcDate.getTime() / 86400000;
+    }
+
+    // ========== КОРРЕКТИРОВАННЫЙ РАСЧЕТ ПОЛОЖЕНИЯ ЛУНЫ ==========
+<!-- Только измененная часть функции calculateLunarPosition -->
+function calculateLunarPosition(date, earthX, earthZ) {
+  // Преобразуем дату в юлианский день
+  const julianDate = calculateJulianDate(date);
+  
+  // Вычисляем фазу Луны для определения положения
+  const moonPhase = calculateMoonPhase(date);
+  
+  // Угол положения Земли на своей орбите
+  const yearStart = new Date(date.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((date - yearStart) / 86400000) + 1;
+  const daysFromSolstice = (dayOfYear + 10) % 365;
+  const earthAngle = (daysFromSolstice / 365) * Math.PI * 2 - Math.PI/2;
+  
+  // ИНВЕРТИРУЕМ угол для правильного положения!
+  // Добавляем 0.5 для сдвига на 180 градусов
+const moonAngleRelativeToEarth = ((1.5 - moonPhase.percentage) % 1) * Math.PI * 2;
+
+  
+  // Позиционируем Луну на орбите вокруг Земли
+  const inclination = 5 * Math.PI / 180; // 5 градусов наклона
+  
+  const moonX = Math.cos(moonAngleRelativeToEarth) * config.moonOrbitRadius;
+  const moonY = Math.sin(inclination) * Math.sin(moonAngleRelativeToEarth) * config.moonOrbitRadius;
+  const moonZ = Math.sin(moonAngleRelativeToEarth) * config.moonOrbitRadius;
+  
+  // Добавляем позицию Земли
+  return {
+    x: earthX + moonX,
+    y: moonY,
+    z: earthZ + moonZ,
+    phase: moonPhase
+  };
+}
+
+
+    // ========== ОБНОВЛЕНИЕ ПОЛОЖЕНИЯ ЗЕМЛИ И ЛУНЫ ==========
+    const trailPoints = [];
+
+    function updateEarthAndMoonPosition(date) {
+      const yearStart = new Date(date.getFullYear(), 0, 1);
+      const dayOfYear = Math.floor((date - yearStart) / 86400000) + 1;
+      
+      const daysFromSolstice = (dayOfYear + 10) % 365;
+      const earthAngle = (daysFromSolstice / 365) * Math.PI * 2 - Math.PI/2;
+      
+      const earthX = Math.cos(earthAngle) * config.orbitRadius;
+      const earthZ = -Math.sin(earthAngle) * config.orbitRadius;
+      
+      // Земля движется по орбите
+      earthGroup.position.set(earthX, 0, earthZ);
+      
+      // Солнце остается в центре (фиксировано)
+      sunGroup.position.set(0, 0, 0);
+      
+      // Расчет положения Луны с учетом фазы
+      const lunarPos = calculateLunarPosition(date, earthX, earthZ);
+      
+      // Позиционируем Луну
+      moonGroup.position.set(lunarPos.x, lunarPos.y, lunarPos.z);
+      
+      // Направление света от Солнца к Луне
+      if (moonLight) {
+        const sunToMoon = new THREE.Vector3(
+          sunGroup.position.x - moonGroup.position.x,
+          sunGroup.position.y - moonGroup.position.y,
+          sunGroup.position.z - moonGroup.position.z
+        ).normalize();
+        moonLight.position.copy(sunToMoon.multiplyScalar(10));
+      }
+      
+      // Обновляем визуализацию фазы Луны
+      updateMoonPhaseVisualization(lunarPos.phase);
+      
+      // Проверка на затмение (Луна между Землей и Солнцем с учётом наклона)
+      const sunToEarth = new THREE.Vector3(earthX, 0, earthZ).normalize();
+      const sunToMoonVec = new THREE.Vector3(
+        lunarPos.x - earthX, lunarPos.y, lunarPos.z - earthZ
+      ).normalize();
+      
+      const angleBetween = sunToEarth.angleTo(sunToMoonVec);
+      
+      // Если угол меньше определённого порога - затмение!
+      if (Math.abs(angleBetween) < 0.05 && Math.abs(lunarPos.y) < 1 && 
+          lunarPos.phase.name === "Новолуние") {
+        moonShadow.visible = true;
+        document.getElementById('moonPhase').textContent = "Фаза Луны: ЗАТМЕНИЕ!";
+      } else {
+        moonShadow.visible = false;
+        document.getElementById('moonPhase').textContent = `Фаза Луны: ${lunarPos.phase.name}`;
+      }
+      
+      if (isFocusedOnEarth) {
+        cameraTarget.copy(earthGroup.position);
+      }
+      
+      // Тень следует за положением Земли относительно Солнца
+      const sunDirection = new THREE.Vector3(-earthX, 0, -earthZ).normalize();
+      shadow.lookAt(
+        earthGroup.position.x + sunDirection.x,
+        earthGroup.position.y + sunDirection.y,
+        earthGroup.position.z + sunDirection.z
+      );
+      
+      trailPoints.push({ x: earthX, y: 0, z: earthZ, time: Date.now() });
+      if (trailPoints.length > 100) trailPoints.shift();
+      
+      const positions = trailGeometry.attributes.position.array;
+      for (let i = 0; i < trailPoints.length; i++) {
+        positions[i * 3] = trailPoints[i].x;
+        positions[i * 3 + 1] = trailPoints[i].y;
+        positions[i * 3 + 2] = trailPoints[i].z;
+      }
+      trailGeometry.attributes.position.needsUpdate = true;
+      
+      const opts = { month: 'long', day: 'numeric', year: 'numeric' };
+      document.getElementById('currentDate').textContent = date.toLocaleDateString('ru-RU', opts);
+      document.getElementById('currentSeason').textContent = `Сезон: ${getSeason(dayOfYear)}`;
+      
+      updateEarthRotation(date);
+    }
+
+    // ========== АНИМАЦИЯ ==========
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      // Плавное перемещение камеры
+      const targetCameraPos = new THREE.Vector3();
+      const radius = cameraDistance;
+      targetCameraPos.x = Math.sin(rotationY) * Math.sin(rotationX) * radius;
+      targetCameraPos.y = Math.cos(rotationX) * radius;
+      targetCameraPos.z = Math.cos(rotationY) * Math.sin(rotationX) * radius;
+      
+      targetCameraPos.add(cameraTarget);
+      
+      camera.position.lerp(targetCameraPos, config.cameraTransitionSpeed);
+      camera.lookAt(cameraTarget);
+      
+      renderer.render(scene, camera);
+    }
+
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    window.addEventListener('load', () => {
+      const today = new Date();
+      document.getElementById('datePicker').valueAsDate = today;
+      updateEarthAndMoonPosition(today);
+      
+      setTimeout(() => {
+        animate();
+      }, 100);
+    });
+
+    // ========== ОБРАБОТЧИКИ СТРЕЛОЧЕК ==========
+    document.getElementById('prevDayBtn').addEventListener('click', () => {
+      const currentDate = new Date(document.getElementById('datePicker').value);
+      currentDate.setDate(currentDate.getDate() - 1);
+      document.getElementById('datePicker').valueAsDate = currentDate;
+      updateEarthAndMoonPosition(currentDate);
+    });
+
+    document.getElementById('nextDayBtn').addEventListener('click', () => {
+      const currentDate = new Date(document.getElementById('datePicker').value);
+      currentDate.setDate(currentDate.getDate() + 1);
+      document.getElementById('datePicker').valueAsDate = currentDate;
+      updateEarthAndMoonPosition(currentDate);
+    });
+
+    document.getElementById('datePicker').addEventListener('change', (e) => {
+      updateEarthAndMoonPosition(new Date(e.target.value));
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ========== ГОРЯЧИЕ КЛАВИШИ ==========
+    window.addEventListener('keydown', (e) => {
+      switch(e.key) {
+        case 'ArrowLeft': 
+          if (e.ctrlKey || e.metaKey) {
+            const currentDate = new Date(document.getElementById('datePicker').value);
+            currentDate.setDate(currentDate.getDate() - 1);
+            document.getElementById('datePicker').valueAsDate = currentDate;
+            updateEarthAndMoonPosition(currentDate);
+          }
+          break;
+        case 'ArrowRight': 
+          if (e.ctrlKey || e.metaKey) {
+            const currentDate = new Date(document.getElementById('datePicker').value);
+            currentDate.setDate(currentDate.getDate() + 1);
+            document.getElementById('datePicker').valueAsDate = currentDate;
+            updateEarthAndMoonPosition(currentDate);
+          }
+          break;
+        case ' ': 
+          if (isFocusedOnEarth) {
+            isFocusedOnEarth = false;
+            cameraTarget.set(0, 0, 0);
+            cameraDistance = config.cameraDistance;
+          } else {
+            isFocusedOnEarth = true;
+            cameraTarget.copy(earthGroup.position);
+            cameraDistance = 20;
+          }
+          break;
+      }
+    });
+  </script>
+</body>
+</html>

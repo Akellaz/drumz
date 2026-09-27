@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Whitney Houston Drum Challenge</title>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/dist/abcjs-basic-min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    #player {
+      margin: 20px 0;
+    }
+    #paper {
+      border: 1px solid #ccc;
+      background: white;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .highlight {
+      fill: #0a9ecc !important;
+      stroke: #0a9ecc !important;
+    }
+    .controls {
+      margin: 10px 0;
+      padding: 15px;
+      background: #e8f4f8;
+      border-radius: 4px;
+    }
+    .timing-control {
+      margin: 10px 0;
+    }
+    input, button {
+      margin: 5px;
+      padding: 8px;
+    }
+    .highlight-toggle {
+      background: #28a745;
+    }
+    .highlight-toggle.active {
+      background: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <h1>Whitney Houston Drum Challenge</h1>
+
+  <!-- Управление -->
+  <div class="controls">
+    <div class="timing-control">
+      <label>Длительность аудио (сек): <input type="number" id="durationInput" value="16" step="0.1"></label>
+    </div>
+    <div class="timing-control">
+      <label>BPM: <input type="number" id="bpmInput" value="67" min="40" max="240"></label>
+    </div>
+    <div class="timing-control">
+      <label>Нот в четверти: <input type="number" id="notesPerBeatInput" value="1" min="1" max="16"></label>
+    </div>
+    <button id="applyTimingsBtn">Применить тайминги</button>
+    <button id="showTimingsBtn">Показать тайминги</button>
+    <button id="toggleHighlightBtn" class="highlight-toggle">Выключить подсветку</button>
+  </div>
+
+  <!-- Аудиоплеер -->
+  <div id="player">
+    <audio id="audio" src="whitney.mp3" controls></audio>
+  </div>
+
+  <!-- Место для нот -->
+  <div id="paper"></div>
+
+  <!-- Для отладки таймингов -->
+  <div id="timingsInfo" style="display: none; background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px;"></div>
+
+  <script>
+    // === 1. ABC-нотация с паузами ===
+    const abcString = `
+X:1
+M:4/4
+L:1/16
+K:C clef=perc
+V:Drums stem=up
+%%percmap g  closed-hi-hat x
+g4g4|g4g4g4g4 | g4g4z4z4 | z4z4z4z4 | Lc4| g4g4g4g4 |g4g4g4g4| 
+`;
+
+    // === 2. Рендерим ноты ===
+    const paper = document.getElementById("paper");
+    const visualObj = ABCJS.renderAbc(paper, abcString, {
+      add_classes: true,
+      paddingtop: 10,
+      paddingbottom: 10,
+    })[0];
+
+    // === 3. Получаем все элементы (ноты и паузы) ===
+    const allElements = paper.querySelectorAll('.abcjs-note, .abcjs-rest');
+    let timings = [];
+    let beats = [];
+    
+    // === 4. Элементы управления ===
+    const audio = document.getElementById("audio");
+    const durationInput = document.getElementById("durationInput");
+    const bpmInput = document.getElementById("bpmInput");
+    const notesPerBeatInput = document.getElementById("notesPerBeatInput");
+    const applyTimingsBtn = document.getElementById("applyTimingsBtn");
+    const showTimingsBtn = document.getElementById("showTimingsBtn");
+    const toggleHighlightBtn = document.getElementById("toggleHighlightBtn");
+    const timingsInfo = document.getElementById("timingsInfo");
+
+    let highlightEnabled = true;
+
+    // === 5. Функции для работы с таймингами ===
+    function calculateTimings() {
+      const audioDuration = parseFloat(durationInput.value) || 16;
+      const bpm = parseInt(bpmInput.value) || 120;
+      const notesPerBeat = parseInt(notesPerBeatInput.value) || 4;
+      
+      const beatInterval = 60 / bpm;
+      const noteDuration = beatInterval / notesPerBeat;
+      
+      timings = [];
+      beats = [];
+      
+      // Генерируем тайминги для всех элементов (ноты + паузы)
+      let currentTime = 0;
+      let elementIndex = 0;
+      
+      allElements.forEach((element, index) => {
+        // Определяем тип элемента
+        let elementType = 'unknown';
+        if (element.classList.contains('abcjs-note')) {
+          elementType = 'note';
+        } else if (element.classList.contains('abcjs-rest')) {
+          elementType = 'rest';
+        }
+        
+        timings.push({
+          start: currentTime,
+          end: currentTime + noteDuration,
+          element: element,
+          type: elementType,
+          index: elementIndex++
+        });
+        
+        currentTime += noteDuration;
+      });
+      
+      console.log(`Тайминги обновлены: ${timings.length} элементов (${allElements.length} всего)`);
+    }
+
+    // === 6. Синхронизация подсветки ===
+    function clearAllHighlights() {
+      if (highlightEnabled) {
+        paper.querySelectorAll(".highlight").forEach(el => {
+          el.classList.remove("highlight");
+        });
+      }
+    }
+
+    function highlightElement(element) {
+      if (highlightEnabled && element) {
+        element.classList.add("highlight");
+      }
+    }
+
+    // === 7. Основная синхронизация ===
+    audio.addEventListener("timeupdate", () => {
+      const t = audio.currentTime;
+      clearAllHighlights();
+      
+      // Подсветка всех элементов (ноты и паузы)
+      const activeElement = timings.find(item => t >= item.start && t < item.end);
+      if (activeElement && activeElement.element) {
+        highlightElement(activeElement.element);
+      }
+    });
+
+    // === 8. Управление подсветкой ===
+    toggleHighlightBtn.addEventListener('click', function() {
+      highlightEnabled = !highlightEnabled;
+      if (highlightEnabled) {
+        toggleHighlightBtn.textContent = "Выключить подсветку";
+        toggleHighlightBtn.classList.remove("active");
+      } else {
+        toggleHighlightBtn.textContent = "Включить подсветку";
+        toggleHighlightBtn.classList.add("active");
+        clearAllHighlights();
+      }
+    });
+
+    // === 9. Управление таймингами ===
+    applyTimingsBtn.addEventListener('click', calculateTimings);
+    
+    showTimingsBtn.addEventListener('click', function() {
+      timingsInfo.style.display = timingsInfo.style.display === 'none' ? 'block' : 'none';
+      
+      if (timingsInfo.style.display === 'block') {
+        let html = '<h4>Тайминги элементов:</h4>';
+        timings.forEach((timing, index) => {
+          const type = timing.type === 'note' ? 'Нота' : 'Пауза';
+          html += `${type} ${index+1}: ${timing.start.toFixed(3)}-${timing.end.toFixed(3)}с<br>`;
+        });
+        timingsInfo.innerHTML = html;
+      }
+    });
+
+    // === 10. Инициализация ===
+    // Автоопределение длительности
+    audio.addEventListener('loadedmetadata', function() {
+      if (audio.duration && !isNaN(audio.duration)) {
+        durationInput.value = audio.duration.toFixed(1);
+      }
+      calculateTimings();
+    });
+
+    // Если метаданные уже загружены
+    if (audio.duration && !isNaN(audio.duration)) {
+      durationInput.value = audio.duration.toFixed(1);
+    }
+    
+    // Начальный расчет
+    calculateTimings();
+  </script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trio VAE — Конструктор</title>
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/dist/magentamusic.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1; --primary-bg: #eef2ff;
+            --text: #1e293b; --text-light: #64748b;
+            --border: #cbd5e1; --bg: #f8fafc;
+            --panel: #ffffff; --danger: #ef4444;
+            --success: #22c55e;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--bg); color: var(--text);
+            max-width: 600px; margin: 0 auto;
+        }
+        h1 { font-size: 20px; margin: 0 0 4px; }
+        .subtitle { color: var(--text-light); font-size: 13px; margin-bottom: 16px; }
+
+        /* === ПАНЕЛЬ УПРАВЛЕНИЯ === */
+        .controls {
+            background: var(--panel); border-radius: 12px;
+            border: 1px solid var(--border); margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .control-section {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .control-section:last-child { border-bottom: none; }
+        .section-label {
+            font-size: 11px; font-weight: 700; color: var(--text-light);
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        /* Кнопки */
+        .btn-row { display: flex; gap: 8px; }
+        .btn {
+            padding: 12px 16px; font-size: 14px; font-weight: 700;
+            border-radius: 8px; border: 1px solid var(--border);
+            background: var(--panel); color: var(--text); cursor: pointer;
+            transition: all 0.15s; flex: 1; text-align: center;
+        }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); flex: 2; }
+        .btn-primary:hover:not(:disabled) { background: #4f46e5; }
+        .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+        /* Селект */
+        .full-select {
+            width: 100%; padding: 10px 12px; border-radius: 8px;
+            border: 1px solid var(--border); background: var(--bg);
+            color: var(--text); font-size: 14px; font-weight: 600;
+            cursor: pointer; outline: none; appearance: auto;
+        }
+        .full-select:focus { border-color: var(--primary); }
+
+        /* Чекбоксы */
+        .checkbox-row { display: flex; gap: 16px; flex-wrap: wrap; }
+        .track-checkbox {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 14px; font-weight: 600; cursor: pointer; user-select: none;
+        }
+        .track-checkbox input[type="checkbox"] {
+            width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;
+        }
+
+        /* Слайдеры */
+        .slider-row { display: flex; flex-direction: column; gap: 12px; }
+        .slider-group { display: flex; align-items: center; gap: 10px; }
+        .slider-label { font-size: 13px; font-weight: 600; color: var(--text-light); min-width: 100px; }
+        .slider-group input[type="range"] { flex: 1; accent-color: var(--primary); cursor: pointer; }
+        .slider-val { font-weight: 700; color: var(--primary); min-width: 36px; text-align: right; font-size: 14px; }
+
+        /* Статус */
+        .status {
+            padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+            background: var(--primary-bg); color: var(--primary); margin-bottom: 16px;
+            text-align: center;
+        }
+        .status.error { background: #fee2e2; color: var(--danger); }
+        .status.success { background: #dcfce7; color: #15803d; }
+        .status.warning { background: #fef3c7; color: #92400e; }
+
+        /* Результат */
+        .output {
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px;
+        }
+        .output h3 {
+            margin: 0 0 12px; font-size: 13px; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--text-light);
+        }
+        .tracks { display: grid; gap: 10px; }
+        .track {
+            border: 1px solid var(--border); border-radius: 8px; padding: 10px;
+            background: #fafbfc;
+        }
+        .track.hidden { display: none; }
+        .track-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 6px; font-size: 13px; font-weight: 700;
+        }
+        .track-name { color: var(--primary); }
+        .track-count { color: var(--text-light); font-weight: 500; font-size: 12px; }
+        .track-notes {
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-size: 11px; color: var(--text); line-height: 1.6; word-break: break-word;
+        }
+        .note-chip {
+            display: inline-block; padding: 2px 5px; margin: 1px;
+            background: var(--primary-bg); color: var(--primary);
+            border-radius: 4px; font-weight: 600; font-size: 11px;
+        }
+        .empty { color: var(--text-light); font-style: italic; font-size: 12px; }
+
+        .stats {
+            display: flex; gap: 16px; margin-top: 12px; padding-top: 10px;
+            border-top: 1px dashed var(--border); font-size: 12px; color: var(--text-light);
+        }
+        .stats b { color: var(--text); }
+
+        .sound-info {
+            margin-top: 12px; padding: 8px 12px; background: #fefce8;
+            border: 1px solid #fde047; border-radius: 6px;
+            font-size: 12px; color: #854d0e; line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎛️ Trio VAE</h1>
+    <p class="subtitle">4 такта · 3 дорожки · 128 инструментов · SGM Plus</p>
+
+    <div class="controls">
+        <!-- 1. Кнопки -->
+        <div class="control-section">
+            <div class="btn-row">
+                <button class="btn btn-primary" id="btnGenerate" disabled>🎲 Сгенерировать</button>
+                <button class="btn" id="btnPlay" disabled>▶ Играть</button>
+                <button class="btn btn-danger" id="btnStop" disabled>⏹</button>
+            </div>
+        </div>
+
+        <!-- 2. Инструмент -->
+        <div class="control-section">
+            <div class="section-label">Инструмент аккомпанемента</div>
+            <select class="full-select" id="instrumentSelect"></select>
+        </div>
+
+        <!-- 3. Дорожки -->
+        <div class="control-section">
+            <div class="section-label">Дорожки</div>
+            <div class="checkbox-row">
+                <label class="track-checkbox"><input type="checkbox" id="chkDrums" checked> 🥁 Барабаны</label>
+                <label class="track-checkbox"><input type="checkbox" id="chkBass" checked> 🎸 Бас</label>
+                <label class="track-checkbox"><input type="checkbox" id="chkKeys" checked> 🎹 Аккомп.</label>
+            </div>
+        </div>
+
+        <!-- 4. Параметры -->
+        <div class="control-section">
+            <div class="section-label">Параметры</div>
+            <div class="slider-row">
+                <div class="slider-group">
+                    <span class="slider-label">Температура</span>
+                    <input type="range" id="temp" min="0.5" max="2.0" step="0.1" value="1.0">
+                    <span class="slider-val" id="tempVal">1.0</span>
+                </div>
+                <div class="slider-group">
+                    <span class="slider-label">BPM</span>
+                    <input type="range" id="bpm" min="60" max="180" step="5" value="100">
+                    <span class="slider-val" id="bpmVal">100</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status" id="status">⏳ Загрузка модели (~17 МБ)...</div>
+
+    <div class="output">
+        <h3>Результат</h3>
+        <div class="tracks">
+            <div class="track" id="trackKeys">
+                <div class="track-head">
+                    <span class="track-name" id="instTrackName">🎹 Аккомпанемент</span>
+                    <span class="track-count" id="keysCount">0 нот</span>
+                </div>
+                <div class="track-notes" id="keysNotes"><span class="empty">Пока ничего</span></div>
+            </div>
+            <div class="track" id="trackBass">
+                <div class="track-head">
+                    <span class="track-name">🎸 Бас</span>
+                    <span class="track-count" id="bassCount">0 нот</span>
+                </div>
+                <div class="track-notes" id="bassNotes"><span class="empty">—</span></div>
+            </div>
+            <div class="track" id="trackDrums">
+                <div class="track-head">
+                    <span class="track-name">🥁 Ударные</span>
+                    <span class="track-count" id="drumsCount">0 нот</span>
+                </div>
+                <div class="track-notes" id="drumsNotes"><span class="empty">—</span></div>
+            </div>
+        </div>
+        <div class="stats">
+            <div>Нот: <b id="totalCount">0</b></div>
+            <div>Длина: <b id="duration">0.0 с</b></div>
+            <div>Тактов: <b>4</b></div>
+        </div>
+        <div class="sound-info">
+            💡 Снимите галочку с дорожки, чтобы убрать её из генерации и воспроизведения.
+        </div>
+    </div>
+
+    <script>
+    const MODEL_URL = 'https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/trio_4bar';
+    const SOUNDFONT_URL = 'https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus';
+
+    const GM_INSTRUMENTS = [
+        "Acoustic Grand Piano","Bright Acoustic Piano","Electric Grand Piano","Honky-tonk Piano",
+        "Electric Piano 1","Electric Piano 2","Harpsichord","Clavinet",
+        "Celesta","Glockenspiel","Music Box","Vibraphone",
+        "Marimba","Xylophone","Tubular Bells","Dulcimer",
+        "Drawbar Organ","Percussive Organ","Rock Organ","Church Organ",
+        "Reed Organ","Accordion","Harmonica","Tango Accordion",
+        "Acoustic Guitar (nylon)","Acoustic Guitar (steel)","Electric Guitar (jazz)","Electric Guitar (clean)",
+        "Electric Guitar (muted)","Overdriven Guitar","Distortion Guitar","Guitar harmonics",
+        "Acoustic Bass","Electric Bass (finger)","Electric Bass (pick)","Fretless Bass",
+        "Slap Bass 1","Slap Bass 2","Synth Bass 1","Synth Bass 2",
+        "Violin","Viola","Cello","Contrabass",
+        "Tremolo Strings","Pizzicato Strings","Orchestral Harp","Timpani",
+        "String Ensemble 1","String Ensemble 2","Synth Strings 1","Synth Strings 2",
+        "Choir Aahs","Voice Oohs","Synth Voice","Orchestra Hit",
+        "Trumpet","Trombone","Tuba","Muted Trumpet",
+        "French Horn","Brass Section","Synth Brass 1","Synth Brass 2",
+        "Soprano Sax","Alto Sax","Tenor Sax","Baritone Sax",
+        "Oboe","English Horn","Bassoon","Clarinet",
+        "Piccolo","Flute","Recorder","Pan Flute",
+        "Blown Bottle","Shakuhachi","Whistle","Ocarina",
+        "Lead 1 (square)","Lead 2 (sawtooth)","Lead 3 (calliope)","Lead 4 (chiff)",
+        "Lead 5 (charang)","Lead 6 (voice)","Lead 7 (fifths)","Lead 8 (bass + lead)",
+        "Pad 1 (new age)","Pad 2 (warm)","Pad 3 (polysynth)","Pad 4 (choir)",
+        "Pad 5 (bowed)","Pad 6 (metallic)","Pad 7 (halo)","Pad 8 (sweep)",
+        "FX 1 (rain)","FX 2 (soundtrack)","FX 3 (crystal)","FX 4 (atmosphere)",
+        "FX 5 (brightness)","FX 6 (goblins)","FX 7 (echoes)","FX 8 (sci-fi)",
+        "Sitar","Banjo","Shamisen","Koto",
+        "Kalimba","Bag pipe","Fiddle","Shanai",
+        "Tinkle Bell","Agogo","Steel Drums","Woodblock",
+        "Taiko Drum","Melodic Tom","Synth Drum","Reverse Cymbal",
+        "Guitar Fret Noise","Breath Noise","Seashore","Bird Tweet",
+        "Telephone Ring","Helicopter","Applause","Gunshot"
+    ];
+
+    const DRUM_NAMES = {
+        35:'Kick',36:'Kick',37:'Snare Rim',38:'Snare',39:'Clap',40:'Snare',
+        41:'Tom Lo',42:'HH Closed',43:'Tom Lo',44:'HH Pedal',45:'Tom Mid',
+        46:'HH Open',47:'Tom Mid',48:'Tom Hi',49:'Crash',50:'Tom Hi',
+        51:'Ride',52:'China',53:'Ride Bell',57:'Crash'
+    };
+
+    const state = {
+        model: null, player: null, sequence: null,
+        isReady: false, isPlaying: false, samplesLoaded: false,
+        selectedProgram: 25,
+        includeDrums: true, includeBass: true, includeKeys: true
+    };
+
+    const $ = id => document.getElementById(id);
+
+    // Инициализация
+    function initInstrumentSelect() {
+        const sel = $('instrumentSelect');
+        GM_INSTRUMENTS.forEach((name, i) => {
+            const o = document.createElement('option');
+            o.value = i; o.textContent = `${i}. ${name}`;
+            if (i === 25) o.selected = true;
+            sel.appendChild(o);
+        });
+        sel.addEventListener('change', e => {
+            state.selectedProgram = parseInt(e.target.value);
+            $('instTrackName').textContent = `🎵 ${GM_INSTRUMENTS[state.selectedProgram]}`;
+        });
+    }
+
+    function initCheckboxes() {
+        $('chkDrums').onchange = e => { state.includeDrums = e.target.checked; updateVisibility(); };
+        $('chkBass').onchange = e => { state.includeBass = e.target.checked; updateVisibility(); };
+        $('chkKeys').onchange = e => { state.includeKeys = e.target.checked; updateVisibility(); };
+    }
+
+    function updateVisibility() {
+        $('trackDrums').classList.toggle('hidden', !state.includeDrums);
+        $('trackBass').classList.toggle('hidden', !state.includeBass);
+        $('trackKeys').classList.toggle('hidden', !state.includeKeys);
+        const any = state.includeDrums || state.includeBass || state.includeKeys;
+        if (state.isReady) $('btnGenerate').disabled = !any;
+        if (!any) setStatus('⚠️ Включите хотя бы одну дорожку', 'warning');
+    }
+
+    $('temp').oninput = e => $('tempVal').textContent = parseFloat(e.target.value).toFixed(1);
+    $('bpm').oninput = e => {
+        $('bpmVal').textContent = e.target.value;
+        if (state.sequence) {
+            state.sequence.tempos = [{ qpm: parseInt(e.target.value), time: 0 }];
+            state.sequence.totalTime = calcDur(state.sequence);
+            $('duration').textContent = state.sequence.totalTime.toFixed(1) + ' с';
+            state.samplesLoaded = false;
+        }
+    };
+
+    $('btnGenerate').onclick = generate;
+    $('btnPlay').onclick = play;
+    $('btnStop').onclick = stop;
+
+    function setStatus(t, type = '') { const el = $('status'); el.textContent = t; el.className = 'status ' + type; }
+
+    async function init() {
+        try {
+            initInstrumentSelect();
+            initCheckboxes();
+            state.model = new mm.MusicVAE(MODEL_URL);
+            await state.model.initialize();
+            state.player = new mm.SoundFontPlayer(SOUNDFONT_URL);
+            state.isReady = true;
+            $('btnGenerate').disabled = false;
+            setStatus('✅ Готово. Нажмите «Сгенерировать»', 'success');
+        } catch (err) {
+            console.error(err);
+            setStatus('❌ Ошибка: ' + err.message, 'error');
+        }
+    }
+
+    async function generate() {
+        if (!state.isReady) return;
+        if (!state.includeDrums && !state.includeBass && !state.includeKeys) {
+            setStatus('⚠️ Включите хотя бы одну дорожку', 'warning'); return;
+        }
+        stop();
+        $('btnGenerate').disabled = true;
+        setStatus('⏳ Генерация...');
+        try {
+            const samples = await state.model.sample(1, parseFloat($('temp').value));
+            state.sequence = samples[0];
+            const orig = state.sequence.notes.length;
+            state.sequence.notes = state.sequence.notes.filter(n => {
+                if (n.isDrum) return state.includeDrums;
+                if (n.program >= 32 && n.program <= 39) return state.includeBass;
+                return state.includeKeys;
+            });
+            for (const n of state.sequence.notes) {
+                if (!n.isDrum && (n.program < 32 || n.program > 39)) n.program = state.selectedProgram;
+            }
+            state.sequence.tempos = [{ qpm: parseInt($('bpm').value), time: 0 }];
+            state.sequence.totalTime = calcDur(state.sequence);
+            state.samplesLoaded = false;
+            render(state.sequence);
+            updateVisibility();
+            $('btnPlay').disabled = false;
+            setStatus(`✅ Готово (${state.sequence.notes.length} нот, удалено ${orig - state.sequence.notes.length})`, 'success');
+        } catch (err) {
+            console.error(err);
+            setStatus('❌ Ошибка: ' + err.message, 'error');
+        } finally { $('btnGenerate').disabled = false; }
+    }
+
+    async function play() {
+        if (!state.sequence) return;
+        $('btnPlay').disabled = true;
+        if (!state.samplesLoaded) {
+            setStatus('⏳ Загрузка звуков...');
+            try { await state.player.loadSamples(state.sequence); state.samplesLoaded = true; }
+            catch (err) { setStatus('❌ Звуки: ' + err.message, 'error'); $('btnPlay').disabled = false; return; }
+        }
+        state.player.start(state.sequence);
+        state.isPlaying = true;
+        $('btnStop').disabled = false;
+        setStatus('▶ Играет...');
+        const chk = setInterval(() => {
+            if (!state.player.isPlaying()) {
+                clearInterval(chk); state.isPlaying = false;
+                $('btnPlay').disabled = false; $('btnStop').disabled = true;
+                setStatus('✅ Готово', 'success');
+            }
+        }, 200);
+    }
+
+    function stop() {
+        if (state.player && state.isPlaying) state.player.stop();
+        state.isPlaying = false;
+        $('btnPlay').disabled = !state.sequence;
+        $('btnStop').disabled = true;
+        if (state.sequence) setStatus('⏸ Стоп');
+    }
+
+    function calcDur(s) { let m = 0; for (const n of s.notes) if (n.endTime > m) m = n.endTime; return m; }
+
+    function midiName(p) {
+        const n = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+        return n[p % 12] + Math.floor(p / 12 - 1);
+    }
+
+    function render(seq) {
+        const d = [], b = [], k = [];
+        for (const n of seq.notes) {
+            const step = n.quantizedStartStep ?? Math.round(n.startTime * 4);
+            const e = { step, time: n.startTime.toFixed(2), pitch: n.pitch };
+            if (n.isDrum) { e.name = DRUM_NAMES[n.pitch] || `D${n.pitch}`; d.push(e); }
+            else if (n.program >= 32 && n.program <= 39) { e.name = midiName(n.pitch); e.inst = GM_INSTRUMENTS[n.program]; b.push(e); }
+            else { e.name = midiName(n.pitch); e.inst = GM_INSTRUMENTS[n.program]; k.push(e); }
+        }
+        [d, b, k].forEach(a => a.sort((x, y) => x.step - y.step));
+        rTrack('drums', d, e => `<span class="note-chip">[${e.step}] ${e.name}</span>`);
+        rTrack('bass', b, e => `<span class="note-chip" title="${e.inst}">[${e.step}] ${e.name}</span>`);
+        rTrack('keys', k, e => `<span class="note-chip" title="${e.inst}">[${e.step}] ${e.name}</span>`);
+        $('totalCount').textContent = seq.notes.length;
+        $('duration').textContent = seq.totalTime.toFixed(1) + ' с';
+    }
+
+    function rTrack(id, notes, fmt) {
+        $(id + 'Count').textContent = notes.length + ' нот';
+        const c = $(id + 'Notes');
+        c.innerHTML = notes.length ? notes.map(fmt).join(' ') : '<span class="empty">Пусто</span>';
+    }
+
+    init();
+    </script>
+</body>
+</html>

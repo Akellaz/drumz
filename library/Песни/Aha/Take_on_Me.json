@@ -1,0 +1,21 @@
+{
+  "title": "Take on Me ",
+  "category": ["четверти", "восьмые"],
+  "difficulty": 3,
+  "description": "",
+  "tempo": 165,
+  "version": "1.0",
+  "created": "2026-08-03",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Aha",
+      "abc": "F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | \n[F4a]  c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | c2c2 c2c2 c2c2 c2c2  | \nF4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4  | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c2c2   |\n[F4a]  c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | c2c2 c2c2 c2c2 c2c2  | \nF4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4  | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | c4 c4 c2c2 c4   |\n[F4a]  c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4   c2c2 c2c2  | \nF4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4  | F4 c4 F4 c4 | F4 c4 F4 c4 | F4 c4 F4 c4 | c2c2 c4 c4 c4    |\n[F4a] z4 c4 z4 | F4 z4 c4 z4 | F4 z4 c4 z4 | [F4a] c2c2 c2c2 c2c2 | \n|:\"4\"[F4a] c4 F4 c4  | F4 c4 F4 c4 | F4 c4 F4 c4 |  \"Fill\"z16 \"4\":| \n[F4a] z4 z4 z4 |] ",
+      "startTime": 0
+    }
+  ],
+  
+  "audio": {
+    "plus": "Take_on_Me.mp3"
+  }
+}

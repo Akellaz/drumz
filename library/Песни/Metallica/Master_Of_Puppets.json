@@ -1,0 +1,19 @@
+{
+  "title": "Master Of Puppets",
+  "category": ["четверти"],
+  "difficulty": "1",
+  "description": "",
+  "tempo": 106,
+  "version": "1.0",
+  "created": "2026-01-22",
+  "fragments": [
+    {
+      "id": 0,
+      "title": "Фрагмент",
+      "abc": "[M: 2/4] z16 | [M: 4/4] z16 | z16 | z16 | [M: 2/4] z16 |[M: 2/4] [F4aD] D4 |\n [F4aD] D4 D4 D4 | [F4aD] D4 D4 D4 | [F4aD] D4 [F4aD] D4 | [M: 2/4] [F4aD] D4 |\n[F4a]z4z4z4"
+    }
+  ],
+  "audio": {
+    "plus": "Master Of Puppets_plus.mp3"
+  }
+}

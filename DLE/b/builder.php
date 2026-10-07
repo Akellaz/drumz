@@ -660,33 +660,76 @@
             }
         }
 
-        async function saveLessonToDB() {
-            const btn = document.getElementById('btn-save-db');
-            const text = document.getElementById('save-db-text');
-            const originalText = text.textContent;
-            btn.disabled = true; text.textContent = 'Сохранение...';
+       
 
-            try {
-                const payload = { id: lessonData.id || 0, title: lessonData.title || 'Новый урок', data: lessonData };
-                const res = await fetch('/workspace/lessons/api.php?action=save', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-                });
-                const result = await res.json();
-                if (result.status === 'success') {
-                    if (!lessonData.id) lessonData.id = result.id;
-                    btn.classList.add('saved'); text.textContent = 'Сохранено ✓';
-                    showToast('✅ Урок сохранён');
-                    renderCoverThumbnail();
-                    setTimeout(() => { btn.classList.remove('saved'); text.textContent = originalText; }, 2000);
-                } else {
-                    alert('Ошибка сервера: ' + result.error); text.textContent = originalText;
-                }
-            } catch (e) {
-                console.error("Ошибка сохранения:", e); alert('Ошибка сети при сохранении.'); text.textContent = originalText;
-            } finally {
-                btn.disabled = false;
-            }
+
+
+
+
+
+
+
+
+	  async function saveLessonToDB() {
+    const btn = document.getElementById('btn-save-db');
+    const text = document.getElementById('save-db-text');
+    const originalText = text.textContent;
+    
+    // 1. Запрашиваем токен у Firebase через нашу новую глобальную функцию
+    const token = await window.getFirebaseToken();
+	
+	
+    console.log("🔍 ПЕРЕД ОТПРАВКОЙ: Тип токена:", typeof token, "Длина:", token ? token.length : 0, "Начало:", token ? token.substring(0, 30) : "НЕТ ТОКЕНА");
+    
+	
+	
+    if (!token) {
+        alert('Сначала нужно войти в систему через Google!');
+        return;
+    }
+
+    btn.disabled = true; 
+    text.textContent = 'Сохранение...';
+
+    try {
+        // 2. Формируем полезную нагрузку, добавляя туда токен
+        const payload = { 
+            id: lessonData.id || 0, 
+            title: lessonData.title || 'Новый урок', 
+            data: lessonData,
+            token: token // <-- Вот это ключевое добавление
+        };
+        
+        const res = await fetch('/workspace/lessons/api.php?action=save', {
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify(payload)
+        });
+        
+        const result = await res.json();
+        
+        if (result.status === 'success') {
+            if (!lessonData.id) lessonData.id = result.id;
+            btn.classList.add('saved'); 
+            text.textContent = 'Сохранено ✓';
+            showToast('✅ Урок сохранён');
+            renderCoverThumbnail();
+            setTimeout(() => { 
+                btn.classList.remove('saved'); 
+                text.textContent = originalText; 
+            }, 2000);
+        } else {
+            alert('Ошибка сервера: ' + (result.error || 'Неизвестная ошибка')); 
+            text.textContent = originalText;
         }
+    } catch (e) {
+        console.error("Ошибка сохранения:", e); 
+        alert('Ошибка сети при сохранении.'); 
+        text.textContent = originalText;
+    } finally {
+        btn.disabled = false;
+    }
+}
 
         function initSortable() {
             paletteSortable = new Sortable(document.getElementById('palette-list'), {

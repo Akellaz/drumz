@@ -87,7 +87,7 @@
         <p style="color: var(--text-light); margin-top: 8px;">Управление уроками и материалами.</p>
         
         <div class="lessons-section">
-          <h2>Мои уроки</h2>
+        
           <ul id="lessonsList" class="lessons-list">
             <li class="empty-state">Загрузка...</li>
           </ul>
@@ -100,70 +100,98 @@
   <script type="module" src="/assets/auth.js"></script>
   
   <script>
+    // Словарь для красивого отображения типов
+    const TYPE_CONFIG = {
+        'lesson': { title: '📚 Уроки', badge: 'Урок' },
+        'rudiment': { title: '🥁 Рудименты', badge: 'Рудимент' },
+        'article': { title: '📝 Статьи', badge: 'Статья' },
+        'other': { title: '📦 Прочее', badge: 'Материал' }
+    };
+
     async function loadLessons() {
       const listEl = document.getElementById('lessonsList');
       try {
         const token = typeof window.getFirebaseToken === 'function' ? await window.getFirebaseToken() : null;
-        
         const headers = { 'Content-Type': 'application/json' };
-        if (token) {
-            headers['Authorization'] = 'Bearer ' + token;
-        }
+        if (token) headers['Authorization'] = 'Bearer ' + token;
 
-        const res = await fetch('/workspace/lessons/api.php?action=list', {
-            method: 'GET',
-            headers: headers
-        });
+        const res = await fetch('/workspace/lessons/api.php?action=list', { method: 'GET', headers: headers });
 
         if (res.status === 403) {
-          listEl.innerHTML = '<li class="empty-state">Пожалуйста, <a href="/">войдите в систему</a>, чтобы увидеть свои уроки.</li>';
+          listEl.innerHTML = '<li class="empty-state">Пожалуйста, <a href="/">войдите в систему</a>.</li>';
           return;
         }
 
-        const lessons = await res.json();
-        
-        if (!Array.isArray(lessons) || lessons.length === 0) {
-          listEl.innerHTML = '<li class="empty-state">Уроков пока нет. <a href="/DLE/builder.php">Создать первый</a></li>';
+        const items = await res.json();
+        if (!Array.isArray(items) || items.length === 0) {
+          listEl.innerHTML = '<li class="empty-state">Материалов пока нет. <a href="/DLE/builder.php">Создать первый</a></li>';
           return;
         }
 
         listEl.innerHTML = '';
-        lessons.forEach(lesson => {
-          const date = new Date(lesson.updated_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
-          const isPublished = lesson.status === 'published';
-          const badgeClass = isPublished ? 'badge-published' : 'badge-draft';
-          const badgeText = isPublished ? 'Опубликован' : 'Черновик';
-          
-          const publishBtn = isPublished
-            ? `<button class="btn-sm btn-unpublish" onclick="togglePublish(${lesson.id}, false)">Снять</button>`
-            : `<button class="btn-sm btn-publish" onclick="togglePublish(${lesson.id}, true)">Опубликовать</button>`;
-
-          const illustrationHtml = lesson.illustration_code 
-            ? `<div class="lesson-illustration-thumb">${lesson.illustration_code}</div>`
-            : `<div class="lesson-illustration-thumb empty">Нет иллюстрации</div>`;
-
-          const li = document.createElement('li');
-          li.className = 'lesson-item';
-          li.innerHTML = `
-            ${illustrationHtml}
-            <div class="lesson-info">
-              <div class="lesson-title-row">
-                <span class="lesson-title">${escapeHtml(lesson.title)}</span>
-                <span class="badge ${badgeClass}">${badgeText}</span>
-              </div>
-              <div class="lesson-meta">Обновлён: ${date}</div>
-            </div>
-            <div class="lesson-actions">
-              <a href="/lessons/view.php?id=${lesson.id}" target="_blank" class="btn-sm btn-view" title="Открыть в новой вкладке">👁️ Посмотреть</a>
-              <a href="/DLE/builder.php?lesson_id=${lesson.id}" class="btn-sm">Редактировать</a>
-              ${publishBtn}
-              <button class="btn-sm btn-delete" onclick="deleteLesson(${lesson.id})" title="Удалить">×</button>
-            </div>
-          `;
-          listEl.appendChild(li);
+        
+        // Группируем элементы по content_type
+        const grouped = {};
+        items.forEach(item => {
+            const type = item.content_type || 'lesson';
+            if (!grouped[type]) grouped[type] = [];
+            grouped[type].push(item);
         });
+
+        // Рендерим каждую группу
+        for (const [type, lessons] of Object.entries(grouped)) {
+            const config = TYPE_CONFIG[type] || TYPE_CONFIG['other'];
+            
+            // Заголовок группы
+            const groupHeader = document.createElement('h2');
+            groupHeader.className = 'lessons-section';
+            groupHeader.style.marginTop = '32px';
+            groupHeader.textContent = config.title;
+            listEl.appendChild(groupHeader);
+
+            const ul = document.createElement('ul');
+            ul.className = 'lessons-list';
+
+            lessons.forEach(lesson => {
+                const date = new Date(lesson.updated_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
+                const isPublished = lesson.status === 'published';
+                const statusBadgeClass = isPublished ? 'badge-published' : 'badge-draft';
+                const statusBadgeText = isPublished ? 'Опубликован' : 'Черновик';
+                
+                const publishBtn = isPublished
+                    ? `<button class="btn-sm btn-unpublish" onclick="togglePublish(${lesson.id}, false)">Снять</button>`
+                    : `<button class="btn-sm btn-publish" onclick="togglePublish(${lesson.id}, true)">Опубликовать</button>`;
+
+                const illustrationHtml = lesson.illustration_code 
+                    ? `<div class="lesson-illustration-thumb">${lesson.illustration_code}</div>`
+                    : `<div class="lesson-illustration-thumb empty">Нет иллюстрации</div>`;
+
+                const li = document.createElement('li');
+                li.className = 'lesson-item';
+                li.innerHTML = `
+                    ${illustrationHtml}
+                    <div class="lesson-info">
+                        <div class="lesson-title-row">
+                            <span class="lesson-title">${escapeHtml(lesson.title)}</span>
+                            <span class="badge" style="background: #e0f2fe; color: #0369a1;">${config.badge}</span>
+                            <span class="badge ${statusBadgeClass}">${statusBadgeText}</span>
+                        </div>
+                        <div class="lesson-meta">Обновлён: ${date}</div>
+                    </div>
+                    <div class="lesson-actions">
+                        <a href="/lessons/view.php?id=${lesson.id}" target="_blank" class="btn-sm btn-view" title="Открыть">👁️</a>
+                        <a href="/DLE/builder.php?lesson_id=${lesson.id}" class="btn-sm">Ред.</a>
+                        ${publishBtn}
+                        <button class="btn-sm btn-delete" onclick="deleteLesson(${lesson.id})" title="Удалить">×</button>
+                    </div>
+                `;
+                ul.appendChild(li);
+            });
+            listEl.appendChild(ul);
+        }
+
       } catch (e) {
-        console.error(e);
+        console.error("Ошибка загрузки:", e);
         listEl.innerHTML = '<li class="empty-state" style="color:#ef4444;">Ошибка загрузки.</li>';
       }
     }
@@ -182,17 +210,18 @@
         });
         const result = await res.json();
         if (result.status === 'success') {
-          loadLessons();
+          loadLessons(); // Перезагружаем список при успехе
         } else {
-          alert('Ошибка: ' + result.error);
+          alert('Ошибка: ' + (result.error || 'Неизвестная ошибка'));
         }
       } catch (e) {
+        console.error(e);
         alert('Ошибка сети');
       }
     }
 
     async function deleteLesson(id) {
-      if (!confirm('Удалить этот урок безвозвратно?')) return;
+      if (!confirm('Удалить этот материал безвозвратно?')) return;
       try {
         const token = typeof window.getFirebaseToken === 'function' ? await window.getFirebaseToken() : null;
         const headers = { 'Content-Type': 'application/json' };
@@ -204,9 +233,13 @@
           body: JSON.stringify({ id, token: token })
         });
         const result = await res.json();
-        if (result.status === 'success') loadLessons();
-        else alert('Ошибка: ' + result.error);
+        if (result.status === 'success') {
+          loadLessons(); // Перезагружаем список при успехе
+        } else {
+          alert('Ошибка: ' + (result.error || 'Неизвестная ошибка'));
+        }
       } catch (e) {
+        console.error(e);
         alert('Ошибка сети');
       }
     }

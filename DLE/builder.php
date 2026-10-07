@@ -143,6 +143,16 @@
             <a href="/workspace/" class="back-to-workspace">← В Рабочее пространство</a>
             <div class="app-title">DLE</div>
             <input type="text" class="lesson-title-input" id="lesson-title-input" placeholder="Название урока" oninput="updateLessonTitle(this.value)">
+			
+			
+			<select id="content-type-select" class="lesson-title-input" style="max-width: 200px; margin-right: 16px;" onchange="updateContentType(this.value)">
+				<option value="lesson">📚 Урок</option>
+				<option value="rudiment">🥁 Рудимент</option>
+				<option value="article">📝 Статья</option>
+				<option value="other">📦 Другое</option>
+			</select>
+			
+			
             <button class="btn-save" id="btn-save-db" onclick="saveLessonToDB()">
                 <span>💾</span> <span id="save-db-text">Сохранить</span>
             </button>
@@ -194,7 +204,7 @@
     <script src="components/blocks/css-art.js"></script>
     <script src="components/blocks/svg-art.js"></script>
     <script>
-        let lessonData = { title: "Новый урок", illustration: { blocks: [] }, cards: [{ blocks: [] }] };
+        let lessonData = { title: "Новый урок", content_type: "lesson", illustration: { blocks: [] }, cards: [{ blocks: [] }] };
         let selectedCardIndex = 0;
         let canvasSortable = null;
         let paletteSortable = null;
@@ -636,6 +646,10 @@
             }
         });
 
+
+
+
+
         async function loadLessonFromDB(id) {
             try {
                 const res = await fetch(`/workspace/lessons/api.php?action=get&id=${id}`);
@@ -649,6 +663,17 @@
                 lessonData.id = lesson.id;
                 
                 document.getElementById('lesson-title-input').value = lessonData.title || 'Новый урок';
+				
+				
+				const select = document.getElementById('content-type-select');
+				if (select && lessonData.content_type) {
+					select.value = lessonData.content_type;
+				} else if (select) {
+					select.value = 'lesson'; // по умолчанию
+				}
+				
+				
+
                 initSortable();
                 renderAll();
                 renderCoverThumbnail();
@@ -695,9 +720,10 @@
         // 2. Формируем полезную нагрузку, добавляя туда токен
         const payload = { 
             id: lessonData.id || 0, 
-            title: lessonData.title || 'Новый урок', 
+            title: lessonData.title || 'Новый материал', 
+			content_type: lessonData.content_type || 'lesson',
             data: lessonData,
-            token: token // <-- Вот это ключевое добавление
+            token: token 
         };
         
         const res = await fetch('/workspace/lessons/api.php?action=save', {
@@ -850,7 +876,15 @@
             renderActiveArea();
         }
 
-        function updateLessonTitle(value) { lessonData.title = value; updateDSL(); }
+        function updateLessonTitle(value) { 
+			lessonData.title = value; 
+			updateDSL(); 
+		}
+
+		function updateContentType(value) {
+			lessonData.content_type = value;
+			updateDSL();
+		}
 
         function updateDSL() {
             let dsl = `=== LESSON ===\ntitle: ${lessonData.title}\n\n`;
@@ -885,6 +919,8 @@
                 const line = lines[i];
                 if (line.startsWith('title:')) { lesson.title = line.substring(6).trim(); } 
                 // === НОВОЕ: Парсим цвет карточки ===
+				
+				else if (line.startsWith('content_type:')) { lesson.content_type = line.substring(13).trim(); }
                 else if (line.startsWith('color:') && currentCard) { currentCard.color = line.substring(6).trim(); }
                 else if (line.startsWith('=== CARD ')) { currentCard = { blocks: [] }; lesson.cards.push(currentCard); } 
                 else if (line.trim().startsWith('- type:')) {
@@ -913,6 +949,7 @@
                     }
                 });
             });
+			if (!lesson.content_type) lesson.content_type = 'lesson';
             return lesson;
         }
 

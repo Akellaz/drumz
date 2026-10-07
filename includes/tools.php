@@ -122,7 +122,7 @@
     </a>
 
 		    <!-- ┌────────────────────────────────────────────────┐
-         │ Drumz Lesson Engine                                     │
+         │ Уроки                                     │
          │ Панель: белая 85% | Скос: 24px, вправо         │
          └────────────────────────────────────────────────┘ -->
     <a class="dz-card" href="/lessons/"
@@ -133,6 +133,27 @@
         <p class="dz-card__desc">Движок для создания уроков.<span class="work-item-badge">бета</span></p>
       </div></div>
     </a>
+	
+	
+	
+	
+	
+	
+			    <!-- ┌────────────────────────────────────────────────┐
+         │ Рудименты                                     │
+         │ Панель: белая 85% | Скос: 24px, вправо         │
+         └────────────────────────────────────────────────┘ -->
+    <a class="dz-card" href="/rudiments/"
+       style="--panel-alpha:.85;">
+      <div class="dz-card__media dz-card__media--empty"></div>
+      <div class="dz-card__body"><div class="dz-card__inner">
+        <h3 class="dz-card__title">Рудименты (DLE)</h3>
+        <p class="dz-card__desc">Движок для создания уроков.<span class="work-item-badge">бета</span></p>
+      </div></div>
+    </a>
+	
+	
+	
 	
 	
 

@@ -26,8 +26,7 @@ RewriteCond %{REQUEST_URI} !^/DLE/ [NC] # <--- РАЗРЕШЕНО: выполн�
 RewriteCond %{REQUEST_URI} !^/blog/ [NC]
 RewriteCond %{REQUEST_URI} !^/workspace/ [NC]
 RewriteCond %{REQUEST_URI} !^/lessons/ [NC]
-
-
+RewriteCond %{REQUEST_URI} !^/rudiments/ [NC]
 
 
 RewriteRule ^ - [R=404,L]

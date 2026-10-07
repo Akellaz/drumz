@@ -49,6 +49,7 @@
 M:4/4
 L:1/16
 K:C clef=perc
+Q:60
 V:Drums stem=up
 %%percmap D pedal-hi-hat x
 %%percmap F acoustic-bass-drum

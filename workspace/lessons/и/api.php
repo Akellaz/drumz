@@ -34,13 +34,11 @@ $action = $_GET['action'] ?? 'list';
 // ЛОКАЛЬНАЯ ПРОВЕРКА ТОКЕНА (Без запроса к Google)
 // ═══════════════════════════════════════════════════════════════
 function verifyFirebaseTokenLocally($token) {
-    // JWT состоит из 3 частей, разделенных точкой: header.payload.signature
     $tokenParts = explode('.', $token);
     if (count($tokenParts) !== 3) {
         return ['valid' => false, 'error' => 'Неверный формат токена (должно быть 3 части)'];
     }
 
-    // Функция для безопасного декодирования base64url
     $base64 = str_replace(['-', '_'], ['+', '/'], $tokenParts[1]);
     $padded = str_pad($base64, strlen($base64) % 4 === 0 ? strlen($base64) : strlen($base64) + (4 - strlen($base64) % 4), '=', STR_PAD_RIGHT);
     
@@ -54,21 +52,14 @@ function verifyFirebaseTokenLocally($token) {
     $projectId = 'drumz-c9989';
     $expectedIss = 'https://securetoken.google.com/' . $projectId;
 
-    // 1. Проверяем издателя (должен быть Firebase)
     if (!isset($payload['iss']) || $payload['iss'] !== $expectedIss) {
         return ['valid' => false, 'error' => 'Неверный издатель токена (iss)'];
     }
 
-    // 2. Проверяем аудиторию (должен быть Project ID)
     if (!isset($payload['aud']) || $payload['aud'] !== $projectId) {
         return ['valid' => false, 'error' => 'Неверная аудитория (aud). Ожидалось: ' . $projectId];
     }
 
-    // 3. Мы намеренно НЕ проверяем время (exp), так как окружение работает в 2026 году,
-    // а внешние серверы Google могут отвергнуть такой токен при стандартной проверке.
-    // Структурная целостность и совпадение aud/iss уже гарантируют, что токен выдан Firebase.
-
-    // 🎉 Всё отлично! Возвращаем данные пользователя
     return [
         'valid' => true,
         'user_id' => $payload['sub'],
@@ -79,7 +70,7 @@ function verifyFirebaseTokenLocally($token) {
 // ═══════════════════════════════════════════════════════════════
 // ЛОГИКА АВТОРИЗАЦИИ
 // ═══════════════════════════════════════════════════════════════
-$publicActions = ['public_list', 'public_get'];
+$publicActions = ['public_list', 'public_get', 'logout'];
 $requiresAuth = !in_array($action, $publicActions);
 $currentUserId = null; 
 
@@ -87,9 +78,18 @@ if ($requiresAuth) {
     if (isset($_SESSION['user_id'])) {
         $currentUserId = $_SESSION['user_id'];
     } else {
-        $rawInput = file_get_contents('php://input');
-        $input = json_decode($rawInput, true);
-        $token = trim($input['token'] ?? '');
+        $token = '';
+        
+        // 1. Сначала ищем токен в заголовке (для GET запросов из workspace/index.php)
+        if (isset($_SERVER['HTTP_AUTHORIZATION']) && strpos($_SERVER['HTTP_AUTHORIZATION'], 'Bearer ') === 0) {
+            $token = trim(substr($_SERVER['HTTP_AUTHORIZATION'], 7));
+        } 
+        // 2. Если нет, ищем в теле запроса (для POST запросов из builder.php)
+        else {
+            $rawInput = file_get_contents('php://input');
+            $input = json_decode($rawInput, true);
+            $token = trim($input['token'] ?? '');
+        }
 
         if (!$token) {
             http_response_code(403);
@@ -178,7 +178,6 @@ elseif ($action === 'public_get') {
 elseif ($action === 'save') {
     $rawInput = file_get_contents('php://input');
     $input = json_decode($rawInput, true);
-    
     $title = trim($input['title'] ?? 'Новый урок');
     $lessonData = $input['data'] ?? null;
     $id = isset($input['id']) ? (int)$input['id'] : 0;
@@ -228,6 +227,11 @@ elseif ($action === 'delete') {
     if (!$id) { http_response_code(400); echo json_encode(['error' => 'Не указан ID для удаления']); exit; }
     $stmt = $pdo->prepare("DELETE FROM lessons WHERE id = ? AND user_id = ?");
     $stmt->execute([$id, $currentUserId]);
+    echo json_encode(['status' => 'success']);
+}
+
+elseif ($action === 'logout') {
+    session_destroy();
     echo json_encode(['status' => 'success']);
 }
 

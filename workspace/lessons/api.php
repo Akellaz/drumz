@@ -116,7 +116,8 @@ if ($requiresAuth) {
 // ═══════════════════════════════════════════════════════════════
 
 if ($action === 'list') {
-    $stmt = $pdo->prepare("SELECT id, title, status, updated_at, data FROM lessons WHERE user_id = ? ORDER BY updated_at DESC");
+    // Добавили content_type в выборку
+    $stmt = $pdo->prepare("SELECT id, title, content_type, status, updated_at, data FROM lessons WHERE user_id = ? ORDER BY updated_at DESC");
     $stmt->execute([$currentUserId]);
     $lessons = $stmt->fetchAll();
     
@@ -137,8 +138,13 @@ if ($action === 'list') {
 }
 
 elseif ($action === 'public_list') {
-    $stmt = $pdo->query("SELECT id, title, updated_at, data FROM lessons WHERE status = 'published' ORDER BY updated_at DESC");
+    // Фильтрация по типу контента. По умолчанию 'lesson', чтобы не сломать старый раздел /lessons/
+    $contentType = $_GET['type'] ?? 'lesson'; 
+    
+    $stmt = $pdo->prepare("SELECT id, title, content_type, updated_at, data FROM lessons WHERE status = 'published' AND content_type = ? ORDER BY updated_at DESC");
+    $stmt->execute([$contentType]);
     $lessons = $stmt->fetchAll();
+    
     foreach ($lessons as &$lesson) {
         $lessonData = json_decode($lesson['data'], true);
         $lesson['illustration_code'] = '';
@@ -158,7 +164,7 @@ elseif ($action === 'public_list') {
 elseif ($action === 'get') {
     $id = (int)($_GET['id'] ?? 0);
     if (!$id) { http_response_code(400); echo json_encode(['error' => 'Не указан ID урока']); exit; }
-    $stmt = $pdo->prepare("SELECT id, title, status, data FROM lessons WHERE id = ? AND user_id = ?");
+    $stmt = $pdo->prepare("SELECT id, title, content_type, status, data FROM lessons WHERE id = ? AND user_id = ?");
     $stmt->execute([$id, $currentUserId]);
     $lesson = $stmt->fetch();
     if ($lesson) { echo json_encode($lesson); } 
@@ -178,24 +184,25 @@ elseif ($action === 'public_get') {
 elseif ($action === 'save') {
     $rawInput = file_get_contents('php://input');
     $input = json_decode($rawInput, true);
-    $title = trim($input['title'] ?? 'Новый урок');
+    $title = trim($input['title'] ?? 'Новый материал');
     $lessonData = $input['data'] ?? null;
+    $contentType = $input['content_type'] ?? ($input['data']['content_type'] ?? 'lesson');
     $id = isset($input['id']) ? (int)$input['id'] : 0;
 
-    if (!$lessonData) { http_response_code(400); echo json_encode(['error' => 'Отсутствуют данные урока']); exit; }
+    if (!$lessonData) { http_response_code(400); echo json_encode(['error' => 'Отсутствуют данные']); exit; }
 
     if ($id > 0) {
-        $stmt = $pdo->prepare("UPDATE lessons SET title = ?, data = ? WHERE id = ? AND user_id = ?");
-        $stmt->execute([$title, json_encode($lessonData, JSON_UNESCAPED_UNICODE), $id, $currentUserId]);
+        $stmt = $pdo->prepare("UPDATE lessons SET title = ?, content_type = ?, data = ? WHERE id = ? AND user_id = ?");
+        $stmt->execute([$title, $contentType, json_encode($lessonData, JSON_UNESCAPED_UNICODE), $id, $currentUserId]);
         if ($stmt->rowCount() === 0) {
             http_response_code(403);
-            echo json_encode(['error' => 'Отказано в доступе: урок вам не принадлежит']);
+            echo json_encode(['error' => 'Отказано в доступе']);
             exit;
         }
         echo json_encode(['status' => 'success', 'id' => $id]);
     } else {
-        $stmt = $pdo->prepare("INSERT INTO lessons (title, data, user_id) VALUES (?, ?, ?)");
-        $stmt->execute([$title, json_encode($lessonData, JSON_UNESCAPED_UNICODE), $currentUserId]);
+        $stmt = $pdo->prepare("INSERT INTO lessons (title, content_type, data, user_id) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$title, $contentType, json_encode($lessonData, JSON_UNESCAPED_UNICODE), $currentUserId]);
         echo json_encode(['status' => 'success', 'id' => (int)$pdo->lastInsertId()]);
     }
 }

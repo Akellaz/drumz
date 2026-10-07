@@ -120,7 +120,7 @@
     async function loadPublicLessons() {
       const container = document.getElementById('lessonsContainer');
       try {
-        const res = await fetch('/workspace/lessons/api.php?action=public_list');
+        const res = await fetch('/workspace/lessons/api.php?action=public_list&type=lesson');
         const lessons = await res.json();
 
         if (!Array.isArray(lessons) || lessons.length === 0) {

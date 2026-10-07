@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бесконечный бас</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/dist/abcjs-basic-min.js"></script>	
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.5.2/abcjs-audio.min.css">
+    
+    <style>
+        :root {
+            --bg-page: #f9fafb;
+            --bg-card: #ffffff;
+            --bg-subtle: #f3f4f6;
+            --border: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #111827;
+            --accent-hover: #374151;
+            --accent-text: #ffffff;
+        }
+
+        body { 
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; 
+            padding: 40px 20px; 
+            background: var(--bg-page); 
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { 
+            background: var(--bg-card); 
+            padding: 40px 48px; 
+            border-radius: 16px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02); 
+            border: 1px solid var(--border);
+            max-width: 680px; 
+            margin: 0 auto; 
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .counter {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        #paper { 
+            margin: 24px 0; 
+            padding: 24px; 
+            background: var(--bg-subtle); 
+            border-radius: 8px; 
+            border: 1px solid var(--border); 
+            min-height: 180px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #audio { 
+            margin-top: 24px; 
+            text-align: center; 
+        }
+
+        .abcjs-inline-audio {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 8px !important;
+            padding: 8px 12px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            box-shadow: none !important;
+        }
+        .abcjs-btn {
+            width: 28px !important;
+            height: 28px !important;
+            border-radius: 6px !important;
+            background: var(--bg-subtle) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text-primary) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            transition: all 0.15s ease !important;
+        }
+        .abcjs-btn:hover {
+            background: var(--border) !important;
+        }
+
+        .btn-generate {
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px;
+            padding: 10px 20px; 
+            background: var(--accent); 
+            color: var(--accent-text); 
+            border: none; 
+            border-radius: 8px;
+            font-size: 14px; 
+            font-weight: 500; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+        }
+        .btn-generate:hover { 
+            background: var(--accent-hover); 
+            transform: translateY(-1px); 
+        }
+        .btn-generate:active { 
+            transform: translateY(0); 
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 28px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <button class="btn-generate" id="generateBtn">
+            <span>↻</span> Новая фраза
+        </button>
+        <div class="counter" id="chunkCounter">Фраза 1</div>
+    </div>
+    
+    <div id="audio"></div>
+    <div id="paper"></div>
+</div>
+
+<script>
+    let synthControl = null;
+    let midiBuffer = null;
+    let currentSectionIndex = 0;
+    let chunkNumber = 1;
+    let isAutoPlaying = false;
+
+    const CHUNK_SIZE = 64; // тактов в одном куске (~4.7 минуты)
+
+    const progressions = [
+        ['Am', 'F', 'G', 'Am'],
+        ['Am', 'Dm', 'Em', 'Am'],
+        ['Am', 'G', 'F', 'Em'],
+        ['Am', 'F', 'C', 'G'],
+        ['Am', 'Dm', 'G', 'C']
+    ];
+
+    const beatGroups = {
+        'q':    { elements: [[4]] },                  
+        'e2':   { elements: [[2], [2]] },             
+        's4':   { elements: [[1], [1], [1], [1]] },   
+        's2e':  { elements: [[1], [1], [2]] },        
+        'es2':  { elements: [[2], [1], [1]] },        
+        'ses':  { elements: [[1], [2], [1]] },        
+        'ed':   { elements: [[3], [1]] },             
+        'z2c2': { elements: ['z2', [2]] },            
+        'z4':   { elements: ['z4'] }                  
+    };
+
+    const weightedOstinato = [
+        { pattern: ['q', 'q', 'q', 'q'], weight: 40 },
+        { pattern: ['q', 'q', 'e2', 'q'], weight: 30 },
+        { pattern: ['e2', 'q', 'q', 'q'], weight: 15 },
+        { pattern: ['q', 'e2', 'q', 'e2'], weight: 10 },
+        { pattern: ['ed', 'q', 'q', 'q'], weight: 5 }
+    ];
+
+    const weightedFill = [
+        { pattern: ['q', 'q', 'q', 's2e'], weight: 40 },
+        { pattern: ['q', 'q', 'e2', 's2e'], weight: 30 },
+        { pattern: ['q', 'e2', 'q', 'es2'], weight: 20 },
+        { pattern: ['q', 'q', 'ed', 'ses'], weight: 10 }
+    ];
+
+    const ostinatoRolePatterns = [
+        [0, 0, 0, 0], [0, 1, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0]
+    ];
+
+    const passingNotes = {
+        'Am-F': 'G,,', 'Am-Dm': 'C,,', 'Am-Em': 'B,,', 'Am-G': 'G,,',
+        'F-G': 'A,,', 'F-C': 'E,,', 'F-Am': 'E,,', 'F-Dm': 'A,,',
+        'G-Am': 'B,,', 'G-C': 'B,,', 'G-F': 'F,,', 'G-Dm': 'B,,',
+        'Dm-G': 'C,,', 'Dm-Am': 'E,,', 'Dm-Em': 'F,,', 'Dm-F': 'A,,',
+        'Em-Am': 'G,,', 'Em-F': 'F,,', 'Em-G': 'G,,', 'Em-Dm': 'D,,',
+        'C-G': 'B,,', 'C-F': 'E,,', 'C-Am': 'G,,', 'C-Dm': 'F,,'
+    };
+
+    const chordNotes = {
+        'Am': { 
+            low: { 0: 'A,,', 1: 'E,,' }, 
+            mid: { 0: 'A,', 1: 'E,' }
+        },
+        'F':  { 
+            low: { 0: 'F,,', 1: 'C,,' }, 
+            mid: { 0: 'F,', 1: 'C,' }
+        },
+        'G':  { 
+            low: { 0: 'G,,', 1: 'D,,' }, 
+            mid: { 0: 'G,', 1: 'D,' }
+        },
+        'C':  { 
+            low: { 0: 'C,,', 1: 'G,,' }, 
+            mid: { 0: 'C,', 1: 'G,' }
+        },
+        'Dm': { 
+            low: { 0: 'D,,', 1: 'A,,' }, 
+            mid: { 0: 'D,', 1: 'A,' }
+        },
+        'Em': { 
+            low: { 0: 'E,,', 1: 'B,,' }, 
+            mid: { 0: 'E,', 1: 'B,' }
+        }
+    };
+
+    const sections = [
+        { name: 'intro', bars: 4, register: 'low', dynamic: '!p!', complexity: 0 },
+        { name: 'A', bars: 16, register: 'low', dynamic: '!mp!', complexity: 1 },
+        { name: "A'", bars: 16, register: 'mid', dynamic: '!mf!', complexity: 2 },
+        { name: 'bridge', bars: 8, register: 'low', dynamic: '!mp!', complexity: 1 },
+        { name: 'B', bars: 16, register: 'mid', dynamic: '!f!', complexity: 3 },
+        { name: "A''", bars: 16, register: 'mid', dynamic: '!mf!', complexity: 2 },
+        { name: 'breath', bars: 4, register: 'low', dynamic: '!p!', complexity: 0 }
+    ];
+
+    function getWeightedRandom(items) {
+        const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
+        let random = Math.random() * totalWeight;
+        for (const item of items) {
+            if (random < item.weight) return item;
+            random -= item.weight;
+        }
+        return items[0];
+    }
+
+    function buildMeasure(groupNames, roles, chord, targetNote, register, dynamic) {
+        let parts = [];
+        let isFirstNote = true;
+        
+        for (let i = 0; i < 4; i++) {
+            const group = beatGroups[groupNames[i]];
+            const role = roles[i];
+            const noteName = role === 3 ? targetNote : (passingNotes[targetNote] || chordNotes[chord][register][role]);
+            
+            for (const element of group.elements) {
+                if (typeof element === 'string') {
+                    parts.push(element);
+                } else {
+                    let noteStr = `${noteName}${element[0]}`;
+                    if (isFirstNote) {
+                        noteStr = dynamic + noteStr;
+                        isFirstNote = false;
+                    }
+                    parts.push(noteStr);
+                }
+            }
+        }
+        return parts.join(' ');
+    }
+
+    function generateSection(section, progression) {
+        let measures = [];
+        
+        for (let bar = 0; bar < section.bars; bar++) {
+            const chordIndex = bar % 4;
+            const chord = progression[chordIndex];
+            const nextChord = progression[(chordIndex + 1) % 4];
+            const isFill = (chordIndex === 3);
+
+            const periodPos = bar % 8;
+            const isConsequent = periodPos >= 4;
+
+            let availablePatterns = isFill ? weightedFill : weightedOstinato;
+            
+            if (section.complexity === 0) {
+                availablePatterns = weightedOstinato.filter(p => p.weight >= 30);
+            } else if (section.complexity === 1) {
+                availablePatterns = weightedOstinato.filter(p => p.weight >= 15);
+            }
+
+            const pattern = getWeightedRandom(availablePatterns).pattern;
+
+            let roles;
+            if (isFill) {
+                roles = [0, 1, 3, Math.random() > 0.5 ? 0 : 1];
+            } else if (isConsequent) {
+                roles = [0, 1, 0, 0];
+            } else {
+                roles = ostinatoRolePatterns[Math.floor(Math.random() * ostinatoRolePatterns.length)];
+            }
+
+            const targetOrPassing = isFill ? chordNotes[nextChord].low[0] : `${chord}-${nextChord}`;
+            measures.push(buildMeasure(pattern, roles, chord, targetOrPassing, section.register, section.dynamic));
+        }
+
+        return measures;
+    }
+
+    function generateChunk() {
+        const progression = progressions[Math.floor(Math.random() * progressions.length)];
+        let allMeasures = [];
+        let barsGenerated = 0;
+
+        // Генерируем такты, пока не наберём CHUNK_SIZE
+        while (barsGenerated < CHUNK_SIZE) {
+            const section = sections[currentSectionIndex];
+            const measures = generateSection(section, progression);
+            allMeasures = allMeasures.concat(measures);
+            barsGenerated += section.bars;
+            
+            currentSectionIndex = (currentSectionIndex + 1) % sections.length;
+        }
+
+        // Обрезаем до точного CHUNK_SIZE
+        allMeasures = allMeasures.slice(0, CHUNK_SIZE);
+
+        // Форматирование в строки по 4 такта
+        let formattedLines = [];
+        for (let i = 0; i < allMeasures.length; i += 4) {
+            formattedLines.push(allMeasures.slice(i, i + 4).join(' | '));
+        }
+
+        return `X:1
+T:Endless Bass - Chunk ${chunkNumber}
+M:4/4
+L:1/16
+K:Am
+Q:1/4=110
+%%MIDI program 32
+%%MIDI bassprog 32
+V:1 clef=bass name="Bass"
+${formattedLines.join(' |\n')} |]`;
+    }
+
+    function loadBass(autoNext = false) {
+        const abcString = generateChunk();
+        document.getElementById('paper').innerHTML = '';
+        document.getElementById('audio').innerHTML = '';
+
+        const visualObj = ABCJS.renderAbc("paper", abcString, { 
+            responsive: "resize",
+            add_classes: true,
+            scale: 0.9
+        })[0];
+
+        if (ABCJS.synth.supportsAudio()) {
+            synthControl = new ABCJS.synth.SynthController();
+            synthControl.load("#audio", null, {
+                displayPlay: true,
+                displayRestart: true,
+                displayProgress: true,
+                displayWarp: false
+            });
+
+            midiBuffer = new ABCJS.synth.CreateSynth();
+            midiBuffer.init({ visualObj: visualObj })
+                .then(() => synthControl.setTune(visualObj, false, { midiBuffer: midiBuffer }))
+                .then(() => {
+                    // Если это автопереход — сразу начинаем играть
+                    if (autoNext && isAutoPlaying) {
+                        synthControl.play();
+                    }
+                })
+                .catch(e => console.error("Ошибка аудио:", e));
+
+            // Отслеживаем конец воспроизведения для автоперехода
+            synthControl.addEventListener('ended', () => {
+                chunkNumber++;
+                document.getElementById('chunkCounter').textContent = `Фраза ${chunkNumber}`;
+                loadBass(true); // Автоматически загружаем следующий кусок
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadBass();
+        
+        document.getElementById('generateBtn').addEventListener('click', () => {
+            isAutoPlaying = false;
+            if (synthControl) {
+                try { synthControl.pause(); } catch(e) {}
+            }
+            chunkNumber++;
+            document.getElementById('chunkCounter').textContent = `Фраза ${chunkNumber}`;
+            loadBass(false);
+        });
+
+        // Отслеживаем ручное включение воспроизведения
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.abcjs-btn') && e.target.closest('.abcjs-btn').title === 'Play') {
+                isAutoPlaying = true;
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

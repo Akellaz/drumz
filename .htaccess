@@ -3,8 +3,9 @@ RewriteBase /
 
 # 1. Прямой доступ к статическим папкам (без дальнейшей обработки правилами)
 RewriteRule ^song-editor/ - [L]
-RewriteRule ^apps/ - [L] # Разрешаем прямой доступ ко всем файлам внутри apps
+RewriteRule ^apps/ - [L]
 RewriteRule ^fire/ - [L]
+RewriteRule ^DLE/ - [L] # <--- РАЗРЕШЕНО: прямой доступ к папке уроков
 
 # 2. Короткие ссылки на упражнения
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -17,14 +18,21 @@ RewriteCond %{REQUEST_URI} !^/admin/ [NC]
 RewriteCond %{REQUEST_URI} !^/library/index\.php [NC]
 RewriteCond %{REQUEST_URI} !^/library/tree\.php [NC]
 RewriteCond %{REQUEST_URI} !^/pro/api\.php [NC]
-RewriteCond %{REQUEST_URI} !^/profile\.php [NC]      # <-- ДОБАВЛЕНО: разблокировка профиля
+RewriteCond %{REQUEST_URI} !^/profile\.php [NC]
 RewriteCond %{REQUEST_URI} !^/stest/ [NC]
 RewriteCond %{REQUEST_URI} !^/ear/ [NC]
-RewriteCond %{REQUEST_URI} !^/apps/ [NC]             # <-- ДОБАВЛЕНО: разблокировка .php внутри apps (на всякий случай)
+RewriteCond %{REQUEST_URI} !^/apps/ [NC]
+RewriteCond %{REQUEST_URI} !^/DLE/ [NC] # <--- РАЗРЕШЕНО: выполнение PHP внутри папки DLE
+RewriteCond %{REQUEST_URI} !^/blog/ [NC]
+RewriteCond %{REQUEST_URI} !^/workspace/ [NC]
+RewriteCond %{REQUEST_URI} !^/lessons/ [NC]
+
+
+
+
 RewriteRule ^ - [R=404,L]
 
-# 4. ЧПУ: Орден (Обновлено: указывает на новую папку apps/orden)
-# Если вы хотите, чтобы короткая ссылка /orden/ всё ещё работала, она теперь ведёт в apps:
+# 4. ЧПУ: Орден (указывает на папку apps/orden)
 RewriteRule ^orden/?$ apps/orden/index.php [L]
 RewriteRule ^orden/manifest/?$ apps/orden/manifest.php [L]
 RewriteRule ^orden/professions/?$ apps/orden/professions.php [L]

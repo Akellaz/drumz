@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Beat Blender — Интерполяция 5x5</title>
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/dist/magentamusic.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #1a1a1a;
+            color: #eee;
+            padding: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        h1 { margin-top: 0; }
+        h2 { margin-top: 30px; border-bottom: 1px solid #444; padding-bottom: 8px; }
+        #status {
+            padding: 10px 16px;
+            background: #2a2a2a;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover:not(:disabled) { background: #4f46e5; }
+        button:disabled { background: #444; cursor: not-allowed; }
+        
+        #gridCanvas {
+            background: #2a2a2a;
+            border-radius: 6px;
+            display: block;
+            image-rendering: pixelated;
+            margin: 20px auto;
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+        .legend span { display: flex; align-items: center; gap: 4px; }
+        .dot {
+            width: 12px;
+            height: 12px;
+            display: inline-block;
+            border-radius: 2px;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        select {
+            padding: 8px 12px;
+            font-size: 14px;
+            background: #2a2a2a;
+            color: #eee;
+            border: 1px solid #444;
+            border-radius: 4px;
+            width: 100%;
+        }
+        
+        .control-label {
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🥁 Beat Blender — Интерполяция 5x5</h1>
+    <div id="status">⏳ Загрузка модели MusicVAE (~5 МБ)...</div>
+    
+    <div class="controls">
+        <div>
+            <div class="control-label">Угол 1 (верх-лево, TL):</div>
+            <select id="corner0">
+                <option value="Rock 1" selected>Rock 1</option>
+                <option value="Rock 2">Rock 2</option>
+                <option value="Break">Break</option>
+                <option value="Reggaeton">Reggaeton</option>
+                <option value="Basic Backbeat">Basic Backbeat</option>
+                <option value="Boots & Cats">Boots & Cats</option>
+                <option value="Pop Punk">Pop Punk</option>
+                <option value="Half Time">Half Time</option>
+            </select>
+        </div>
+        <div>
+            <div class="control-label">Угол 2 (верх-право, TR):</div>
+            <select id="corner1">
+                <option value="Break" selected>Break</option>
+                <option value="Rock 1">Rock 1</option>
+                <option value="Rock 2">Rock 2</option>
+                <option value="Reggaeton">Reggaeton</option>
+                <option value="Basic Backbeat">Basic Backbeat</option>
+                <option value="Boots & Cats">Boots & Cats</option>
+                <option value="Pop Punk">Pop Punk</option>
+                <option value="Half Time">Half Time</option>
+            </select>
+        </div>
+        <div>
+            <div class="control-label">Угол 3 (низ-лево, BL):</div>
+            <select id="corner2">
+                <option value="Reggaeton" selected>Reggaeton</option>
+                <option value="Rock 1">Rock 1</option>
+                <option value="Rock 2">Rock 2</option>
+                <option value="Break">Break</option>
+                <option value="Basic Backbeat">Basic Backbeat</option>
+                <option value="Boots & Cats">Boots & Cats</option>
+                <option value="Pop Punk">Pop Punk</option>
+                <option value="Half Time">Half Time</option>
+            </select>
+        </div>
+        <div>
+            <div class="control-label">Угол 4 (низ-право, BR):</div>
+            <select id="corner3">
+                <option value="Basic Backbeat" selected>Basic Backbeat</option>
+                <option value="Rock 1">Rock 1</option>
+                <option value="Rock 2">Rock 2</option>
+                <option value="Break">Break</option>
+                <option value="Reggaeton">Reggaeton</option>
+                <option value="Boots & Cats">Boots & Cats</option>
+                <option value="Pop Punk">Pop Punk</option>
+                <option value="Half Time">Half Time</option>
+            </select>
+        </div>
+    </div>
+    
+    <button id="btn" disabled>Сгенерировать интерполяцию 5×5</button>
+    
+    <h2>Сетка интерполяции 5×5 (25 ритмов)</h2>
+    <canvas id="gridCanvas" width="512" height="572"></canvas>
+    
+    <div class="legend">
+        <span><span class="dot" style="background:#ef4444"></span>Kick</span>
+        <span><span class="dot" style="background:#f59e0b"></span>Snare</span>
+        <span><span class="dot" style="background:#10b981"></span>Closed HH</span>
+        <span><span class="dot" style="background:#34d399"></span>Open HH</span>
+        <span><span class="dot" style="background:#8b5cf6"></span>Toms</span>
+        <span><span class="dot" style="background:#ec4899"></span>Crash / Ride</span>
+    </div>
+
+    <script>
+        // =========================================================
+        // 1. КОНСТАНТЫ И МАППИНГ
+        // =========================================================
+        const CHECKPOINT = 'https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/drums_2bar_hikl_small';
+        const GRID = 5;  // 5x5 = 25 ритмов
+        
+        // Готовые паттерны из Beat Blender (preset-beats.json)
+        const PRESETS = {
+            "Rock 1": [1, 0, 1, 0, 2, 0, 0, 0, 1, 0, 1, 0, 2, 0, 0, 0, 1, 0, 1, 0, 2, 0, 0, 0, 1, 0, 1, 0, 2, 0, 0, 0],
+            "Rock 2": [385, 0, 1, 0, 256, 0, 1, 1, 386, 0, 0, 1, 256, 0, 1, 0, 385, 0, 1, 0, 256, 1, 0, 0, 386, 0, 1, 0, 258, 1, 1, 258],
+            "Reggaeton": [257, 0, 0, 258, 1, 0, 258, 0, 1, 256, 256, 2, 1, 0, 258, 0, 257, 0, 0, 258, 1, 0, 258, 0, 257, 256, 0, 258, 1, 0, 258, 0],
+            "Break": [5, 0, 5, 0, 6, 0, 4, 2, 5, 2, 5, 0, 6, 0, 4, 0, 5, 0, 5, 0, 6, 0, 4, 2, 5, 2, 5, 0, 6, 0, 4, 0],
+            "Basic Backbeat": [5, 0, 4, 0, 7, 0, 4, 0, 5, 0, 4, 0, 7, 0, 4, 0, 5, 0, 4, 0, 7, 0, 4, 0, 5, 0, 4, 0, 7, 0, 4, 0],
+            "Boots & Cats": [1, 0, 4, 0, 2, 0, 4, 0, 1, 0, 4, 0, 2, 0, 4, 0, 1, 0, 4, 0, 2, 0, 4, 0, 1, 0, 4, 0, 2, 0, 4, 0],
+            "Pop Punk": [5, 4, 10, 5, 4, 5, 10, 4, 5, 4, 10, 5, 4, 5, 10, 4, 5, 4, 10, 5, 4, 5, 10, 4, 5, 5, 10, 5, 22, 26, 5, 6],
+            "Half Time": [5, 0, 4, 0, 4, 0, 5, 0, 6, 0, 4, 0, 4, 0, 5, 0, 4, 0, 5, 0, 4, 0, 5, 0, 6, 0, 4, 1, 4, 0, 5, 0]
+        };
+        
+        // MIDI → номер дорожки (0-8)
+        const MIDI_TO_ROW = {
+            36:0, 35:0,
+            38:1, 27:1, 28:1, 31:1, 32:1, 33:1, 34:1, 37:1, 39:1, 40:1, 56:1, 65:1, 66:1, 75:1, 85:1,
+            42:2, 44:2, 54:2, 68:2, 69:2, 70:2, 71:2, 73:2, 78:2, 80:2,
+            46:3, 67:3, 72:3, 74:3, 79:3, 81:3,
+            45:4, 29:4, 41:4, 61:4, 64:4, 84:4,
+            48:5, 47:5, 60:5, 63:5, 77:5, 86:5, 87:5,
+            50:6, 30:6, 43:6, 62:6, 76:6, 83:6,
+            49:7, 55:7, 57:7, 58:7,
+            51:8, 52:8, 53:8, 59:8, 82:8
+        };
+        // Дорожка → MIDI
+        const ROW_TO_MIDI = [36, 38, 42, 46, 45, 48, 50, 49, 51];
+        // Цвета дорожек
+        const COLORS = [
+            '#ef4444', '#f59e0b', '#10b981', '#34d399',
+            '#8b5cf6', '#8b5cf6', '#8b5cf6', '#ec4899', '#ec4899'
+        ];
+        
+        // Размеры ячеек для 5x5
+        const STEP_W = 3;      // ширина шага внутри ячейки
+        const STEP_H = 12;     // высота дорожки внутри ячейки
+        const GAP = 6;         // промежуток между ячейками
+        
+        // =========================================================
+        // 2. КОНВЕРТЕРЫ: битовая маска <-> NoteSequence
+        // =========================================================
+        function maskToNoteSequence(mask) {
+            const notes = [];
+            mask.forEach((value, step) => {
+                for (let row = 0; row < 9; row++) {
+                    if ((value >> row) & 1) {
+                        notes.push({
+                            pitch: ROW_TO_MIDI[row],
+                            quantizedStartStep: step,
+                            quantizedEndStep: step + 1
+                        });
+                    }
+                }
+            });
+            return {
+                notes,
+                totalQuantizedSteps: 32,
+                quantizationInfo: { stepsPerQuarter: 4 }
+            };
+        }
+        
+        function noteSequenceToMask(ns) {
+            const mask = new Array(32).fill(0);
+            ns.notes.forEach(n => {
+                const row = MIDI_TO_ROW[n.pitch];
+                if (row !== undefined) {
+                    mask[n.quantizedStartStep] += Math.pow(2, row);
+                }
+            });
+            return mask;
+        }
+        
+        // =========================================================
+        // 3. ОТРИСОВКА
+        // =========================================================
+        function drawPattern(ctx, pattern, x, y, isCorner = false) {
+            const cellW = 32 * STEP_W;
+            const cellH = 9 * STEP_H;
+            
+            // Фон ячейки
+            ctx.fillStyle = isCorner ? '#3a3a3a' : '#2a2a2a';
+            ctx.fillRect(x, y, cellW, cellH);
+            
+            // Рамка для угловых ячеек
+            if (isCorner) {
+                ctx.strokeStyle = '#6366f1';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x, y, cellW, cellH);
+            }
+            
+            // Рисуем каждый шаг
+            for (let step = 0; step < 32; step++) {
+                const value = pattern[step];
+                
+                // Подсветка долей (каждые 4 шага)
+                if (step % 4 === 0) {
+                    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+                    ctx.fillRect(x + step * STEP_W, y, STEP_W, cellH);
+                }
+                
+                // Проверяем каждый бит (дорожку)
+                for (let row = 0; row < 9; row++) {
+                    if ((value >> row) & 1) {
+                        ctx.fillStyle = COLORS[row];
+                        ctx.fillRect(
+                            x + step * STEP_W + 1,
+                            y + row * STEP_H + 1,
+                            STEP_W - 2,
+                            STEP_H - 2
+                        );
+                    }
+                }
+            }
+        }
+        
+        function drawGrid(canvas, patterns, cornerNames) {
+            const ctx = canvas.getContext('2d');
+            const cellW = 32 * STEP_W;
+            const cellH = 9 * STEP_H;
+            
+            const totalW = GRID * cellW + (GRID - 1) * GAP;
+            const totalH = GRID * cellH + (GRID - 1) * GAP;
+            canvas.width = totalW;
+            canvas.height = totalH;
+            
+            // Фон
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, totalW, totalH);
+            
+            // Рисуем каждую ячейку
+            for (let i = 0; i < patterns.length; i++) {
+                const col = i % GRID;
+                const row = Math.floor(i / GRID);
+                const x = col * (cellW + GAP);
+                const y = row * (cellH + GAP);
+                
+                // Определяем, является ли ячейка угловой
+                const isCorner = (row === 0 && col === 0) || 
+                                 (row === 0 && col === GRID - 1) ||
+                                 (row === GRID - 1 && col === 0) ||
+                                 (row === GRID - 1 && col === GRID - 1);
+                
+                drawPattern(ctx, patterns[i], x, y, isCorner);
+            }
+            
+            // Подписи углов
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px system-ui';
+            ctx.textAlign = 'left';
+            
+            // Позиции подписей (визуальные углы сетки)
+            const cornerPositions = [
+                { x: 0, y: -5 },                                    // верх-лево (TL)
+                { x: (GRID - 1) * (cellW + GAP), y: -5 },           // верх-право (TR)
+                { x: 0, y: GRID * (cellH + GAP) - GAP + 16 },       // низ-лево (BL)
+                { x: (GRID - 1) * (cellW + GAP), y: GRID * (cellH + GAP) - GAP + 16 }  // низ-право (BR)
+            ];
+            
+            // cornerNames идут в порядке [TL, TR, BL, BR] — как в UI
+            cornerNames.forEach((name, i) => {
+                ctx.fillText(name, cornerPositions[i].x, cornerPositions[i].y);
+            });
+        }
+        
+        // =========================================================
+        // 4. ИНИЦИАЛИЗАЦИЯ
+        // =========================================================
+        const mvae = new mm.MusicVAE(CHECKPOINT);
+        const status = document.getElementById('status');
+        const btn = document.getElementById('btn');
+        
+        mvae.initialize().then(() => {
+            status.textContent = '✅ Модель готова. Выберите паттерны и нажмите кнопку.';
+            status.style.color = '#4ec9b0';
+            btn.disabled = false;
+        }).catch(err => {
+            status.textContent = '❌ Ошибка загрузки модели: ' + err.message;
+            status.style.color = '#f87171';
+        });
+        
+        // =========================================================
+        // 5. ГЛАВНАЯ ФУНКЦИЯ
+        // =========================================================
+        btn.onclick = async () => {
+            btn.disabled = true;
+            btn.textContent = '⏳ Интерполяция...';
+            status.textContent = 'Интерполирую между 4 углами через латентное пространство...';
+            
+            try {
+                // Получаем выбранные паттерны из UI
+                const corner0Name = document.getElementById('corner0').value; // TL
+                const corner1Name = document.getElementById('corner1').value; // TR
+                const corner2Name = document.getElementById('corner2').value; // BL
+                const corner3Name = document.getElementById('corner3').value; // BR
+                
+                const TL = PRESETS[corner0Name];
+                const TR = PRESETS[corner1Name];
+                const BL = PRESETS[corner2Name];
+                const BR = PRESETS[corner3Name];
+                
+                // ⚠️ ВАЖНО: порядок передачи в interpolate — [TL, BL, TR, BR]
+                // Это соответствует логике Beat Blender (см. updateMusicVAE в bundle.js)
+                const corners = [TL, BL, TR, BR];
+                
+                // Конвертируем в NoteSequence
+                const noteSeqs = corners.map(maskToNoteSequence);
+                
+                // Интерполяция (5x5 = 25 ритмов)
+                const results = await mvae.interpolate(noteSeqs, GRID);
+                const grid = results.map(noteSequenceToMask);
+                
+                // Перезаписываем угловые ячейки исходными паттернами
+                // (как делает оригинальный Beat Blender — чтобы углы были точными)
+                // Индексы углов в сетке 5x5:
+                // TL = 0, TR = 4, BL = 20, BR = 24
+                grid[0]  = TL;  // верх-лево
+                grid[4]  = TR;  // верх-право
+                grid[20] = BL;  // низ-лево
+                grid[24] = BR;  // низ-право
+                
+                // Показываем сетку
+                // Подписи в порядке [TL, TR, BL, BR] — как в UI
+                drawGrid(document.getElementById('gridCanvas'), grid, [
+                    corner0Name, corner1Name, corner2Name, corner3Name
+                ]);
+                
+                status.textContent = `✅ Готово! Сгенерировано ${grid.length} ритмов (сетка ${GRID}×${GRID}).`;
+                status.style.color = '#4ec9b0';
+                
+            } catch (err) {
+                console.error(err);
+                status.textContent = '❌ Ошибка: ' + err.message;
+                status.style.color = '#f87171';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Сгенерировать интерполяцию 5×5';
+            }
+        };
+    </script>
+</body>
+</html>

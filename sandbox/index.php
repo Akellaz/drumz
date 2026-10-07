@@ -84,8 +84,19 @@ $description = 'Экспериментальные и разрабатываем
       <h2>🛠️ В разработке</h2>
       <ul class="dev-links">
 	  
+	  
+	  
+	  
+
+	  
+		          <li>
+          <a href="/bb/my-blender.html" target="_blank">BB</a>
+          <span class="status experimental">🧪</span>
+        </li>
+	    
+	  
 	          <li>
-          <a href="/builder/" target="_blank">builder</a>
+          <a href="/apps/drum-kit/" target="_blank">drum-kit</a>
           <span class="status experimental">🧪</span>
         </li>
 	  
@@ -103,6 +114,12 @@ $description = 'Экспериментальные и разрабатываем
 	  	   <li>
           <a href="/apps/puzzle/" target="_blank">Puzzle</a>
           <span class="status ready">✅</span>
+        </li>
+
+	  
+		          <li>
+          <a href="/bb/" target="_blank">Beat Blender</a>
+          <span class="status experimental">🧪</span>
         </li>
 
 	   <li>

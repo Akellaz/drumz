@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drumz piano</title>
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #0f1419;
+            --border: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+            --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+        }
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+        h2 { text-align: center; margin-bottom: 20px; font-weight: 700; }
+        
+        .viz-wrap {
+            width: 100%;
+            height: 200px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        canvas { width: 100%; height: 100%; display: block; }
+        
+        .controls { display: flex; flex-direction: column; gap: 16px; }
+        
+        .btn-play {
+            width: 64px; height: 64px; border-radius: 50%; border: none;
+            background: var(--accent-gradient); color: white; font-size: 28px;
+            cursor: pointer; margin: 0 auto; display: flex; align-items: center; justify-content: center;
+            transition: transform 0.15s;
+        }
+        .btn-play:hover { transform: scale(1.08); }
+        
+        .status { text-align: center; color: var(--text-secondary); font-size: 14px; margin-top: -10px; margin-bottom: 10px; }
+        
+        .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .row label { color: var(--text-secondary); font-size: 14px; min-width: 80px; }
+        
+        input[type="range"] {
+            flex: 1; height: 6px; border-radius: 3px; background: var(--border); outline: none;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+            background: var(--accent); cursor: pointer;
+        }
+        
+        .moods {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0;
+        }
+        .mood-btn {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            color: var(--text-secondary); padding: 12px 8px; border-radius: 8px;
+            cursor: pointer; text-align: center; font-size: 13px; transition: all 0.2s;
+        }
+        .mood-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+        .mood-btn.active {
+            background: rgba(56, 189, 248, 0.1); border-color: var(--accent); color: var(--accent); font-weight: 600;
+        }
+        
+        select {
+            flex: 1; padding: 8px 12px; background: var(--bg-secondary); color: var(--text-primary);
+            border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 14px;
+        }
+        
+        .export-box {
+            margin-top: 24px; padding: 16px; background: rgba(255,255,255,0.03);
+            border-radius: 12px; border: 1px solid var(--border); text-align: center;
+        }
+        .export-box h3 { margin: 0 0 12px 0; font-size: 16px; }
+        .export-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .btn-export {
+            padding: 8px 20px; background: var(--accent-gradient); color: #0f172a;
+            border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px;
+        }
+        .btn-export:disabled { opacity: 0.5; cursor: not-allowed; }
+        .export-prog { display: none; margin-top: 12px; font-size: 13px; color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Drumz piano</h2>
+
+    <div class="viz-wrap">
+        <canvas id="epViz"></canvas>
+    </div>
+
+    <div class="controls">
+        <button class="btn-play" id="epPlayBtn" title="Играть">▶</button>
+        <div id="epStatus" class="status">Нажмите «Играть», чтобы начать</div>
+
+        <div class="row">
+            <label>Громкость</label>
+            <input type="range" id="epVol" min="0" max="100" value="60">
+            <span id="epVolVal" style="min-width: 40px; text-align: right; font-size: 14px; color: var(--accent);">60%</span>
+良
+        </div>
+
+        <div style="text-align: center; margin: 10px 0; color: var(--text-secondary); font-size: 14px; font-weight: 600;">Настроение</div>
+        <div class="moods" id="epPresets">
+            <button class="mood-btn active" data-mood="calm">🌿 Спокойное</button>
+            <button class="mood-btn" data-mood="dreamy">☁️ Мечтательное</button>
+            <button class="mood-btn" data-mood="melancholic">🌙 Меланхоличное</button>
+            <button class="mood-btn" data-mood="nostalgic">🍂 Ностальгичное</button>
+            <button class="mood-btn" data-mood="zen">🎋 Дзен</button>
+            <button class="mood-btn" data-mood="flight">🕊️ Полёт</button>
+        </div>
+
+        <div class="row">
+            <label>Темп</label>
+            <select id="epTempo">
+                <option value="60">Медленный (60 BPM)</option>
+                <option value="80" selected>Средний (80 BPM)</option>
+                <option value="100">Быстрый (100 BPM)</option>
+            </select>
+        </div>
+
+        <div class="row">
+            <label>Октавы</label>
+            <input type="range" id="epOctaveRange" min="2" max="5" value="3">
+            <span id="epOctaveVal" style="min-width: 20px; text-align: right; font-size: 14px; color: var(--accent);">3</span>
+        </div>
+
+        <div class="export-box">
+            <h3>💾 Сохранить в файл</h3>
+            <div class="export-row">
+                <select id="epFmt" style="max-width: 100px;">
+                    <option value="mp3">MP3</option>
+                    <option value="wav">WAV</option>
+                    <option value="midi">MIDI</option>
+                </select>
+                <select id="epExpDur" style="max-width100px;">
+                    <option value="1">1 мин</option>
+                    <option value="3" selected>3 мин</option>
+                    <option value="5">5 мин</option>
+                </select>
+                <button id="epExportBtn" class="btn-export">Скачать</button>
+            </div>
+            <div id="epExportProg" class="export-prog">Сочиняем и рендерим... 0%</div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключаем скачанные локальные скрипты -->
+<script src="piano-synth.js"></script>
+<script src="audio-background.js"></script>
+<script src="endless-piano-engine.js"></script>
+<script src="id3-writer.js"></script>
+<script src="mp3-encoder.js"></script>
+<script src="endless-piano-export.js"></script>
+
+<script>
+(function() {
+    'use strict';
+    
+    // === КЛЮЧЕВЫЕ НАСТРОЙКИ ДЛЯ ЛОКАЛЬНОЙ РАБОТЫ ===
+    const SAMPLE_BASE = "./audio"; // Указываем на локальную папку
+    const IS_PREMIUM = true;       // Разблокируем экспорт
+    // ================================================
+
+    let synth = null;
+    let engine = null;
+    let playing = false;
+    let currentMood = 'calm';
+    let currentBpm = 80;
+    let currentOctaves = 3;
+    let savedVol = 60;
+
+    const $ = (id) => document.getElementById(id);
+
+    // Инициализация движка
+    function ensureEngine() {
+        if (engine) return true;
+        if (!window.TimbricaPianoSynth || !window.EndlessPianoEngine) {
+            alert('Ошибка: JS-файлы не загружены. Проверьте консоль (F12).');
+            return false;
+        }
+        
+        synth = window.TimbricaPianoSynth.create({ voice: 'grand', reverb: 'warm' });
+        synth.init();
+        
+        engine = window.EndlessPianoEngine.createEngine({
+            synth: synth,
+            sampleBase: SAMPLE_BASE,
+            sampleVersion: 1,
+            onEngineUpgrade: () => console.log('Сэмплы загружены'),
+            onSampleError: (failed) => console.warn('Не удалось загрузить сэмплы:', failed)
+        });
+        return true;
+    }
+
+    // Старт / Стоп
+    function togglePlay() {
+        if (!playing) {
+            if (!ensureEngine()) return;
+            if (synth.ctx.state !== 'running') synth.ctx.resume();
+            
+            engine.start(currentMood, currentBpm, currentOctaves);
+            synth.setVolume(savedVol / 100);
+            
+            playing = true;
+            $('epPlayBtn').innerHTML = '⏸';
+            $('epStatus').textContent = 'Играет...';
+            startViz();
+        } else {
+            engine.stop(false);
+            playing = false;
+            $('epPlayBtn').innerHTML = '▶';
+            $('epStatus').textContent = 'Пауза';
+            stopViz();
+        }
+    }
+
+    // Смена настроения
+    function setMood(mood) {
+        currentMood = mood;
+        document.querySelectorAll('.mood-btn').forEach(btn => {
+            const isActive = btn.dataset.mood === mood;
+            btn.classList.toggle('active', isActive);
+        });
+        if (playing && engine) {
+            engine.change(currentMood, currentBpm, currentOctaves);
+        }
+    }
+
+    // Визуализация (упрощенная)
+    let animId = null;
+    function startViz() {
+        const canvas = $('epViz');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        
+        function draw() {
+            if (!playing) return;
+            animId = requestAnimationFrame(draw);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const notes = engine.vizNotes;
+            const now = synth.ctx.currentTime;
+            const la = 3.5;
+            const mMin = 36, mMax = 84;
+            const nw = canvas.width / (mMax - mMin);
+            
+            ctx.fillStyle = '#38bdf8';
+            for (let i = 0; i < notes.length; i++) {
+                const n = notes[i];
+                if (n.midi < mMin || n.midi > mMax) continue;
+                const dur = n.end - n.start;
+                const yBot = canvas.height - ((n.start - now) / la) * canvas.height
+                const yTop = canvas.height - ((n.start + dur - now) / la) * canvas.height;
+                const nH = Math.max(3, yBot - yTop);
+                
+                if (yBot < -10 || yTop > canvas.height + 10) continue;
+                
+                const x = (n.midi - mMin) * nw;
+                const active = (now >= n.start && now <= n.end);
+                ctx.globalAlpha = active ? 0.9 : 0.3 + n.vel * 0.5;
+                ctx.fillRect(x + 1, Math.min(yTop, yBot), Math.max(nw - 2, 2), Math.abs(nH));
+            }
+            ctx.globalAlpha = 1;
+        }
+        draw();
+    }
+
+    function stopViz() {
+        if (animId) {
+            cancelAnimationFrame(animId);
+            animId = null;
+        }
+        const canvas = $('epViz');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Нажмите «Играть», чтобы начать', canvas.width / 2, canvas.height / 2);
+    }
+
+    // Экспорт (с обходом премиума)
+    function isPremiumNow() { return IS_PREMIUM; }
+
+    function runExport() {
+        const fmt = $('epFmt').value;
+        const mins = parseInt($('epExpDur').value, 10);
+        const btn = $('epExportBtn');
+        const prog = $('epExportProg');
+        
+        btn.disabled = true;
+        prog.style.display = 'block';
+        prog.textContent = 'Сочиняем... 0%';
+
+        window.EndlessPianoExport.run({
+            format: fmt,
+            minutes: mins,
+            kbps: 320,
+            mood: currentMood,
+            bpm: currentBpm,
+            octaves: currentOctaves,
+            reverb: 'warm',
+            sampleBase: SAMPLE_BASE,
+            sampleVersion: 1,
+            buffers: (engine && engine.sampler) ? engine.sampler.buffers : null,
+            id3: {
+                title: 'Endless Piano - ' + currentMood,
+                artist: 'Local Generator',
+                album: 'Endless Piano',
+                year: String(new Date().getFullYear()),
+                genre: 'Ambient'
+            },
+            onStage: (stage, pct) => {
+                const labels = { compose: 'Сочиняем', render: 'Рендерим', encode: 'Кодируем' };
+                const fill = stage === 'compose' ? 0.05 : (stage === 'render' ? 0.05 + pct * 0.67 : 0.72 + pct * 0.28);
+                prog.textContent = `${labels[stage] || 'Обработка'}... ${Math.round(fill * 100)}%`;
+            }
+        }).then(res => {
+            // Скачивание файла
+            const url = URL.createObjectURL(res.blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = res.filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            prog.textContent = 'Готово! Файл скачивается.';
+            setTimeout(() => { prog.style.display = 'none'; }, 3000);
+        }).catch(err => {
+            console.error(err);
+            prog.textContent = 'Ошибка экспорта. Проверьте консоль (F12).';
+            prog.style.color = '#f87171';
+        }).finally(() => {
+            btn.disabled = false;
+        });
+    }
+
+    // === Привязка событий ===
+    $('epPlayBtn').addEventListener('click', togglePlay);
+    
+    $('epVol').addEventListener('input', (e) => {
+        savedVol = parseInt(e.target.value, 10);
+        $('epVolVal').textContent = savedVol + '%';
+        if (synth) synth.setVolume(savedVol / 100);
+    });
+
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.addEventListener('click', () => setMood(btn.dataset.mood));
+    });
+
+    $('epTempo').addEventListener('change', (e) => {
+        currentBpm = parseInt(e.target.value, 10);
+        if (playing && engine) engine.change(currentMood, currentBpm, currentOctaves);
+    });
+
+    $('epOctaveRange').addEventListener('input', (e) => {
+        currentOctaves = parseInt(e.target.value, 10);
+        $('epOctaveVal').textContent = currentOctaves;
+        if (playing && engine) engine.change(currentMood, currentBpm, currentOctaves);
+    });
+
+    $('epExportBtn').addEventListener('click', () => {
+        if (isPremiumNow()) {
+            runExport();
+        } else {
+            alert('Функция экспорта разблокирована в этой локальной версии!');
+        }
+    });
+
+    // Начальная отрисовка холста
+    stopViz();
+})();
+</script>
+</body>
+</html>

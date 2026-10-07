@@ -1,4 +1,3 @@
-// assets/auth.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
   getAuth, 
@@ -15,6 +14,9 @@ import {
   serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// ═══════════════════════════════════════════════════════════════
+// 1. Инициализация Firebase
+// ═══════════════════════════════════════════════════════════════
 const firebaseConfig = {
   apiKey: "AIzaSyCb4mcornYDLKr36cfW8oGQtd_NE4Ktjd4",
   authDomain: "drumz-c9989.firebaseapp.com",
@@ -25,58 +27,97 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const provider = new GoogleAuthProvider();
 
-const authContainer = document.getElementById('authContainer');
-
+// ═══════════════════════════════════════════════════════════════
+// 2. Логика работы с Firestore
+// ═══════════════════════════════════════════════════════════════
 async function saveUserToFirestore(user) {
   const userDocRef = doc(db, "users", user.uid);
   const docSnap = await getDoc(userDocRef);
   
   if (!docSnap.exists()) {
-    const isAdmin = user.email === 's.schepotin@gmail.com';
     await setDoc(userDocRef, {
       name: user.displayName,
       email: user.email,
       photoURL: user.photoURL,
       provider: "google",
-      role: isAdmin ? 'admin' : 'user',
       createdAt: serverTimestamp(),
       lastLogin: serverTimestamp()
     });
   } else {
-    const data = docSnap.data();
-    const updateData = { lastLogin: serverTimestamp() };
-    
-    if (!data.role) {
-      const isAdmin = user.email === 's.schepotin@gmail.com';
-      updateData.role = isAdmin ? 'admin' : 'user';
-    }
-    
-    await setDoc(userDocRef, updateData, { merge: true });
+    await setDoc(userDocRef, { lastLogin: serverTimestamp() }, { merge: true });
   }
 }
 
+export async function logout() {
+  // 1. Сообщаем серверу, что нужно уничтожить PHP-сессию
+  try {
+      await fetch('/workspace/lessons/api.php?action=logout', { method: 'POST' });
+  } catch (e) {
+      console.warn('Не удалось очистить сессию на сервере', e);
+  }
+  
+  // 2. Очищаем локальный кэш
+  localStorage.removeItem('user_cache');
+  
+  // 3. Выходим из Firebase
+  await signOut(auth);
+  
+  // 4. Перенаправляем на главную
+  window.location.href = '/';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 3. UI: Мгновенный рендер из кэша
+// ═══════════════════════════════════════════════════════════════
+const authContainer = document.getElementById('authContainer');
+let isRenderedFromCache = false;
+
+function renderFromCache() {
+  const cached = localStorage.getItem('user_cache');
+  if (!cached) return false;
+  
+  try {
+    const userData = JSON.parse(cached);
+    if (!userData.photoURL) return false;
+    
+    authContainer.innerHTML = `
+      <a href="/workspace" class="user-avatar-link">
+        <img src="${userData.photoURL}" alt="Аватар" class="user-avatar">
+      </a>
+    `;
+    isRenderedFromCache = true;
+    return true;
+  } catch (e) {
+    console.error('Ошибка чтения кэша:', e);
+    return false;
+  }
+}
+
+renderFromCache();
+
+// ═══════════════════════════════════════════════════════════════
+// 4. UI: Обновление при изменении состояния авторизации
+// ═══════════════════════════════════════════════════════════════
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     await saveUserToFirestore(user);
-    
-    authContainer.innerHTML = `
-      <div class="user-profile">
-        <img src="${user.photoURL}" alt="Аватар" class="user-avatar">
-        <span class="user-name">${user.displayName}</span>
-        <button id="logoutBtn" class="btn-logout" title="Выйти">✕</button>
-      </div>
-    `;
-
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-      await signOut(auth);
-      window.location.reload();
-    });
-
+    localStorage.setItem('user_cache', JSON.stringify({
+      photoURL: user.photoURL,
+      displayName: user.displayName
+    }));
   } else {
+    localStorage.removeItem('user_cache');
+  }
+  
+  renderAvatar(user);
+});
+
+function renderAvatar(user) {
+  if (!user) {
     authContainer.innerHTML = `
       <button id="loginBtn" class="btn-login">
         <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
@@ -97,5 +138,41 @@ onAuthStateChanged(auth, async (user) => {
         alert("Не удалось войти. Проверьте настройки или попробуйте позже.");
       }
     });
+    return;
   }
-});
+  
+  if (isRenderedFromCache) {
+    const img = authContainer.querySelector('.user-avatar');
+    if (img && img.src !== user.photoURL) {
+      img.src = user.photoURL;
+    }
+    return;
+  }
+  
+  authContainer.innerHTML = `
+    <a href="/workspace" class="user-avatar-link">
+      <img src="${user.photoURL}" alt="Аватар" class="user-avatar">
+    </a>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 5. UI: Обработка кнопки "Выйти" в сайдбаре
+// ═══════════════════════════════════════════════════════════════
+const logoutBtn = document.getElementById('sidebarLogoutBtn');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', async () => {
+    await logout();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 6. Глобальный помощник для получения токена (для builder.php и workspace)
+// ═══════════════════════════════════════════════════════════════
+window.getFirebaseToken = async function() {
+    if (typeof auth !== 'undefined' && auth.currentUser) {
+        const token = await auth.currentUser.getIdToken();
+        return token;
+    }
+    return null;
+};

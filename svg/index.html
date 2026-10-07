@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Минимальный SVG Тест</title>
+    <style>
+        body { display: flex; height: 100vh; margin: 0; font-family: sans-serif; }
+        
+        #palette { 
+            width: 200px; padding: 20px; background: #f0f0f0; border-right: 1px solid #ccc; 
+        }
+        .btn { 
+            display: block; width: 100%; padding: 10px; margin-bottom: 10px; 
+            cursor: pointer; font-size: 14px; 
+        }
+        
+        #canvas-container { 
+            flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; 
+        }
+        
+        #mainCanvas { 
+            background: #ffff00 !important; /* Ярко-желтый */
+            border: 5px solid #ff0000 !important; /* Красная рамка */
+            width: 400px; height: 400px; display: block; 
+        }
+        
+        #code-output { 
+            width: 400px; height: 120px; margin-top: 20px; font-family: monospace; font-size: 12px; 
+        }
+    </style>
+</head>
+<body>
+
+    <div id="palette">
+        <button class="btn" onclick="addRect()">🟥 Добавить квадрат</button>
+        <button class="btn" onclick="addNote()">🎵 Добавить ноту</button>
+        <button class="btn" onclick="clearCanvas()" style="background: #ffcccc;">🗑 Очистить</button>
+    </div>
+
+    <div id="canvas-container">
+        <svg id="mainCanvas" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+            <g id="layer"></g>
+        </svg>
+        <textarea id="code-output" readonly></textarea>
+    </div>
+
+    <script>
+        const layer = document.getElementById('layer');
+        const output = document.getElementById('code-output');
+
+        function addRect() {
+            // insertAdjacentHTML корректно создает именно SVG-элементы внутри SVG
+            layer.insertAdjacentHTML('beforeend', '<rect x="175" y="175" width="50" height="50" fill="red" />');
+            updateCode();
+        }
+
+        function addNote() {
+            layer.insertAdjacentHTML('beforeend', '<ellipse cx="200" cy="200" rx="20" ry="14" transform="rotate(-25 200 200)" fill="black" />');
+            updateCode();
+        }
+
+        function clearCanvas() {
+            layer.innerHTML = '';
+            updateCode();
+        }
+
+        function updateCode() {
+            output.value = `<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">\n  ${layer.innerHTML}\n</svg>`;
+        }
+    </script>
+</body>
+</html>

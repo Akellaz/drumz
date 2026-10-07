@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чтение записи | Drum Engine</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="container">
+        <a href="index.html" class="back-link">← Назад к блогу</a>
+        
+        <article id="post-container">
+            <div class="loading">Загрузка записи...</div>
+        </article>
+    </main>
+
+    <script>
+        async function loadPost() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('id');
+
+            if (!postId) {
+                document.getElementById('post-container').innerHTML = '<div class="loading">Пост не найден.</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`api.php?action=get&id=${encodeURIComponent(postId)}`);
+                
+                if (!response.ok) {
+                    document.getElementById('post-container').innerHTML = '<div class="loading">Пост не найден.</div>';
+                    return;
+                }
+
+                const post = await response.json();
+                
+                if (post.error) {
+                    document.getElementById('post-container').innerHTML = '<div class="loading">Пост не найден.</div>';
+                    return;
+                }
+
+                document.title = `${post.title} | Drumz`; // Привёл к единообразию с заголовком сайта
+
+                let visualHTML = '';
+                if (post.visualType === 'abstract') {
+                    visualHTML = `
+                        <div class="post-visual-abstract">
+                            <div class="grid-overlay"></div>
+                            <div class="shape-1"></div>
+                            <div class="shape-2"></div>
+                            <div class="shape-3"></div>
+                        </div>
+                    `;
+                } else {
+                    visualHTML = `<div class="post-visual" style="background: ${post.gradient};"></div>`;
+                }
+
+                const container = document.getElementById('post-container');
+                container.innerHTML = `
+                    <header class="post-header">
+                        <time class="post-date">${new Date(post.date).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+                        <h1 class="post-title">${post.title}</h1>
+                    </header>
+                    ${visualHTML}
+                    <div class="post-content">
+                        ${post.content}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Ошибка загрузки поста:', error);
+                document.getElementById('post-container').innerHTML = '<div class="loading">Ошибка загрузки.</div>';
+            }
+        }
+        loadPost();
+    </script>
+    </script>
+</body>
+</html>
